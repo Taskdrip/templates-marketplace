@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useGetMe, User } from "@workspace/api-client-react";
 
 interface AuthContextType {
@@ -14,11 +14,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("cm_token"));
   const [localUser, setLocalUser] = useState<User | null>(null);
+  const isLoggingOut = useRef(false);
 
-  const { data: user, isLoading: isQueryLoading, isError } = useGetMe({
+  const { data: user, isLoading: isQueryLoading, isError, error } = useGetMe({
     query: {
-      enabled: !!token,
-      queryKey: ["/api/auth/me"],
+      enabled: !!token && !isLoggingOut.current,
+      retry: false,
+      staleTime: 5 * 60 * 1000,
     },
   });
 
@@ -29,27 +31,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   useEffect(() => {
-    if (isError) {
-      setToken(null);
-      setLocalUser(null);
-      localStorage.removeItem("cm_token");
+    if (isError && token) {
+      const apiError = error as any;
+      if (apiError?.status === 401) {
+        isLoggingOut.current = true;
+        setToken(null);
+        setLocalUser(null);
+        localStorage.removeItem("cm_token");
+        setTimeout(() => { isLoggingOut.current = false; }, 500);
+      }
     }
-  }, [isError]);
+  }, [isError, error, token]);
 
-  const login = (newToken: string, user: User) => {
+  const login = (newToken: string, userData: User) => {
     localStorage.setItem("cm_token", newToken);
     setToken(newToken);
-    setLocalUser(user);
+    setLocalUser(userData);
+    isLoggingOut.current = false;
   };
 
   const logout = () => {
+    isLoggingOut.current = true;
     localStorage.removeItem("cm_token");
     setToken(null);
     setLocalUser(null);
+    setTimeout(() => { isLoggingOut.current = false; }, 500);
   };
 
   const isAdmin = localUser?.role === "admin";
-  const isLoading = token ? isQueryLoading && !localUser : false;
+  const isLoading = !!token && !localUser && isQueryLoading;
 
   return (
     <AuthContext.Provider value={{ user: localUser, isAdmin, login, logout, isLoading }}>

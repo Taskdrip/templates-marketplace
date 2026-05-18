@@ -23,26 +23,24 @@ export default function Login() {
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     loginMutation.mutate({ data: values }, {
       onSuccess: (response) => {
         setAuthContext(response.token, response.user);
-        toast({
-          title: "Welcome back",
-          description: "You have successfully logged in.",
-        });
-        setLocation("/dashboard");
+        toast({ title: "Welcome back", description: "You have successfully logged in." });
+        if (response.user.role === "admin") {
+          setLocation("/admin");
+        } else {
+          setLocation("/dashboard");
+        }
       },
       onError: (error: any) => {
         toast({
           title: "Login failed",
-          description: error.message || "Invalid credentials. Please try again.",
+          description: error?.data?.error || error.message || "Invalid credentials. Please try again.",
           variant: "destructive",
         });
       }
@@ -70,7 +68,7 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your email" {...field} className="bg-background/50" />
+                      <Input placeholder="Enter your email" autoComplete="email" {...field} className="bg-background/50" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -83,12 +81,9 @@ export default function Login() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel>Password</FormLabel>
-                      <Link href="#" className="text-sm text-primary hover:underline">
-                        Forgot password?
-                      </Link>
                     </div>
                     <FormControl>
-                      <Input type="password" placeholder="Enter your password" {...field} className="bg-background/50" />
+                      <Input type="password" placeholder="Enter your password" autoComplete="current-password" {...field} className="bg-background/50" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
