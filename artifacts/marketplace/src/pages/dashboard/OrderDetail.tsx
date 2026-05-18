@@ -1,0 +1,263 @@
+import { useState } from "react";
+import { useRoute } from "wouter";
+import { useGetOrder, useGetWalletAddresses, useSubmitPayment } from "@workspace/api-client-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { Copy, CheckCircle2, AlertCircle, Clock, Check, Download, Package } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getGetOrderQueryKey } from "@workspace/api-client-react";
+
+export default function OrderDetail() {
+  const [, params] = useRoute("/dashboard/orders/:id");
+  const id = Number(params?.id);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const { data: order, isLoading: isOrderLoading } = useGetOrder(id, {
+    query: { enabled: !isNaN(id) }
+  });
+  
+  const { data: walletData } = useGetWalletAddresses({
+    query: { enabled: order?.status === 'pending' }
+  });
+  
+  const submitPayment = useSubmitPayment();
+  
+  const [selectedChain, setSelectedChain] = useState<string>("USDT_TRC20");
+  const [txHash, setTxHash] = useState("");
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(text);
+    setTimeout(() => setCopied(null), 2000);
+    toast({ description: "Address copied to clipboard" });
+  };
+
+  const handlePaymentSubmit = () => {
+    if (!txHash) {
+      toast({ title: "Error", description: "Transaction hash is required", variant: "destructive" });
+      return;
+    }
+    
+    if (!order) return;
+
+    submitPayment.mutate({
+      data: {
+        orderId: order.id,
+        chain: selectedChain,
+        txHash,
+        amount: order.amount,
+      }
+    }, {
+      onSuccess: () => {
+        toast({ title: "Payment Submitted", description: "Your payment is now awaiting confirmation." });
+        queryClient.invalidateQueries({ queryKey: getGetOrderQueryKey(id) });
+      },
+      onError: (err: any) => {
+        toast({ title: "Submission Failed", description: err.message || "Failed to submit payment", variant: "destructive" });
+      }
+    });
+  };
+
+  if (isOrderLoading) return <div>Loading...</div>;
+  if (!order) return <div>Order not found</div>;
+
+  const steps = [
+    { id: 'pending', label: 'Payment Required', icon: AlertCircle },
+    { id: 'awaiting_confirmation', label: 'Confirming', icon: Clock },
+    { id: 'confirmed', label: 'Payment Confirmed', icon: CheckCircle2 },
+    { id: 'delivered', label: 'Delivered', icon: Package },
+  ];
+
+  const currentStepIndex = steps.findIndex(s => s.id === order.status) !== -1 
+    ? steps.findIndex(s => s.id === order.status) 
+    : order.status === 'rejected' ? -1 : 0;
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Order #{order.id}</h1>
+        <p className="text-muted-foreground mt-1">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
+      </div>
+
+      {/* Progress Tracker */}
+      <Card className="bg-card/50 border-border/50">
+        <CardContent className="pt-6">
+          <div className="relative flex justify-between items-center">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-muted -z-10"></div>
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary -z-10 transition-all duration-500" 
+                 style={{ width: `${currentStepIndex >= 0 ? (currentStepIndex / (steps.length - 1)) * 100 : 0}%` }}></div>
+            
+            {steps.map((step, index) => {
+              const isCompleted = currentStepIndex >= index;
+              const isCurrent = currentStepIndex === index;
+              const Icon = step.icon;
+              
+              return (
+                <div key={step.id} className="flex flex-col items-center gap-2 bg-card p-2">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+                    order.status === 'rejected' ? 'bg-destructive border-destructive text-destructive-foreground' :
+                    isCompleted ? 'bg-primary border-primary text-primary-foreground' : 
+                    isCurrent ? 'bg-background border-primary text-primary' : 
+                    'bg-background border-muted text-muted-foreground'
+                  }`}>
+                    {order.status === 'rejected' && isCurrent ? <AlertCircle className="w-5 h-5" /> : 
+                     isCompleted && !isCurrent ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                  </div>
+                  <span className={`text-xs font-medium ${isCompleted || isCurrent ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {order.status === 'rejected' && isCurrent ? 'Rejected' : step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          
+          {order.adminNotes && (
+            <div className="mt-6 p-4 bg-secondary/50 rounded-lg border border-border/50 text-sm">
+              <span className="font-semibold">Note: </span> {order.adminNotes}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Order Items */}
+          <Card className="bg-card/50 border-border/50">
+            <CardHeader>
+              <CardTitle>Order Items</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4 py-4">
+                <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                  {order.productImage ? (
+                    <img src={order.productImage} alt={order.productName || ""} className="w-full h-full object-cover" />
+                  ) : (
+                    <Package className="w-8 h-8 text-muted-foreground/30" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{order.productName}</h3>
+                  <p className="text-sm text-muted-foreground">Digital Download</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-lg">${order.amount.toFixed(2)}</p>
+                </div>
+              </div>
+              <Separator className="my-4" />
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span className="text-primary">${order.amount.toFixed(2)} USDT</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Download Section (if delivered) */}
+          {order.status === 'delivered' && (
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="flex items-center justify-between p-6">
+                <div>
+                  <h3 className="font-semibold text-lg text-primary">Ready to Download</h3>
+                  <p className="text-sm text-muted-foreground">Your digital asset is available.</p>
+                </div>
+                <Button className="gap-2">
+                  <Download className="w-4 h-4" /> Download Files
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        <div>
+          {/* Payment Section */}
+          {order.status === 'pending' ? (
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle>Complete Payment</CardTitle>
+                <CardDescription>Send exactly {order.amount} USDT to one of our addresses</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Tabs value={selectedChain} onValueChange={setSelectedChain}>
+                  <TabsList className="grid grid-cols-3 mb-4">
+                    <TabsTrigger value="USDT_TRC20">TRC20</TabsTrigger>
+                    <TabsTrigger value="USDT_BEP20">BEP20</TabsTrigger>
+                    <TabsTrigger value="USDT_TON">TON</TabsTrigger>
+                  </TabsList>
+                  
+                  {walletData?.wallets.map(wallet => (
+                    <TabsContent key={wallet.chain} value={wallet.chain} className="space-y-4">
+                      <div className="p-4 bg-black/40 rounded-xl border border-border/50 text-center">
+                        <div className="w-32 h-32 bg-white mx-auto mb-4 rounded-lg p-2 flex items-center justify-center">
+                          {/* Fake QR */}
+                          <div className="w-full h-full bg-[url('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=fakeqr')] bg-cover opacity-80"></div>
+                        </div>
+                        <Label className="text-muted-foreground mb-1 block">Send to address</Label>
+                        <div className="flex items-center gap-2 bg-background p-2 rounded border border-border/50">
+                          <code className="text-xs truncate flex-1 text-primary">{wallet.address}</code>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => handleCopy(wallet.address)}>
+                            {copied === wallet.address ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  ))}
+                </Tabs>
+
+                <Separator />
+                
+                <div className="space-y-3">
+                  <Label>Transaction Hash (TXID)</Label>
+                  <Input 
+                    placeholder="Enter the transaction hash after sending" 
+                    value={txHash}
+                    onChange={(e) => setTxHash(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">This helps us verify your payment quickly.</p>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full" 
+                  onClick={handlePaymentSubmit}
+                  disabled={submitPayment.isPending || !txHash}
+                >
+                  {submitPayment.isPending ? "Submitting..." : "I have made the payment"}
+                </Button>
+              </CardFooter>
+            </Card>
+          ) : (
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle>Payment Status</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge variant="outline" className="capitalize">{order.status.replace('_', ' ')}</Badge>
+                </div>
+                {order.payment && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Network</span>
+                      <span>{order.payment.chain.replace('USDT_', '')}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">TX Hash</span>
+                      <span className="truncate w-32 text-right">{order.payment.txHash}</span>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

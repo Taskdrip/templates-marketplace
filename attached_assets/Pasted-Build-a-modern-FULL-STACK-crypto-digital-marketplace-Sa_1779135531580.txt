@@ -1,0 +1,263 @@
+Build a modern FULL-STACK crypto digital marketplace SaaS web app similar to CodeCanyon, ThemeForest, Gumroad, and Sellix combined.
+
+The platform sells:
+- Crypto trading bots
+- Arbitrage bots
+- Telegram bots
+- Crypto scripts
+- Blockchain templates
+- SaaS starter kits
+- AI apps
+- Mobile apps
+- Websites
+- Landing pages
+- Cheat codes
+- Trading indicators
+- UI kits
+- Social media accounts/pages
+- Automation tools
+- Software source codes
+- Web3 templates
+- Discord bots
+- Casino scripts
+- Crypto exchange clones
+- NFT marketplace scripts
+- DeFi scripts
+- and downloadable digital products.
+
+TECH STACK:
+- React + Vite + TypeScript
+- Tailwind CSS
+- Node.js + Express
+- PostgreSQL
+- Prisma ORM
+- Socket.IO for real-time chat
+- JWT Authentication
+- PWA Support
+- Railway deployment ready
+- GitHub ready
+- Clean scalable architecture
+- Mobile responsive UI
+- Modern animations using Framer Motion
+
+DESIGN STYLE:
+- Professional like CodeCanyon + Stripe + Coinbase
+- White background
+- Black premium UI
+- Gradient blue accents
+- Clean crypto illustrations
+- Modern hero section
+- Premium glassmorphism cards
+- Smooth animations
+- Responsive design
+- Crypto themed visuals
+- Beautiful signup/login screens
+- Modern dashboard UI
+- Elegant typography
+- Dark transparent overlays
+- Advanced search bar
+- Category sliders
+- Trending products carousel
+- Featured products section
+- Modern product cards with ratings and preview images
+
+CREATE THESE PAGES:
+
+PUBLIC PAGES:
+- Landing page
+- Marketplace page
+- Product details page
+- Categories page
+- Pricing page
+- About page
+- Contact page
+- FAQ page
+- Login page
+- Register page
+
+USER DASHBOARD:
+- User profile
+- Purchase history
+- Download center
+- Order tracking
+- Transaction tracking
+- Support tickets
+- Real-time chat with admin
+- Wallet/payment history
+- Notification center
+- Favorites/Wishlist
+
+ADMIN DASHBOARD:
+- Secure admin login
+- Admin analytics dashboard
+- Product upload manager
+- Product category manager
+- Order management
+- User management
+- Payment verification dashboard
+- Wallet address manager
+- Chat support dashboard
+- Push notification manager
+- Revenue analytics
+- Product approval system
+
+CHECKOUT SYSTEM:
+Create a Stripe-inspired crypto checkout experience.
+
+Allow payments with:
+- USDT TRC20 (Tron)
+- USDT TON
+- USDT BEP20 (BNB Smart Chain)
+
+IMPORTANT PAYMENT FEATURES:
+- Admin can manually add/edit wallet addresses from backend dashboard
+- Each chain should have separate wallet input fields
+- Display QR code automatically for each wallet
+- User can copy wallet address easily
+- User uploads payment screenshot/receipt
+- User inputs transaction hash manually
+- User selects blockchain used
+- User receives custom success message after payment submission
+- Admin can approve or reject payment manually
+- Order status updates automatically:
+  - Pending
+  - Awaiting Confirmation
+  - Confirmed
+  - Delivered
+  - Rejected
+
+ORDER TRACKING:
+Create beautiful order tracking UI:
+- Progress bar
+- Payment verification status
+- Download availability
+- Delivery status
+- Admin notes
+- Time stamps
+- Push notifications
+
+REAL-TIME CHAT:
+Build in-app live chat between user and admin using Socket.IO:
+- Real-time messaging
+- Typing indicator
+- File/image upload
+- Online/offline status
+- Mobile responsive chat
+- Notification badge
+- Admin support panel
+
+AUTHENTICATION:
+- JWT authentication
+- Secure password hashing
+- Email verification
+- Forgot password
+- Role-based access
+- User/Admin roles
+- Session persistence
+
+PRODUCT FEATURES:
+Each product should support:
+- Multiple preview images
+- Demo links
+- Product tags
+- Categories
+- Ratings/reviews
+- Downloads
+- Version updates
+- File uploads
+- Changelog
+- Documentation
+- Video previews
+
+MARKETPLACE FEATURES:
+- Search functionality
+- Filters
+- Sorting
+- Trending section
+- New arrivals
+- Best sellers
+- Recommended products
+- Related products
+- Featured creators
+
+PWA FEATURES:
+- Installable app
+- Offline support
+- Push notifications
+- Mobile optimized
+- Fast loading
+
+DATABASE MODELS:
+Create database models for:
+- Users
+- Admins
+- Products
+- Orders
+- Payments
+- Wallets
+- Categories
+- Messages
+- Notifications
+- Reviews
+- Downloads
+- Transactions
+- Support tickets
+
+SECURITY:
+- Input validation
+- Rate limiting
+- Helmet security
+- Secure file uploads
+- JWT middleware
+- Protected routes
+- Admin authorization
+- Anti-spam protection
+
+CREATE:
+- Beautiful homepage hero slider
+- Animated crypto backgrounds
+- Crypto-themed illustrations
+- Dashboard charts
+- Statistics widgets
+- Animated counters
+- Testimonial section
+- FAQ accordion
+- Sticky navbar
+- Modern footer
+- Elegant loading screens
+- Skeleton loaders
+- Toast notifications
+
+USE:
+- Framer Motion animations
+- Lucide React icons
+- Recharts
+- Tailwind gradients
+- Modern shadows
+- Rounded premium cards
+- Responsive grids
+
+DEPLOYMENT:
+- Railway deployment ready
+- GitHub ready
+- Docker ready
+- Environment variables configured
+- Production-ready structure
+
+OUTPUT:
+- Full frontend code
+- Full backend code
+- Prisma schema
+- API routes
+- Authentication middleware
+- Admin dashboard
+- User dashboard
+- Payment flow
+- Chat system
+- Clean folder structure
+- README setup instructions
+- Seed data
+- Dummy crypto products
+- Fully responsive UI
+
+Make the platform look like a premium billion-dollar crypto marketplace startup.
