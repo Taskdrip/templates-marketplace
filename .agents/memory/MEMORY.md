@@ -1,0 +1,1 @@
+- [DigiMarket project overview](digimarket-overview.md) — Web3 digital marketplace with escrow, USDT payments, phone/telegram auth, buyer+seller roles.

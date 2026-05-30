@@ -13,6 +13,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import Home from "@/pages/public/Home";
 import Login from "@/pages/public/Login";
 import Register from "@/pages/public/Register";
+import SellerRegister from "@/pages/public/SellerRegister";
 import Marketplace from "@/pages/public/Marketplace";
 import ProductDetail from "@/pages/public/ProductDetail";
 import Categories from "@/pages/public/Categories";
@@ -87,6 +88,9 @@ function Router() {
       </Route>
       <Route path="/register">
         <PublicLayout><Register /></PublicLayout>
+      </Route>
+      <Route path="/seller-register">
+        <PublicLayout><SellerRegister /></PublicLayout>
       </Route>
       
       {/* Fallback */}

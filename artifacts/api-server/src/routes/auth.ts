@@ -1,14 +1,14 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { signToken } from "../lib/jwt";
 import { requireAuth } from "../middlewares/auth";
 
 const router = Router();
 
 router.post("/auth/register", async (req, res): Promise<void> => {
-  const { username, email, password } = req.body;
+  const { username, email, password, displayName, phone, telegramHandle, isSeller, sellerBio } = req.body;
   if (!username || !email || !password) {
     res.status(400).json({ error: "Missing required fields" });
     return;
@@ -21,7 +21,16 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const [user] = await db.insert(usersTable).values({ username, email, passwordHash }).returning();
+  const [user] = await db.insert(usersTable).values({
+    username,
+    email,
+    passwordHash,
+    displayName: displayName || username,
+    phone: phone || null,
+    telegramHandle: telegramHandle || null,
+    isSeller: isSeller === true,
+    sellerBio: sellerBio || null,
+  }).returning();
 
   const token = signToken({ userId: user.id, role: user.role });
   res.status(201).json({
@@ -32,6 +41,10 @@ router.post("/auth/register", async (req, res): Promise<void> => {
       email: user.email,
       role: user.role,
       avatarUrl: user.avatarUrl,
+      displayName: user.displayName,
+      phone: user.phone,
+      telegramHandle: user.telegramHandle,
+      isSeller: user.isSeller,
       isActive: user.isActive,
       createdAt: user.createdAt.toISOString(),
       totalPurchases: 0,
@@ -40,13 +53,26 @@ router.post("/auth/register", async (req, res): Promise<void> => {
 });
 
 router.post("/auth/login", async (req, res): Promise<void> => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    res.status(400).json({ error: "Missing required fields" });
+  const { email, phone, telegram, password } = req.body;
+
+  if (!password) {
+    res.status(400).json({ error: "Password is required" });
     return;
   }
 
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
+  let user;
+  if (email) {
+    [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
+  } else if (phone) {
+    [user] = await db.select().from(usersTable).where(eq(usersTable.phone, phone));
+  } else if (telegram) {
+    const handle = telegram.startsWith("@") ? telegram.slice(1) : telegram;
+    [user] = await db.select().from(usersTable).where(eq(usersTable.telegramHandle, handle));
+  } else {
+    res.status(400).json({ error: "Provide email, phone, or Telegram handle" });
+    return;
+  }
+
   if (!user) {
     res.status(401).json({ error: "Invalid credentials" });
     return;
@@ -64,7 +90,6 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   }
 
   const token = signToken({ userId: user.id, role: user.role });
-
   res.json({
     token,
     user: {
@@ -73,6 +98,10 @@ router.post("/auth/login", async (req, res): Promise<void> => {
       email: user.email,
       role: user.role,
       avatarUrl: user.avatarUrl,
+      displayName: user.displayName,
+      phone: user.phone,
+      telegramHandle: user.telegramHandle,
+      isSeller: user.isSeller,
       isActive: user.isActive,
       createdAt: user.createdAt.toISOString(),
       totalPurchases: 0,
@@ -93,6 +122,10 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
     email: user.email,
     role: user.role,
     avatarUrl: user.avatarUrl,
+    displayName: user.displayName,
+    phone: user.phone,
+    telegramHandle: user.telegramHandle,
+    isSeller: user.isSeller,
     isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
     totalPurchases: 0,
