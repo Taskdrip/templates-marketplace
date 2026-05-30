@@ -41,6 +41,8 @@ packages:
   - scripts
 
 catalog:
+  '@types/bcrypt': ^6.0.0
+  bcrypt: ^6.0.0
   '@replit/vite-plugin-cartographer': ^0.5.1
   '@replit/vite-plugin-dev-banner': ^0.1.1
   '@replit/vite-plugin-runtime-error-modal': ^0.0.6
@@ -70,6 +72,7 @@ autoInstallPeers: false
 
 onlyBuiltDependencies:
   - '@swc/core'
+  - bcrypt
   - esbuild
   - msw
   - unrs-resolver
