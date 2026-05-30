@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRoute, useLocation } from "wouter";
-import { useGetOrder, useGetWalletAddresses, useSubmitPayment, useGetMessages, useSendMessage, useStartConversation } from "@workspace/api-client-react";
+import { useGetOrder, useGetWalletAddresses, useGetMessages } from "@workspace/api-client-react";
+import { useSubmitPayment, useSendMessage, useStartConversation } from "@/hooks/useMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

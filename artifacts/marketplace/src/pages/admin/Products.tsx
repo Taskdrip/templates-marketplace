@@ -1,12 +1,10 @@
 import { useState } from "react";
 import {
   useListProducts,
-  useCreateProduct,
-  useUpdateProduct,
-  useDeleteProduct,
   useListCategories,
   Product,
 } from "@workspace/api-client-react";
+import { useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useMutations";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

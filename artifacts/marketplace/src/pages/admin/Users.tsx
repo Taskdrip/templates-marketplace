@@ -1,4 +1,5 @@
-import { useListAdminUsers, useUpdateAdminUser } from "@workspace/api-client-react";
+import { useListAdminUsers } from "@workspace/api-client-react";
+import { useUpdateAdminUser } from "@/hooks/useMutations";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

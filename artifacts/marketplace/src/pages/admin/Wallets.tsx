@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useUpdateWallet, useCreateWallet } from "@workspace/api-client-react";
+import { useUpdateWallet, useCreateWallet } from "@/hooks/useMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

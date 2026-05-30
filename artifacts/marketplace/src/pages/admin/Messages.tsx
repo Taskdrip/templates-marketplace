@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useListConversations, useGetMessages, useSendMessage } from "@workspace/api-client-react";
+import { useListConversations, useGetMessages } from "@workspace/api-client-react";
+import { useSendMessage } from "@/hooks/useMutations";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ export default function AdminMessages() {
 
   useEffect(() => {
     // Setup socket connection
-    const newSocket = io({ path: '/ws' });
+    const newSocket = io({ path: '/ws/socket.io' });
     setSocket(newSocket);
 
     newSocket.on('message', () => {

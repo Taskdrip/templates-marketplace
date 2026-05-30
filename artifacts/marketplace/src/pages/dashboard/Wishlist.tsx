@@ -1,4 +1,5 @@
-import { useListFavorites, useRemoveFavorite } from "@workspace/api-client-react";
+import { useListFavorites } from "@workspace/api-client-react";
+import { useRemoveFavorite } from "@/hooks/useMutations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";

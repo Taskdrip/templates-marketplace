@@ -1,3 +1,4 @@
-- [DigiMarket project overview](digimarket-overview.md) — Web3 digital marketplace with escrow, USDT payments, phone/telegram auth, buyer+seller roles.
-- [DigiMarket custom hooks](digimarket-hooks.md) — useSettings/useUpdateSettings in artifacts/marketplace/src/hooks/useSettings.ts (not in generated API client).
+- [Vaultrade project overview](vaultrade-overview.md) — Crypto digital marketplace (Vaultrade.store) rebranded from DigiMarket; USDT TRC20/TON/BEP20 payments.
+- [Vaultrade custom hooks](digimarket-hooks.md) — useSettings/useUpdateSettings in artifacts/marketplace/src/hooks/useSettings.ts; useMutations.ts has standalone mutation hooks (parallel to generated API).
+- [Vaultrade API client exports](vaultrade-api-exports.md) — ALL mutation hooks exist in generated api.ts (useUpdateOrderStatus, useSubmitPayment, useSendMessage, useCreateOrder etc.); customFetch also exported; only useGetSettings was never generated.
 - [DigiMarket non-spec routes](digimarket-admin-routes.md) — Settings, Blog, PushNotif routes exist in API but not in OpenAPI spec; frontend uses raw fetch with cm_token.

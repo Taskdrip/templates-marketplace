@@ -1,4 +1,5 @@
-import { useListNotifications, useMarkAllNotificationsRead, useMarkNotificationRead } from "@workspace/api-client-react";
+import { useListNotifications } from "@workspace/api-client-react";
+import { useMarkAllNotificationsRead, useMarkNotificationRead } from "@/hooks/useMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bell, Check, ExternalLink, Package, ShoppingBag, Wallet } from "lucide-react";

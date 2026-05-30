@@ -1,4 +1,5 @@
-import { useListTickets, useUpdateTicket } from "@workspace/api-client-react";
+import { useListTickets } from "@workspace/api-client-react";
+import { useUpdateTicket } from "@/hooks/useMutations";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

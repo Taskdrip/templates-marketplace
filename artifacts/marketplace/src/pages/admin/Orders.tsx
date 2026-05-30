@@ -1,4 +1,5 @@
-import { useListAdminOrders, useUpdateOrderStatus } from "@workspace/api-client-react";
+import { useListAdminOrders } from "@workspace/api-client-react";
+import { useUpdateOrderStatus } from "@/hooks/useMutations";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
