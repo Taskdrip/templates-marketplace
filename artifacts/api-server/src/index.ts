@@ -3,17 +3,15 @@ import { Server as SocketIOServer } from "socket.io";
 import app from "./app";
 import { logger } from "./lib/logger";
 import { verifyToken } from "./lib/jwt";
+import { setIO } from "./socketInstance";
 
 const rawPort = process.env["PORT"];
 
 if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
+  throw new Error("PORT environment variable is required but was not provided.");
 }
 
 const port = Number(rawPort);
-
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
@@ -22,18 +20,15 @@ const httpServer = createServer(app);
 
 const io = new SocketIOServer(httpServer, {
   path: "/ws/socket.io",
-  cors: {
-    origin: true,
-    credentials: true,
-  },
+  cors: { origin: true, credentials: true },
 });
+
+// Make IO accessible from routes
+setIO(io);
 
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token as string | undefined;
-  if (!token) {
-    next(new Error("No token provided"));
-    return;
-  }
+  if (!token) { next(new Error("No token provided")); return; }
   try {
     const payload = verifyToken(token);
     (socket as any).userId = payload.userId;
@@ -50,10 +45,7 @@ io.on("connection", (socket) => {
 
   logger.info({ userId }, "Socket connected");
   socket.join(`user:${userId}`);
-
-  if (userRole === "admin") {
-    socket.join("admin");
-  }
+  if (userRole === "admin") socket.join("admin");
 
   socket.on("join_conversation", (conversationId: number) => {
     socket.join(`conversation:${conversationId}`);
@@ -90,10 +82,6 @@ io.on("connection", (socket) => {
 export { io };
 
 httpServer.listen(port, (err?: Error) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
-  }
-
+  if (err) { logger.error({ err }, "Error listening on port"); process.exit(1); }
   logger.info({ port }, "Server listening");
 });

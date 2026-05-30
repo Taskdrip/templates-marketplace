@@ -1,17 +1,18 @@
+import { useState } from "react";
 import { useRoute } from "wouter";
 import { useGetProduct, useListRelatedProducts, useCreateOrder } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { ShoppingCart, Check, ShieldCheck, Cpu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import CryptoCheckoutModal from "@/components/checkout/CryptoCheckoutModal";
+import PaymentThankYouModal from "@/components/checkout/PaymentThankYouModal";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/marketplace/:id");
-  const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -27,28 +28,30 @@ export default function ProductDetail() {
   
   const createOrder = useCreateOrder();
 
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [thankYouOpen, setThankYouOpen] = useState(false);
+  const [activeOrderId, setActiveOrderId] = useState<number | null>(null);
+
   const handlePurchase = () => {
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to purchase this product.",
-      });
-      setLocation("/login");
+      toast({ title: "Authentication required", description: "Please log in to purchase this product." });
       return;
     }
-
     createOrder.mutate({ data: { productId: id } }, {
       onSuccess: (order) => {
-        setLocation(`/dashboard/orders/${order.id}`);
+        setActiveOrderId(order.id);
+        setCheckoutOpen(true);
       },
       onError: () => {
-        toast({
-          title: "Error",
-          description: "Could not create order. Please try again.",
-          variant: "destructive"
-        });
+        toast({ title: "Error", description: "Could not create order. Please try again.", variant: "destructive" });
       }
     });
+  };
+
+  const handlePaymentSuccess = (orderId: number) => {
+    setCheckoutOpen(false);
+    setActiveOrderId(orderId);
+    setThankYouOpen(true);
   };
 
   if (isLoading) {
@@ -86,7 +89,6 @@ export default function ProductDetail() {
             )}
           </div>
           
-          {/* Thumbnails if multiple images exist */}
           {product.previewImages && product.previewImages.length > 1 && (
             <div className="flex gap-4 overflow-x-auto pb-2">
               {product.previewImages.map((img, i) => (
@@ -103,30 +105,21 @@ export default function ProductDetail() {
                 {product.categoryName}
               </Badge>
               {product.isFeatured && (
-                <Badge className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border-none">
-                  Featured
-                </Badge>
+                <Badge className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border-none">Featured</Badge>
               )}
             </div>
-            
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{product.name}</h1>
-            
             <div className="prose prose-invert max-w-none">
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
+              <p className="text-lg text-muted-foreground leading-relaxed">{product.description}</p>
             </div>
           </div>
           
-          {/* Tags */}
           {product.tags && product.tags.length > 0 && (
             <div>
               <h3 className="text-sm font-medium mb-3 text-muted-foreground">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {product.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="bg-secondary/50">
-                    {tag}
-                  </Badge>
+                  <Badge key={tag} variant="secondary" className="bg-secondary/50">{tag}</Badge>
                 ))}
               </div>
             </div>
@@ -139,39 +132,47 @@ export default function ProductDetail() {
             <CardContent className="p-6">
               <div className="flex items-end gap-2 mb-6">
                 <span className="text-4xl font-bold text-foreground">${product.price.toFixed(2)}</span>
+                {product.originalPrice && (
+                  <span className="text-xl text-muted-foreground line-through mb-1">${product.originalPrice.toFixed(2)}</span>
+                )}
                 <span className="text-muted-foreground mb-1">USDT</span>
               </div>
               
               <Button 
                 size="lg" 
-                className="w-full h-14 text-lg bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(var(--primary),0.3)] mb-4"
+                className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-[0_0_20px_rgba(139,92,246,0.4)] mb-4 gap-2"
                 onClick={handlePurchase}
                 disabled={createOrder.isPending}
               >
-                {createOrder.isPending ? "Processing..." : (
-                  <>
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Buy Now
-                  </>
+                {createOrder.isPending ? (
+                  <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing...</>
+                ) : (
+                  <><ShoppingCart className="w-5 h-5" /> Buy with Crypto</>
                 )}
               </Button>
               
-              <div className="space-y-4 pt-4 border-t border-border/50 text-sm">
+              <div className="space-y-3 pt-4 border-t border-border/50 text-sm">
                 <div className="flex items-center text-muted-foreground">
-                  <Check className="w-4 h-4 mr-3 text-emerald-500" />
-                  Instant download after payment
+                  <Check className="w-4 h-4 mr-3 text-emerald-500" /> Instant download after payment
                 </div>
                 <div className="flex items-center text-muted-foreground">
-                  <Check className="w-4 h-4 mr-3 text-emerald-500" />
-                  Future updates included
+                  <Check className="w-4 h-4 mr-3 text-emerald-500" /> Future updates included
                 </div>
                 <div className="flex items-center text-muted-foreground">
-                  <Check className="w-4 h-4 mr-3 text-emerald-500" />
-                  Quality verified
+                  <Check className="w-4 h-4 mr-3 text-emerald-500" /> Quality verified
                 </div>
                 <div className="flex items-center text-muted-foreground">
-                  <ShieldCheck className="w-4 h-4 mr-3 text-emerald-500" />
-                  Secure smart contract payment
+                  <ShieldCheck className="w-4 h-4 mr-3 text-emerald-500" /> Escrow-protected payment
+                </div>
+              </div>
+
+              {/* Payment methods */}
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <p className="text-xs text-muted-foreground mb-2 text-center">Accepted payment networks</p>
+                <div className="flex justify-center gap-2">
+                  {["🔴 TRC20", "💎 TON", "🟡 BEP20"].map(n => (
+                    <span key={n} className="text-xs bg-muted/40 px-2 py-1 rounded-md border border-border/30 text-muted-foreground">{n}</span>
+                  ))}
                 </div>
               </div>
             </CardContent>
@@ -193,6 +194,25 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Checkout Modal */}
+      {activeOrderId && (
+        <>
+          <CryptoCheckoutModal
+            open={checkoutOpen}
+            onClose={() => setCheckoutOpen(false)}
+            onSuccess={handlePaymentSuccess}
+            orderId={activeOrderId}
+            amount={product.price}
+            productName={product.name}
+          />
+          <PaymentThankYouModal
+            open={thankYouOpen}
+            onClose={() => setThankYouOpen(false)}
+            orderId={activeOrderId}
+          />
+        </>
+      )}
     </div>
   );
 }

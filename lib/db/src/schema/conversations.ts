@@ -5,6 +5,8 @@ import { z } from "zod/v4";
 export const conversationsTable = pgTable("conversations", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
+  sellerId: integer("seller_id"),
+  orderId: integer("order_id"),
   subject: text("subject"),
   lastMessage: text("last_message"),
   lastMessageAt: timestamp("last_message_at", { withTimezone: true }),

@@ -1,83 +1,76 @@
 import { useState, useEffect } from "react";
-import { useGetWalletAddresses, useUpdateWallet, useCreateWallet } from "@workspace/api-client-react";
+import { useUpdateWallet, useCreateWallet } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
-import { getGetWalletAddressesQueryKey } from "@workspace/api-client-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, AlertCircle, Copy } from "lucide-react";
 
+const API_BASE = "/api";
+function getToken() { return localStorage.getItem("cm_token"); }
+
+async function fetchAdminWallets() {
+  const res = await fetch(`${API_BASE}/wallets`, {
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
+  return res.json() as Promise<Array<{
+    id: number; chain: string; address: string; label: string | null; customMessage: string | null; isActive: boolean;
+  }>>;
+}
+
 const CHAINS = [
-  {
-    id: "USDT_TRC20",
-    label: "USDT — TRON (TRC20)",
-    network: "Tron Network",
-    color: "text-red-400",
-    bg: "bg-red-500/10",
-    placeholder: "TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  },
-  {
-    id: "USDT_BEP20",
-    label: "USDT — BNB Smart Chain (BEP20)",
-    network: "BNB Chain",
-    color: "text-yellow-400",
-    bg: "bg-yellow-500/10",
-    placeholder: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  },
-  {
-    id: "USDT_TON",
-    label: "USDT — TON Network",
-    network: "The Open Network",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-    placeholder: "EQxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  },
+  { id: "USDT_TRC20", label: "USDT — TRON (TRC20)",          network: "Tron Network",       color: "text-red-400",    bg: "bg-red-500/10",    border: "border-red-500/20",    placeholder: "TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
+  { id: "USDT_BEP20", label: "USDT — BNB Smart Chain (BEP20)", network: "BNB Chain",        color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20", placeholder: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
+  { id: "USDT_TON",   label: "USDT — TON Network",            network: "The Open Network",   color: "text-blue-400",   bg: "bg-blue-500/10",   border: "border-blue-500/20",   placeholder: "EQxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
 ];
 
+type WalletState = { id: number; address: string; originalAddress: string; customMessage: string; originalMessage: string };
+
 export default function AdminWallets() {
-  const { data: walletData, isLoading } = useGetWalletAddresses();
+  const { data: wallets = [], isLoading, refetch } = useQuery({ queryKey: ["admin-wallets"], queryFn: fetchAdminWallets });
   const updateWallet = useUpdateWallet();
   const createWallet = useCreateWallet();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [addresses, setAddresses] = useState<Record<string, { id: number; address: string; original: string }>>({});
+  const [state, setState] = useState<Record<string, WalletState>>({});
   const [saving, setSaving] = useState<string | null>(null);
 
   useEffect(() => {
-    if (walletData?.wallets) {
-      const map: Record<string, { id: number; address: string; original: string }> = {};
-      walletData.wallets.forEach(w => {
-        map[w.chain] = { id: w.id, address: w.address, original: w.address };
-      });
-      setAddresses(map);
-    }
-  }, [walletData]);
+    const map: Record<string, WalletState> = {};
+    wallets.forEach(w => {
+      map[w.chain] = {
+        id: w.id, address: w.address, originalAddress: w.address,
+        customMessage: w.customMessage ?? "", originalMessage: w.customMessage ?? "",
+      };
+    });
+    setState(map);
+  }, [wallets]);
 
   const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: getGetWalletAddressesQueryKey() });
+    queryClient.invalidateQueries({ queryKey: ["admin-wallets"] });
+    refetch();
   };
 
   const handleSave = async (chain: string) => {
-    const data = addresses[chain];
-    if (!data?.address.trim()) {
-      toast({ title: "Address required", variant: "destructive" });
-      return;
-    }
+    const data = state[chain];
+    if (!data?.address.trim()) { toast({ title: "Address required", variant: "destructive" }); return; }
     setSaving(chain);
     try {
+      const payload = { address: data.address.trim(), chain, label: chain, customMessage: data.customMessage, isActive: true };
       if (data.id) {
-        await updateWallet.mutateAsync({ id: data.id, data: { address: data.address.trim(), chain, isActive: true } });
+        await updateWallet.mutateAsync({ id: data.id, data: payload });
       } else {
-        await createWallet.mutateAsync({ data: { address: data.address.trim(), chain, label: chain, isActive: true } });
+        await createWallet.mutateAsync({ data: payload });
       }
-      toast({ title: "Wallet saved", description: `${chain} receiving address updated.` });
+      toast({ title: "Wallet saved", description: `${chain} address updated.` });
       invalidate();
     } catch {
-      toast({ title: "Save failed", description: "Could not update wallet address.", variant: "destructive" });
+      toast({ title: "Save failed", variant: "destructive" });
     } finally {
       setSaving(null);
     }
@@ -88,12 +81,17 @@ export default function AdminWallets() {
     toast({ title: "Copied", description: "Address copied to clipboard." });
   };
 
+  const isDirty = (chain: string) => {
+    const d = state[chain];
+    return d && (d.address !== d.originalAddress || d.customMessage !== d.originalMessage);
+  };
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Checkout Wallets</h1>
         <p className="text-muted-foreground mt-1">
-          Set the crypto addresses where customers send their payments. Changes take effect immediately.
+          Set the crypto addresses where customers send payments. Add a custom message displayed to buyers during checkout.
         </p>
       </div>
 
@@ -102,15 +100,13 @@ export default function AdminWallets() {
           <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-amber-200/80">
             Always double-check addresses before saving. Payments sent to wrong addresses cannot be recovered.
-            Use hardware wallet addresses for maximum security.
           </p>
         </CardContent>
       </Card>
 
       <div className="space-y-4">
         {CHAINS.map(chain => {
-          const current = addresses[chain.id];
-          const isDirty = current && current.address !== current.original;
+          const current = state[chain.id];
           const isSaving = saving === chain.id;
           const hasAddress = !!current?.address;
 
@@ -124,11 +120,11 @@ export default function AdminWallets() {
                   </div>
                   <Badge
                     variant="outline"
-                    className={hasAddress ? "bg-emerald-500/10 text-emerald-400 border-none gap-1" : "bg-muted/50 text-muted-foreground border-none"}
+                    className={hasAddress
+                      ? "bg-emerald-500/10 text-emerald-400 border-none gap-1"
+                      : "bg-muted/50 text-muted-foreground border-none"}
                   >
-                    {hasAddress ? (
-                      <><CheckCircle2 className="w-3 h-3" /> Active</>
-                    ) : "Not configured"}
+                    {hasAddress ? <><CheckCircle2 className="w-3 h-3" /> Active</> : "Not configured"}
                   </Badge>
                 </div>
               </CardHeader>
@@ -138,14 +134,14 @@ export default function AdminWallets() {
                 ) : (
                   <>
                     <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Receiving Address</Label>
+                      <Label className="text-xs text-muted-foreground">Receiving Address *</Label>
                       <div className="flex gap-2">
                         <Input
                           className="bg-background font-mono text-sm flex-1"
                           value={current?.address ?? ""}
-                          onChange={e => setAddresses(prev => ({
+                          onChange={e => setState(prev => ({
                             ...prev,
-                            [chain.id]: { ...(prev[chain.id] ?? { id: 0, original: "" }), address: e.target.value },
+                            [chain.id]: { ...(prev[chain.id] ?? { id: 0, originalAddress: "", customMessage: "", originalMessage: "" }), address: e.target.value },
                           }))}
                           placeholder={chain.placeholder}
                         />
@@ -156,14 +152,28 @@ export default function AdminWallets() {
                         )}
                       </div>
                     </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Custom Message (shown to buyer during checkout)</Label>
+                      <Textarea
+                        className="bg-background text-sm resize-none min-h-[70px]"
+                        value={current?.customMessage ?? ""}
+                        onChange={e => setState(prev => ({
+                          ...prev,
+                          [chain.id]: { ...(prev[chain.id] ?? { id: 0, address: "", originalAddress: "", originalMessage: "" }), customMessage: e.target.value },
+                        }))}
+                        placeholder={`e.g. Send USDT on ${chain.network}. Fast and low fees. Minimum: $1 USDT.`}
+                      />
+                    </div>
+
                     <div className="flex justify-end">
                       <Button
                         size="sm"
                         onClick={() => handleSave(chain.id)}
-                        disabled={isSaving || !isDirty}
-                        className="min-w-[100px]"
+                        disabled={isSaving || !isDirty(chain.id)}
+                        className="min-w-[120px]"
                       >
-                        {isSaving ? "Saving..." : isDirty ? "Save Changes" : "Saved"}
+                        {isSaving ? "Saving..." : isDirty(chain.id) ? "Save Changes" : "Saved"}
                       </Button>
                     </div>
                   </>
@@ -177,16 +187,16 @@ export default function AdminWallets() {
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
           <CardTitle className="text-base">Payment Flow</CardTitle>
-          <CardDescription>How customer payments work</CardDescription>
+          <CardDescription>How customer payments work in DigiMarket</CardDescription>
         </CardHeader>
         <CardContent>
           <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-            <li>Customer selects a product and clicks "Buy Now"</li>
-            <li>Customer chooses a payment chain (TRC20 / BEP20 / TON)</li>
-            <li>Customer sends USDT to the displayed wallet address</li>
-            <li>Customer submits their TX hash and/or payment screenshot</li>
+            <li>Customer clicks <strong className="text-foreground">"Buy with Crypto"</strong> on a product page</li>
+            <li>A Web3 checkout popup opens with a 30-minute timer</li>
+            <li>Customer selects network (TRC20 / BEP20 / TON) and sends USDT</li>
+            <li>Customer submits their TX hash + optional proof screenshot</li>
             <li>Admin verifies the payment in the <span className="text-foreground font-medium">Payments</span> tab</li>
-            <li>Admin confirms → customer gets access to the download</li>
+            <li>Admin confirms → customer gets access to the download + chat notification</li>
           </ol>
         </CardContent>
       </Card>

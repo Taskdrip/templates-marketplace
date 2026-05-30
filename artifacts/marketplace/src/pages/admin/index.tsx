@@ -10,6 +10,9 @@ import AdminWallets from "./Wallets";
 import AdminMessages from "./Messages";
 import AdminTickets from "./Tickets";
 import AdminRevenue from "./Revenue";
+import AdminSettings from "./Settings";
+import AdminBlog from "./Blog";
+import AdminPushNotifications from "./PushNotifications";
 
 export default function AdminRouter() {
   return (
@@ -24,6 +27,9 @@ export default function AdminRouter() {
         <Route path="/admin/messages" component={AdminMessages} />
         <Route path="/admin/tickets" component={AdminTickets} />
         <Route path="/admin/revenue" component={AdminRevenue} />
+        <Route path="/admin/settings" component={AdminSettings} />
+        <Route path="/admin/blog" component={AdminBlog} />
+        <Route path="/admin/push" component={AdminPushNotifications} />
       </Switch>
     </AdminLayout>
   );

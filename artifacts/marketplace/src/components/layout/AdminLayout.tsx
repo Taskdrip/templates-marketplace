@@ -2,16 +2,9 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { 
-  LayoutDashboard, 
-  Package, 
-  Users, 
-  ShoppingCart, 
-  Wallet, 
-  MessageSquare, 
-  Ticket, 
-  LineChart,
-  LogOut,
-  ShieldAlert
+  LayoutDashboard, Package, Users, ShoppingCart, Wallet,
+  MessageSquare, Ticket, LineChart, LogOut, ShieldAlert,
+  Settings, FileText, Bell, CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -20,51 +13,70 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { logout, user } = useAuth();
 
   const links = [
-    { href: "/admin", label: "Analytics", icon: LayoutDashboard },
+    { href: "/admin", label: "Analytics", icon: LayoutDashboard, exact: true },
     { href: "/admin/products", label: "Products", icon: Package },
     { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
     { href: "/admin/users", label: "Users", icon: Users },
-    { href: "/admin/payments", label: "Payments", icon: Wallet },
+    { href: "/admin/payments", label: "Payments", icon: CreditCard },
     { href: "/admin/wallets", label: "Wallet Setup", icon: Wallet },
     { href: "/admin/messages", label: "Support Chat", icon: MessageSquare },
     { href: "/admin/tickets", label: "Tickets", icon: Ticket },
     { href: "/admin/revenue", label: "Revenue", icon: LineChart },
+    { href: "/admin/blog", label: "Blog", icon: FileText },
+    { href: "/admin/push", label: "Push Notifications", icon: Bell },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
+
+  const isActive = (href: string, exact = false) => {
+    if (exact) return location === href;
+    return location === href || (location.startsWith(href) && href !== "/admin");
+  };
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-border/40 bg-black/40 backdrop-blur-xl relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-blue-600"></div>
         <div className="flex flex-col h-full py-4">
           <div className="px-4 mb-6">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
                 <ShieldAlert className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-lg text-white">Admin Panel</span>
+              <div>
+                <span className="font-bold text-sm text-white block leading-tight">DigiMarket</span>
+                <span className="text-[10px] text-purple-400">Admin Panel</span>
+              </div>
             </Link>
           </div>
 
-          <nav className="flex-1 px-2 space-y-1">
+          <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
             {links.map((link) => (
               <Link key={link.href} href={link.href}>
                 <div className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
-                  location === link.href || (location.startsWith(link.href) && link.href !== "/admin")
-                    ? "bg-red-500/10 text-red-500"
-                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                  isActive(link.href, link.exact)
+                    ? "bg-purple-500/15 text-purple-400 border border-purple-500/20"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-white border border-transparent"
                 )}>
-                  <link.icon className="w-4 h-4" />
+                  <link.icon className="w-4 h-4 shrink-0" />
                   {link.label}
                 </div>
               </Link>
             ))}
           </nav>
 
-          <div className="p-4 mt-auto">
-            <Button variant="outline" className="w-full justify-start border-border/50" asChild>
-              <Link href="/dashboard">Back to App</Link>
+          <div className="p-4 mt-auto space-y-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-muted-foreground hover:text-red-400 gap-2"
+              onClick={logout}
+            >
+              <LogOut className="w-4 h-4" /> Sign Out
+            </Button>
+            <Button variant="outline" className="w-full justify-start border-border/50 text-xs" asChild>
+              <Link href="/dashboard">← Back to App</Link>
             </Button>
           </div>
         </div>
@@ -73,9 +85,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
         <header className="flex items-center justify-between p-4 border-b border-border/40 bg-card/30 backdrop-blur-xl">
-          <h2 className="font-semibold text-lg hidden md:block">CryptoMarket Administration</h2>
+          <h2 className="font-semibold text-lg hidden md:block">DigiMarket Administration</h2>
           <div className="flex items-center gap-4 ml-auto">
-            <span className="text-sm text-muted-foreground">Signed in as <strong className="text-foreground">{user?.username}</strong></span>
+            <span className="text-sm text-muted-foreground">
+              Signed in as <strong className="text-foreground">{user?.username}</strong>
+              <span className="ml-2 text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full">ADMIN</span>
+            </span>
           </div>
         </header>
 

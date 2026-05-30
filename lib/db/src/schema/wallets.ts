@@ -7,6 +7,7 @@ export const walletsTable = pgTable("wallets", {
   chain: text("chain").notNull(),
   address: text("address").notNull(),
   label: text("label"),
+  customMessage: text("custom_message"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

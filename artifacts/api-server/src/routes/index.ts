@@ -13,6 +13,9 @@ import favoritesRouter from "./favorites";
 import downloadsRouter from "./downloads";
 import ticketsRouter from "./tickets";
 import adminRouter from "./admin";
+import settingsRouter from "./settings";
+import blogRouter from "./blog";
+import pushNotificationsRouter from "./pushNotifications";
 
 const router: IRouter = Router();
 
@@ -30,5 +33,8 @@ router.use(favoritesRouter);
 router.use(downloadsRouter);
 router.use(ticketsRouter);
 router.use(adminRouter);
+router.use(settingsRouter);
+router.use(blogRouter);
+router.use(pushNotificationsRouter);
 
 export default router;
