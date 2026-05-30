@@ -5,29 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  LogOut, LayoutDashboard, ShieldAlert, Search, Menu, X,
+  LogOut, LayoutDashboard, ShieldAlert, Search, Menu,
   Store, ChevronDown, Bell, Package, TrendingUp,
-  Globe, Code2, Instagram, Facebook, Layers, ExternalLink,
+  Globe, Code2, Instagram, Layers, ExternalLink, FileText, Cpu, Zap,
 } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { VaultradeLogomark, VaultradeWordmark } from "@/components/VaultradeLogo";
 
 const CATEGORIES = [
-  { name: "Source Code & Apps", slug: "source-code-apps", icon: <Code2 className="w-4 h-4" /> },
-  { name: "HTML Templates", slug: "templates", icon: <Layers className="w-4 h-4" /> },
-  { name: "Social Media Accounts", slug: "social-media-accounts", icon: <Instagram className="w-4 h-4" /> },
-  { name: "Facebook Accounts", slug: "facebook-accounts", icon: <Facebook className="w-4 h-4" /> },
-  { name: "Websites & Domains", slug: "websites-domains", icon: <Globe className="w-4 h-4" /> },
-  { name: "Landing Pages", slug: "landing-pages", icon: <ExternalLink className="w-4 h-4" /> },
-  { name: "Crypto & DeFi Tools", slug: "crypto-defi-tools", icon: <TrendingUp className="w-4 h-4" /> },
-  { name: "SaaS Applications", slug: "saas-apps", icon: <Package className="w-4 h-4" /> },
+  { name: "Source Code & Apps",     slug: "source-code-apps",      icon: <Code2 className="w-4 h-4" /> },
+  { name: "HTML Templates",         slug: "templates",              icon: <Layers className="w-4 h-4" /> },
+  { name: "Social Media Accounts",  slug: "social-media-accounts",  icon: <Instagram className="w-4 h-4" /> },
+  { name: "Websites & Domains",     slug: "websites-domains",       icon: <Globe className="w-4 h-4" /> },
+  { name: "Landing Pages",          slug: "landing-pages",          icon: <ExternalLink className="w-4 h-4" /> },
+  { name: "Crypto & DeFi Tools",    slug: "crypto-defi-tools",      icon: <TrendingUp className="w-4 h-4" /> },
+  { name: "Trading Bots & Scripts", slug: "trading-bots",           icon: <Cpu className="w-4 h-4" /> },
+  { name: "SaaS Applications",      slug: "saas-apps",              icon: <Package className="w-4 h-4" /> },
 ];
 
 export default function Navbar() {
@@ -45,6 +43,17 @@ export default function Navbar() {
     }
   };
 
+  const navLink = (href: string, label: string) => (
+    <Link
+      href={href}
+      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors hover:text-foreground ${
+        location === href ? "text-foreground bg-accent" : "text-foreground/60"
+      }`}
+    >
+      {label}
+    </Link>
+  );
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-xl">
@@ -52,16 +61,14 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-md shadow-primary/30">
-              <Store className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-extrabold text-lg tracking-tight hidden sm:block bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-400">
-              DigiMarket
+            <VaultradeLogomark size={34} />
+            <span className="hidden sm:block">
+              <VaultradeWordmark className="text-lg" />
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1 ml-2">
+          <nav className="hidden md:flex items-center gap-0.5 ml-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-1 text-foreground/70 hover:text-foreground">
@@ -82,19 +89,10 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link
-              href="/marketplace"
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors hover:text-foreground ${location === "/marketplace" ? "text-foreground bg-accent" : "text-foreground/60"}`}
-            >
-              Marketplace
-            </Link>
-
-            <Link
-              href="/pricing"
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors hover:text-foreground ${location === "/pricing" ? "text-foreground bg-accent" : "text-foreground/60"}`}
-            >
-              Pricing
-            </Link>
+            {navLink("/marketplace", "Marketplace")}
+            {navLink("/pricing", "Pricing")}
+            {navLink("/blog", "Blog")}
+            {navLink("/about", "About")}
           </nav>
 
           {/* Search bar - desktop */}
@@ -102,7 +100,7 @@ export default function Navbar() {
             <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search products..."
+                placeholder="Search products, bots, scripts..."
                 className="pl-9 h-9 bg-muted/40 border-border/30 text-sm rounded-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -124,7 +122,7 @@ export default function Navbar() {
                 className="hidden sm:flex gap-1.5 border-primary/30 text-primary hover:bg-primary/10 rounded-full text-xs font-semibold"
                 onClick={() => setLocation("/seller-register")}
               >
-                <Store className="w-3.5 h-3.5" /> Start Selling
+                <Zap className="w-3.5 h-3.5" /> Start Selling
               </Button>
             )}
 
@@ -178,8 +176,8 @@ export default function Navbar() {
                 <Button variant="ghost" size="sm" asChild className="hidden sm:flex text-sm">
                   <Link href="/login">Sign In</Link>
                 </Button>
-                <Button size="sm" asChild className="bg-primary hover:bg-primary/90 rounded-full text-sm font-semibold px-4">
-                  <Link href="/register">Sign Up</Link>
+                <Button size="sm" asChild className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 rounded-full text-sm font-semibold px-4 shadow-md shadow-violet-500/20">
+                  <Link href="/register">Sign Up Free</Link>
                 </Button>
               </div>
             )}
@@ -191,7 +189,11 @@ export default function Navbar() {
                   <Menu className="w-4 h-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-72 pt-8">
+              <SheetContent side="right" className="w-72 pt-6">
+                <div className="flex items-center gap-2 mb-6 px-3">
+                  <VaultradeLogomark size={28} />
+                  <VaultradeWordmark className="text-base" />
+                </div>
                 <div className="flex flex-col gap-1">
                   <Link href="/marketplace" className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">
                     Marketplace
@@ -202,7 +204,14 @@ export default function Navbar() {
                   <Link href="/pricing" className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">
                     Pricing
                   </Link>
+                  <Link href="/blog" className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">
+                    <FileText className="w-4 h-4 text-muted-foreground" /> Blog
+                  </Link>
+                  <Link href="/about" className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">
+                    About
+                  </Link>
                   <div className="border-t border-border/50 my-2" />
+                  <p className="px-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Categories</p>
                   {CATEGORIES.map(cat => (
                     <Link key={cat.slug} href={`/marketplace?cat=${cat.slug}`} className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-accent text-sm text-muted-foreground">
                       {cat.icon} {cat.name}
@@ -212,7 +221,7 @@ export default function Navbar() {
                     <>
                       <div className="border-t border-border/50 my-2" />
                       <Link href="/login" className="px-3 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">Sign In</Link>
-                      <Link href="/register" className="px-3 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium text-center">Sign Up</Link>
+                      <Link href="/register" className="px-3 py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-medium text-center">Sign Up Free</Link>
                     </>
                   )}
                 </div>
@@ -227,7 +236,7 @@ export default function Navbar() {
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search products..."
+                placeholder="Search Vaultrade..."
                 className="pl-9 h-9 bg-muted/40 border-border/30 text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

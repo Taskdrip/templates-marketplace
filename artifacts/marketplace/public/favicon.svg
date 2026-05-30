@@ -1,3 +1,75 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1e1040"/>
+      <stop offset="100%" stop-color="#0c1a3d"/>
+    </linearGradient>
+    <linearGradient id="v-grad" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="ring-grad" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0.8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="180" height="180" rx="40" fill="url(#bg-grad)"/>
+
+  <!-- Outer hex ring -->
+  <polygon
+    points="90,18 154,54 154,126 90,162 26,126 26,54"
+    fill="none"
+    stroke="url(#ring-grad)"
+    stroke-width="2.5"
+    opacity="0.5"
+  />
+
+  <!-- Inner hex fill -->
+  <polygon
+    points="90,35 142,65 142,115 90,145 38,115 38,65"
+    fill="url(#v-grad)"
+    opacity="0.08"
+  />
+
+  <!-- Glow layer for the V -->
+  <path
+    d="M46 52L73 128L90 90L107 128L134 52"
+    stroke="url(#v-grad)"
+    stroke-width="20"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    opacity="0.15"
+    filter="url(#glow)"
+  />
+
+  <!-- Main V shape -->
+  <path
+    d="M46 52L73 128L90 90L107 128L134 52"
+    stroke="url(#v-grad)"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Center diamond node -->
+  <rect x="84" y="84" width="12" height="12" rx="2" transform="rotate(45 90 90)" fill="white" opacity="0.95"/>
+
+  <!-- Top corner dots -->
+  <circle cx="46" cy="52" r="7" fill="#a855f7" opacity="0.8"/>
+  <circle cx="134" cy="52" r="7" fill="#2563eb" opacity="0.8"/>
+
+  <!-- Circuit line details -->
+  <line x1="46" y1="52" x2="30" y2="52" stroke="#7c3aed" stroke-width="2" opacity="0.4"/>
+  <line x1="134" y1="52" x2="150" y2="52" stroke="#2563eb" stroke-width="2" opacity="0.4"/>
+  <circle cx="26" cy="52" r="3" fill="#7c3aed" opacity="0.5"/>
+  <circle cx="154" cy="52" r="3" fill="#2563eb" opacity="0.5"/>
 </svg>

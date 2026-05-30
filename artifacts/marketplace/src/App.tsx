@@ -21,6 +21,9 @@ import Pricing from "@/pages/public/Pricing";
 import About from "@/pages/public/About";
 import FAQ from "@/pages/public/FAQ";
 import Contact from "@/pages/public/Contact";
+import BlogPage from "@/pages/public/BlogPage";
+import Terms from "@/pages/public/Terms";
+import Privacy from "@/pages/public/Privacy";
 
 // Protected Routers
 import DashboardRouter from "@/pages/dashboard/index";
@@ -28,8 +31,7 @@ import AdminRouter from "@/pages/admin/index";
 
 const queryClient = new QueryClient();
 
-// Protected Route Wrapper
-function ProtectedRoute({ component: Component, adminOnly = false }: { component: any, adminOnly?: boolean }) {
+function ProtectedRoute({ component: Component, adminOnly = false }: { component: any; adminOnly?: boolean }) {
   const { user, isAdmin, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -41,9 +43,17 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
     }
   }, [user, isAdmin, isLoading, setLocation, adminOnly]);
 
-  if (isLoading) return <div className="h-screen w-full flex items-center justify-center"><div className="animate-pulse flex flex-col items-center"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div><p className="mt-4 text-muted-foreground">Loading...</p></div></div>;
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading Vaultrade...</p>
+        </div>
+      </div>
+    );
+  }
   if (!user || (adminOnly && !isAdmin)) return null;
-
   return <Component />;
 }
 
@@ -83,6 +93,15 @@ function Router() {
       <Route path="/contact">
         <PublicLayout><Contact /></PublicLayout>
       </Route>
+      <Route path="/blog">
+        <PublicLayout><BlogPage /></PublicLayout>
+      </Route>
+      <Route path="/terms">
+        <PublicLayout><Terms /></PublicLayout>
+      </Route>
+      <Route path="/privacy">
+        <PublicLayout><Privacy /></PublicLayout>
+      </Route>
       <Route path="/login">
         <PublicLayout><Login /></PublicLayout>
       </Route>
@@ -92,7 +111,7 @@ function Router() {
       <Route path="/seller-register">
         <PublicLayout><SellerRegister /></PublicLayout>
       </Route>
-      
+
       {/* Fallback */}
       <Route>
         <PublicLayout><NotFound /></PublicLayout>

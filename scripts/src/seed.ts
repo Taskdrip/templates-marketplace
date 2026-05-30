@@ -50,7 +50,7 @@ async function seed() {
     return user;
   };
 
-  await upsertUser({ username: "admin", email: "admin@digimarket.io", password: "admin123", role: "admin", displayName: "DigiMarket Admin" });
+  await upsertUser({ username: "admin", email: "admin@digimarket.io", password: "admin123", role: "admin", displayName: "Vaultrade Admin" });
   await upsertUser({ username: "john_doe", email: "john@example.com", password: "user123", role: "user", displayName: "John Doe", phone: "+1234567890", telegramHandle: "johndoe" });
   await upsertUser({ username: "techseller", email: "seller@example.com", password: "seller123", role: "user", displayName: "TechSeller Pro", telegramHandle: "techsellerpro", isSeller: true, sellerBio: "Professional developer selling premium source code and templates" });
 
@@ -74,11 +74,11 @@ async function seed() {
     console.log(`  Created setting ${key}`);
   };
 
-  await upsertSetting("telegram_link", "https://t.me/digimarket_support");
+  await upsertSetting("telegram_link", "https://t.me/vaultrade_store");
   await upsertSetting("thank_you_message", "🎉 Thank you for your payment! Your order is being reviewed by our team. You will receive a notification once confirmed. If you need help, chat with us below or reach us on Telegram.");
   await upsertSetting("payment_instructions", "Complete your payment within 30 minutes. Send the exact USDT amount to the address shown, then enter your Transaction Hash (TXID) and upload a payment screenshot as proof.");
-  await upsertSetting("site_name", "DigiMarket");
-  await upsertSetting("support_email", "support@digimarket.io");
+  await upsertSetting("site_name", "Vaultrade");
+  await upsertSetting("support_email", "support@vaultrade.store");
 
   // --- Products (idempotent — only if none exist) ---
   const existingProducts = await db.select().from(productsTable);

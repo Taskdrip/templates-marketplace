@@ -7,14 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Bell, Send, Users, Megaphone, Link as LinkIcon } from "lucide-react";
-import { useGetSettings } from "@workspace/api-client-react";
+import { useSettings } from "@/hooks/useSettings";
 
 const API_BASE = "/api";
 function getToken() { return localStorage.getItem("cm_token"); }
 
 export default function AdminPushNotifications() {
   const { toast } = useToast();
-  const { data: settings } = useGetSettings();
+  const { data: settings } = useSettings();
   const [form, setForm] = useState({ title: "", message: "", link: "" });
   const [sending, setSending] = useState(false);
   const [history, setHistory] = useState<Array<{ title: string; message: string; sent: number; time: string }>>([]);
