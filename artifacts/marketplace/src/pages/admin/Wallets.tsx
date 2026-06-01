@@ -187,7 +187,7 @@ export default function AdminWallets() {
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
           <CardTitle className="text-base">Payment Flow</CardTitle>
-          <CardDescription>How customer payments work in DigiMarket</CardDescription>
+          <CardDescription>How customer payments work in Vaultrade.store</CardDescription>
         </CardHeader>
         <CardContent>
           <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">

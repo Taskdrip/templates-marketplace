@@ -110,7 +110,7 @@ export default function SellerRegister() {
             <Store className="w-4 h-4" /> Seller Program
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-            Start Selling on DigiMarket
+            Start Selling on Vaultrade.store
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             List your digital products and reach 85,000+ buyers globally. Receive USDT payments with full escrow protection.

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, paymentsTable, ordersTable, walletsTable, notificationsTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import { requireAuth, requireAdmin } from "../middlewares/auth";
 
 const router = Router();
@@ -109,9 +109,8 @@ router.get("/payments", requireAuth, async (req, res): Promise<void> => {
     const orders = await db.select().from(ordersTable).where(eq(ordersTable.userId, req.userId!));
     const orderIds = orders.map(o => o.id);
     payments = orderIds.length > 0
-      ? await db.select().from(paymentsTable).orderBy(desc(paymentsTable.createdAt))
+      ? await db.select().from(paymentsTable).where(inArray(paymentsTable.orderId, orderIds)).orderBy(desc(paymentsTable.createdAt))
       : [];
-    payments = payments.filter(p => orderIds.includes(p.orderId));
   }
   res.json(payments.map(toPayment));
 });

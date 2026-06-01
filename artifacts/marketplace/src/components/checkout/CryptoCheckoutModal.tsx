@@ -288,7 +288,7 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
           </Button>
 
           <p className="text-[10px] text-center text-muted-foreground">
-            Order #{orderId} · Secured by DigiMarket Escrow
+            Order #{orderId} · Secured by Vaultrade Escrow
           </p>
         </div>
       </DialogContent>

@@ -71,7 +71,7 @@ export default function Login() {
             <Store className="w-6 h-6 text-white" />
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Welcome back</h2>
-          <p className="text-muted-foreground mt-2 text-sm">Sign in to your DigiMarket account</p>
+          <p className="text-muted-foreground mt-2 text-sm">Sign in to your Vaultrade.store account</p>
         </div>
 
         {/* Login method tabs */}

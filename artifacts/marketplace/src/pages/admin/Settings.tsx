@@ -61,7 +61,7 @@ export default function AdminSettings() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Site Name</Label>
-              <Input className="bg-background" value={form.site_name} onChange={set("site_name")} placeholder="DigiMarket" />
+              <Input className="bg-background" value={form.site_name} onChange={set("site_name")} placeholder="Vaultrade.store" />
             </div>
             <div className="space-y-1.5">
               <Label>Support Email</Label>
