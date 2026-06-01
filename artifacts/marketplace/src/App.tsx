@@ -67,6 +67,9 @@ function Router() {
       <Route path="/admin*">
         <ProtectedRoute component={AdminRouter} adminOnly={true} />
       </Route>
+      <Route path="/seller*">
+        <ProtectedRoute component={DashboardRouter} />
+      </Route>
 
       {/* Public Routes with Layout */}
       <Route path="/">

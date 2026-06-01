@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, ordersTable, productsTable, paymentsTable, notificationsTable } from "@workspace/db";
+import { db, ordersTable, productsTable, paymentsTable, notificationsTable, usersTable } from "@workspace/db";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth, requireAdmin } from "../middlewares/auth";
 
@@ -10,6 +10,7 @@ function toOrderResponse(o: any, product?: any, payment?: any) {
     id: o.id,
     userId: o.userId,
     productId: o.productId,
+    sellerId: product?.sellerId ?? null,
     productName: product?.name ?? null,
     productImage: product?.previewImages?.[0] ?? null,
     amount: parseFloat(o.amount),
@@ -37,13 +38,10 @@ router.get("/orders", requireAuth, async (req, res): Promise<void> => {
 
   const productIds = [...new Set(orders.map(o => o.productId))];
   const products = productIds.length > 0
-    ? await db.select().from(productsTable).where(
-        productIds.length === 1
-          ? eq(productsTable.id, productIds[0])
-          : undefined
-      )
+    ? await db.select().from(productsTable)
     : [];
-  const productMap = new Map(products.map(p => [p.id, p]));
+  const allProducts = products.filter(p => productIds.includes(p.id));
+  const productMap = new Map(allProducts.map(p => [p.id, p]));
 
   const payments = await db.select().from(paymentsTable);
   const paymentMap = new Map(payments.map(p => [p.orderId, p]));
@@ -74,6 +72,17 @@ router.post("/orders", requireAuth, async (req, res): Promise<void> => {
     isRead: "false",
   });
 
+  if (product.sellerId) {
+    await db.insert(notificationsTable).values({
+      userId: product.sellerId,
+      type: "order",
+      title: "New Order for Your Product!",
+      message: `Someone ordered "${product.name}" — $${parseFloat(product.price).toFixed(2)} USDT is now in escrow.`,
+      link: `/dashboard`,
+      isRead: "false",
+    });
+  }
+
   res.status(201).json(toOrderResponse(order, product));
 });
 
@@ -94,6 +103,62 @@ router.get("/orders/:id", requireAuth, async (req, res): Promise<void> => {
   res.json(toOrderResponse(order, product, payment));
 });
 
+router.post("/orders/:id/confirm-receipt", requireAuth, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+
+  const [order] = await db.select().from(ordersTable).where(eq(ordersTable.id, id));
+  if (!order) { res.status(404).json({ error: "Not found" }); return; }
+  if (order.userId !== req.userId) { res.status(403).json({ error: "Forbidden" }); return; }
+  if (order.status !== "confirmed") {
+    res.status(400).json({ error: "Order must be in confirmed status to confirm receipt" });
+    return;
+  }
+
+  const [updatedOrder] = await db.update(ordersTable)
+    .set({ status: "delivered" })
+    .where(eq(ordersTable.id, id))
+    .returning();
+
+  const [product] = await db.select().from(productsTable).where(eq(productsTable.id, order.productId));
+
+  await db.insert(notificationsTable).values({
+    userId: order.userId,
+    type: "order_update",
+    title: "Receipt Confirmed",
+    message: `You confirmed receipt for "${product?.name ?? `Order #${id}`}". Funds will be released to the seller.`,
+    link: `/dashboard/orders/${id}`,
+    isRead: "false",
+  });
+
+  if (product?.sellerId) {
+    await db.insert(notificationsTable).values({
+      userId: product.sellerId,
+      type: "payment",
+      title: "Buyer Confirmed Receipt!",
+      message: `Buyer confirmed receipt for "${product.name}". Funds pending release by admin.`,
+      link: `/dashboard`,
+      isRead: "false",
+    });
+  }
+
+  const admins = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.role, "admin"));
+  for (const admin of admins) {
+    await db.insert(notificationsTable).values({
+      userId: admin.id,
+      type: "order_update",
+      title: "Buyer Confirmed Receipt — Release Funds",
+      message: `Order #${id} buyer confirmed receipt for "${product?.name}". Please release funds to seller.`,
+      link: `/admin/orders`,
+      isRead: "false",
+    });
+  }
+
+  const [payment] = await db.select().from(paymentsTable).where(eq(paymentsTable.orderId, id));
+  res.json(toOrderResponse(updatedOrder, product, payment));
+});
+
 router.patch("/orders/:id/status", requireAuth, requireAdmin, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(raw, 10);
@@ -108,17 +173,37 @@ router.patch("/orders/:id/status", requireAuth, requireAdmin, async (req, res): 
     .returning();
   if (!order) { res.status(404).json({ error: "Not found" }); return; }
 
+  const statusMessages: Record<string, string> = {
+    confirmed: "Your payment has been confirmed. Your order is ready for download.",
+    delivered: "Your order has been delivered successfully.",
+    rejected: "Your order has been rejected.",
+    funds_released: "The seller has been paid for this order.",
+  };
+
   await db.insert(notificationsTable).values({
     userId: order.userId,
     type: "order_update",
     title: "Order Status Updated",
-    message: `Your order #${order.id} status has been updated to: ${status}`,
+    message: statusMessages[status] ?? `Your order #${order.id} status has been updated to: ${status}`,
     link: `/dashboard/orders/${order.id}`,
     isRead: "false",
   });
 
   const [product] = await db.select().from(productsTable).where(eq(productsTable.id, order.productId));
   const [payment] = await db.select().from(paymentsTable).where(eq(paymentsTable.orderId, id));
+
+  if (status === "funds_released" && product?.sellerId) {
+    const sellerAmount = parseFloat(order.amount) * 0.9;
+    await db.insert(notificationsTable).values({
+      userId: product.sellerId,
+      type: "payment",
+      title: "Funds Released to You!",
+      message: `$${sellerAmount.toFixed(2)} USDT has been released for "${product.name}" (Order #${id}).`,
+      link: `/dashboard`,
+      isRead: "false",
+    });
+  }
+
   res.json(toOrderResponse(order, product, payment));
 });
 

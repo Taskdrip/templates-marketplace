@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRoute, useLocation } from "wouter";
 import { useGetOrder, useGetWalletAddresses, useGetMessages } from "@workspace/api-client-react";
-import { useSubmitPayment, useSendMessage, useStartConversation } from "@/hooks/useMutations";
+import { useSubmitPayment, useSendMessage, useStartConversation, useConfirmReceipt } from "@/hooks/useMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, CheckCircle2, AlertCircle, Clock, Check, Download, Package, MessageCircle, Send, User, ShieldCheck } from "lucide-react";
+import { Copy, CheckCircle2, AlertCircle, Clock, Check, Download, Package, MessageCircle, Send, User, ShieldCheck, ThumbsUp } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetOrderQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,7 +33,6 @@ function EscrowChat({ orderId }: EscrowChatProps) {
   const startConversation = useStartConversation();
   const sendMessage = useSendMessage();
 
-  // Start or find the escrow conversation for this order
   useEffect(() => {
     startConversation.mutate(
       { data: { subject: `Order #${orderId} Escrow Chat`, orderId } as any },
@@ -77,7 +76,6 @@ function EscrowChat({ orderId }: EscrowChatProps) {
 
   return (
     <div className="flex flex-col h-[400px]">
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
@@ -120,7 +118,6 @@ function EscrowChat({ orderId }: EscrowChatProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="border-t border-border/40 p-3 flex gap-2">
         <Input
           className="flex-1 bg-background text-sm h-9"
@@ -155,6 +152,7 @@ export default function OrderDetail() {
   });
   
   const submitPayment = useSubmitPayment();
+  const confirmReceipt = useConfirmReceipt();
   
   const [selectedChain, setSelectedChain] = useState<string>("USDT_TRC20");
   const [txHash, setTxHash] = useState("");
@@ -186,19 +184,33 @@ export default function OrderDetail() {
     });
   };
 
+  const handleConfirmReceipt = () => {
+    if (!order) return;
+    if (!confirm("Confirm that you have received and tested the product? This will release funds to the seller.")) return;
+    confirmReceipt.mutate({ id: order.id }, {
+      onSuccess: () => {
+        toast({ title: "Receipt Confirmed!", description: "Thank you! Funds will be released to the seller." });
+        queryClient.invalidateQueries({ queryKey: getGetOrderQueryKey(id) });
+      },
+      onError: (err: any) => {
+        toast({ title: "Error", description: err.message, variant: "destructive" });
+      }
+    });
+  };
+
   if (isOrderLoading) return <div className="flex items-center justify-center py-20 text-muted-foreground">Loading order...</div>;
   if (!order) return <div className="text-center py-20 text-muted-foreground">Order not found</div>;
 
   const steps = [
-    { id: "pending", label: "Payment Required", icon: AlertCircle },
-    { id: "awaiting_confirmation", label: "Confirming", icon: Clock },
-    { id: "confirmed", label: "Payment Confirmed", icon: CheckCircle2 },
-    { id: "delivered", label: "Delivered", icon: Package },
+    { id: "pending",              label: "Payment Required", icon: AlertCircle },
+    { id: "awaiting_confirmation",label: "Confirming",       icon: Clock },
+    { id: "confirmed",            label: "Ready to Download",icon: Download },
+    { id: "delivered",            label: "Receipt Confirmed",icon: ThumbsUp },
   ];
 
   const currentStepIndex = steps.findIndex(s => s.id === order.status) !== -1
     ? steps.findIndex(s => s.id === order.status)
-    : order.status === "rejected" ? -1 : 0;
+    : order.status === "rejected" ? -1 : order.status === "funds_released" ? steps.length - 1 : 0;
 
   return (
     <div className="space-y-8">
@@ -212,11 +224,12 @@ export default function OrderDetail() {
           className={cn("capitalize text-sm", {
             "bg-amber-500/10 text-amber-400 border-amber-500/30": order.status === "pending",
             "bg-blue-500/10 text-blue-400 border-blue-500/30": order.status === "awaiting_confirmation",
-            "bg-emerald-500/10 text-emerald-400 border-emerald-500/30": order.status === "confirmed" || order.status === "delivered",
+            "bg-violet-500/10 text-violet-400 border-violet-500/30": order.status === "confirmed",
+            "bg-emerald-500/10 text-emerald-400 border-emerald-500/30": order.status === "delivered" || order.status === "funds_released",
             "bg-red-500/10 text-red-400 border-red-500/30": order.status === "rejected",
           })}
         >
-          {order.status.replace(/_/g, " ")}
+          {order.status === "funds_released" ? "Complete" : order.status.replace(/_/g, " ")}
         </Badge>
       </div>
 
@@ -236,16 +249,15 @@ export default function OrderDetail() {
               return (
                 <div key={step.id} className="flex flex-col items-center gap-2 bg-card p-2">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
-                    order.status === "rejected" ? "bg-destructive border-destructive text-destructive-foreground" :
+                    order.status === "rejected" && index === 0 ? "bg-destructive border-destructive text-destructive-foreground" :
                     isCompleted ? "bg-primary border-primary text-primary-foreground" :
                     isCurrent ? "bg-background border-primary text-primary" :
                     "bg-background border-muted text-muted-foreground"
                   }`}>
-                    {order.status === "rejected" && isCurrent ? <AlertCircle className="w-5 h-5" /> :
-                     isCompleted && !isCurrent ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                    {isCompleted && !isCurrent ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                   </div>
-                  <span className={`text-xs font-medium ${isCompleted || isCurrent ? "text-foreground" : "text-muted-foreground"}`}>
-                    {order.status === "rejected" && isCurrent ? "Rejected" : step.label}
+                  <span className={`text-xs font-medium text-center max-w-[70px] ${isCompleted || isCurrent ? "text-foreground" : "text-muted-foreground"}`}>
+                    {step.label}
                   </span>
                 </div>
               );
@@ -290,17 +302,52 @@ export default function OrderDetail() {
             </CardContent>
           </Card>
 
-          {/* Download Section */}
-          {order.status === "delivered" && (
-            <Card className="bg-emerald-500/5 border-emerald-500/20">
-              <CardContent className="flex items-center justify-between p-6">
-                <div>
-                  <h3 className="font-semibold text-lg text-emerald-400">Ready to Download</h3>
-                  <p className="text-sm text-muted-foreground">Your digital asset is available.</p>
+          {/* Download + Confirm Receipt Section */}
+          {(order.status === "confirmed" || order.status === "delivered" || order.status === "funds_released") && (
+            <Card className={cn(
+              "border",
+              order.status === "confirmed" ? "bg-blue-500/5 border-blue-500/20" : "bg-emerald-500/5 border-emerald-500/20"
+            )}>
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className={cn("font-semibold text-lg", order.status === "confirmed" ? "text-blue-400" : "text-emerald-400")}>
+                      {order.status === "confirmed" ? "Ready to Download" : "Download Available"}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {order.status === "confirmed"
+                        ? "Payment confirmed. Download your product and confirm receipt when satisfied."
+                        : "You have confirmed receipt. Thank you!"}
+                    </p>
+                  </div>
+                  <Button className="gap-2 bg-emerald-600 hover:bg-emerald-500">
+                    <Download className="w-4 h-4" /> Download Files
+                  </Button>
                 </div>
-                <Button className="gap-2 bg-emerald-600 hover:bg-emerald-500">
-                  <Download className="w-4 h-4" /> Download Files
-                </Button>
+
+                {order.status === "confirmed" && (
+                  <div className="border-t border-border/30 pt-4">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Once you've downloaded and verified the product works as described, click below to release funds to the seller.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="gap-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+                      onClick={handleConfirmReceipt}
+                      disabled={confirmReceipt.isPending}
+                    >
+                      <ThumbsUp className="w-4 h-4" />
+                      {confirmReceipt.isPending ? "Confirming..." : "Confirm Receipt & Release Funds"}
+                    </Button>
+                  </div>
+                )}
+
+                {(order.status === "delivered" || order.status === "funds_released") && (
+                  <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Receipt confirmed. Funds are being released to the seller.
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -378,18 +425,34 @@ export default function OrderDetail() {
               <CardHeader><CardTitle>Payment Status</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Status</span>
-                  <Badge variant="outline" className="capitalize">{order.status.replace(/_/g, " ")}</Badge>
+                  <span className="text-muted-foreground">Order Status</span>
+                  <Badge variant="outline" className="capitalize">
+                    {order.status === "funds_released" ? "Complete" : order.status.replace(/_/g, " ")}
+                  </Badge>
                 </div>
                 {order.payment && (
                   <>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Network</span>
-                      <span>{order.payment.chain.replace("USDT_", "")}</span>
+                      <span>{order.payment.chain.replace("USDT_", "USDT ")}</span>
                     </div>
                     <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Amount</span>
+                      <span className="font-semibold">${order.payment.amount.toFixed(2)} USDT</span>
+                    </div>
+                    <div className="space-y-1 text-sm">
                       <span className="text-muted-foreground">TX Hash</span>
-                      <span className="truncate w-32 text-right font-mono text-xs">{order.payment.txHash}</span>
+                      <p className="break-all font-mono text-xs bg-muted/50 p-2 rounded border border-border/40">{order.payment.txHash}</p>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Payment</span>
+                      <Badge variant="outline" className={cn("capitalize text-xs", {
+                        "bg-emerald-500/10 text-emerald-400 border-emerald-500/30": order.payment.status === "confirmed",
+                        "bg-red-500/10 text-red-400 border-red-500/30": order.payment.status === "rejected",
+                        "bg-amber-500/10 text-amber-400 border-amber-500/30": order.payment.status === "pending",
+                      })}>
+                        {order.payment.status}
+                      </Badge>
                     </div>
                   </>
                 )}

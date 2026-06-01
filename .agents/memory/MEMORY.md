@@ -2,3 +2,4 @@
 - [Vaultrade custom hooks](digimarket-hooks.md) — useSettings/useUpdateSettings in artifacts/marketplace/src/hooks/useSettings.ts; useMutations.ts has standalone mutation hooks (parallel to generated API).
 - [Vaultrade API client exports](vaultrade-api-exports.md) — ALL mutation hooks exist in generated api.ts (useUpdateOrderStatus, useSubmitPayment, useSendMessage, useCreateOrder etc.); customFetch also exported; only useGetSettings was never generated.
 - [DigiMarket non-spec routes](digimarket-admin-routes.md) — Settings, Blog, PushNotif routes exist in API but not in OpenAPI spec; frontend uses raw fetch with cm_token.
+- [Vaultrade escrow flow](vaultrade-escrow.md) — Order statuses, seller routes, SQL tips, auth prefix.

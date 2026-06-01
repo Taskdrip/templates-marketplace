@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, ShoppingBag, Download, Wallet,
   MessageSquare, Bell, Heart, Ticket, UserCircle, LogOut, Menu,
+  Package, TrendingUp, PlusCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -13,9 +14,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [location] = useLocation();
   const { logout, user } = useAuth();
 
-  const links = [
+  const buyerLinks = [
     { href: "/dashboard",               label: "Overview",        icon: LayoutDashboard },
-    { href: "/dashboard/orders",        label: "Orders",          icon: ShoppingBag },
+    { href: "/dashboard/orders",        label: "My Orders",       icon: ShoppingBag },
     { href: "/dashboard/downloads",     label: "Downloads",       icon: Download },
     { href: "/dashboard/wallet",        label: "Wallet",          icon: Wallet },
     { href: "/dashboard/messages",      label: "Messages",        icon: MessageSquare },
@@ -24,6 +25,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: "/dashboard/tickets",       label: "Support Tickets", icon: Ticket },
     { href: "/dashboard/profile",       label: "Profile",         icon: UserCircle },
   ];
+
+  const sellerLinks = [
+    { href: "/seller/products",     label: "My Products",   icon: Package },
+    { href: "/seller/products/new", label: "List Product",  icon: PlusCircle },
+    { href: "/seller/earnings",     label: "Earnings",      icon: TrendingUp },
+  ];
+
+  const NavLink = ({ href, label, icon: Icon }: { href: string; label: string; icon: any }) => (
+    <Link key={href} href={href}>
+      <div className={cn(
+        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+        location === href || (location.startsWith(href) && href !== "/dashboard")
+          ? "bg-primary/10 text-primary border border-primary/20"
+          : "text-muted-foreground hover:bg-secondary hover:text-foreground border border-transparent"
+      )}>
+        <Icon className="w-4 h-4" />
+        {label}
+      </div>
+    </Link>
+  );
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full py-4">
@@ -41,25 +62,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="overflow-hidden">
             <p className="font-medium text-sm truncate">{user?.displayName || user?.username}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+            <p className="text-xs text-muted-foreground truncate">{user?.isSeller ? "Seller · " : ""}{user?.email}</p>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 px-2 space-y-0.5">
-        {links.map((link) => (
-          <Link key={link.href} href={link.href}>
-            <div className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
-              location === link.href || (location.startsWith(link.href) && link.href !== "/dashboard")
-                ? "bg-primary/10 text-primary border border-primary/20"
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground border border-transparent"
-            )}>
-              <link.icon className="w-4 h-4" />
-              {link.label}
-            </div>
-          </Link>
+      <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
+        {buyerLinks.map((link) => (
+          <NavLink key={link.href} {...link} />
         ))}
+
+        {user?.isSeller && (
+          <>
+            <div className="px-3 pt-4 pb-1">
+              <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60">Seller Hub</p>
+            </div>
+            {sellerLinks.map((link) => (
+              <NavLink key={link.href} {...link} />
+            ))}
+          </>
+        )}
       </nav>
 
       <div className="p-4 mt-auto space-y-2">

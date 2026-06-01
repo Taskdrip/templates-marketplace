@@ -14,15 +14,22 @@ async function apiFetch(method: string, path: string, body?: unknown) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error((err as any).message || `Request failed: ${res.status}`);
+    throw new Error((err as any).error || (err as any).message || `Request failed: ${res.status}`);
   }
   return res.json().catch(() => null);
 }
 
 export function useUpdateOrderStatus() {
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: { status: string } }) =>
+    mutationFn: ({ id, data }: { id: number; data: { status: string; adminNotes?: string } }) =>
       apiFetch("PATCH", `/orders/${id}/status`, data),
+  });
+}
+
+export function useConfirmReceipt() {
+  return useMutation({
+    mutationFn: ({ id }: { id: number }) =>
+      apiFetch("POST", `/orders/${id}/confirm-receipt`),
   });
 }
 
@@ -129,5 +136,26 @@ export function useDeleteProduct() {
   return useMutation({
     mutationFn: ({ id }: { id: number }) =>
       apiFetch("DELETE", `/products/${id}`),
+  });
+}
+
+export function useSellerSubmitProduct() {
+  return useMutation({
+    mutationFn: ({ data }: { data: Record<string, unknown> }) =>
+      apiFetch("POST", "/seller/products", data),
+  });
+}
+
+export function useSellerUpdateProduct() {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Record<string, unknown> }) =>
+      apiFetch("PATCH", `/seller/products/${id}`, data),
+  });
+}
+
+export function useSellerDeleteProduct() {
+  return useMutation({
+    mutationFn: ({ id }: { id: number }) =>
+      apiFetch("DELETE", `/seller/products/${id}`),
   });
 }

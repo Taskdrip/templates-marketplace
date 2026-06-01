@@ -16,11 +16,13 @@ import adminRouter from "./admin";
 import settingsRouter from "./settings";
 import blogRouter from "./blog";
 import pushNotificationsRouter from "./pushNotifications";
+import sellerRouter from "./seller";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(authRouter);
+router.use(sellerRouter);
 router.use(productsRouter);
 router.use(categoriesRouter);
 router.use(ordersRouter);
