@@ -75,14 +75,14 @@ export default function AdminPayments() {
                   ))}
                 </TableRow>
               ))
-            ) : !paymentsData?.payments?.length ? (
+            ) : !paymentsData?.length ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                   No payments to review.
                 </TableCell>
               </TableRow>
             ) : (
-              paymentsData.payments.map((payment) => {
+              (paymentsData as any[]).map((payment) => {
                 const explorerUrl = payment.chain
                   ? chainExplorer[payment.chain]?.(payment.txHash)
                   : undefined;

@@ -1,19 +1,42 @@
-import { useListDownloads, useGetDownloadLink } from "@workspace/api-client-react";
+import { useListDownloads } from "@workspace/api-client-react";
+import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download as DownloadIcon, Package, ExternalLink } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Downloads() {
-  const { data: downloadsData, isLoading } = useListDownloads();
-  const getDownloadLink = useGetDownloadLink();
+  const { data: downloads, isLoading } = useListDownloads();
+  const { toast } = useToast();
+
+  const fetchDownloadLink = useMutation({
+    mutationFn: async (orderId: number) => {
+      const token = localStorage.getItem("cm_token");
+      const baseUrl = (import.meta as any).env?.VITE_API_URL ?? "";
+      const resp = await fetch(`${baseUrl}/api/downloads/${orderId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to get download link");
+      }
+      return resp.json();
+    },
+    onSuccess: (data) => {
+      const url = data.url || data.downloadUrl || data.fileUrl;
+      if (url) {
+        window.open(url, "_blank");
+      } else {
+        toast({ title: "Download ready", description: "Your file is available for download." });
+      }
+    },
+    onError: (err: any) => {
+      toast({ title: "Download failed", description: err.message, variant: "destructive" });
+    },
+  });
 
   const handleDownload = (orderId: number) => {
-    getDownloadLink.mutate({ orderId }, {
-      onSuccess: (data) => {
-        // In a real app, we'd use this URL to trigger a download
-        window.open(data.url, '_blank');
-      }
-    });
+    fetchDownloadLink.mutate(orderId);
   };
 
   return (
@@ -35,7 +58,7 @@ export default function Downloads() {
               </CardContent>
             </Card>
           ))
-        ) : downloadsData?.downloads.length === 0 ? (
+        ) : !downloads?.length ? (
           <div className="col-span-full py-24 text-center bg-card/30 border border-border/50 rounded-2xl">
             <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-30" />
             <h3 className="text-xl font-medium">No downloads available</h3>
@@ -44,7 +67,7 @@ export default function Downloads() {
             </p>
           </div>
         ) : (
-          downloadsData?.downloads.map((download) => (
+          downloads.map((download: any) => (
             <Card key={download.id} className="bg-card/50 border-border/50 overflow-hidden flex flex-col">
               <div className="h-40 bg-muted relative">
                 {download.productImage ? (
@@ -65,10 +88,10 @@ export default function Downloads() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-4 pt-2 mt-auto">
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={() => handleDownload(download.orderId)}
-                  disabled={getDownloadLink.isPending}
+                  disabled={fetchDownloadLink.isPending}
                 >
                   <DownloadIcon className="w-4 h-4 mr-2" />
                   Download Files

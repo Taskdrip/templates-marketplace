@@ -58,12 +58,12 @@ export default function AdminTickets() {
           Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="bg-card/50 border-border/50 animate-pulse h-24"></Card>
           ))
-        ) : ticketsData?.tickets.length === 0 ? (
+        ) : !ticketsData?.length ? (
           <div className="py-24 text-center text-muted-foreground">
             No support tickets.
           </div>
         ) : (
-          ticketsData?.tickets.map((ticket) => (
+          (ticketsData as any[]).map((ticket) => (
             <Card key={ticket.id} className="bg-card/50 border-border/50">
               <CardContent className="p-6 flex flex-col sm:flex-row justify-between gap-4">
                 <div className="space-y-2 flex-1">

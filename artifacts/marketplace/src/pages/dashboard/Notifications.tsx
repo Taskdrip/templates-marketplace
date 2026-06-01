@@ -1,13 +1,13 @@
 import { useListNotifications } from "@workspace/api-client-react";
 import { useMarkAllNotificationsRead, useMarkNotificationRead } from "@/hooks/useMutations";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bell, Check, ExternalLink, Package, ShoppingBag, Wallet } from "lucide-react";
+import { Bell, Check, ExternalLink, Package, Wallet } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListNotificationsQueryKey } from "@workspace/api-client-react";
 
 export default function Notifications() {
-  const { data: notificationsData, isLoading } = useListNotifications();
+  const { data: notifications, isLoading } = useListNotifications();
   const markAllRead = useMarkAllNotificationsRead();
   const markRead = useMarkNotificationRead();
   const queryClient = useQueryClient();
@@ -37,6 +37,8 @@ export default function Notifications() {
     }
   };
 
+  const isRead = (n: any) => n.isRead === true || n.isRead === "true";
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-end">
@@ -53,7 +55,7 @@ export default function Notifications() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="p-8 text-center text-muted-foreground">Loading...</div>
-          ) : notificationsData?.notifications.length === 0 ? (
+          ) : !notifications?.length ? (
             <div className="py-16 text-center">
               <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
               <h3 className="text-xl font-medium">All caught up!</h3>
@@ -61,17 +63,17 @@ export default function Notifications() {
             </div>
           ) : (
             <div className="divide-y divide-border/50">
-              {notificationsData?.notifications.map((notification) => (
-                <div 
-                  key={notification.id} 
-                  className={`p-4 sm:p-6 flex gap-4 transition-colors ${!notification.isRead ? 'bg-primary/5' : 'hover:bg-muted/30'}`}
+              {notifications.map((notification: any) => (
+                <div
+                  key={notification.id}
+                  className={`p-4 sm:p-6 flex gap-4 transition-colors ${!isRead(notification) ? 'bg-primary/5' : 'hover:bg-muted/30'}`}
                 >
-                  <div className={`mt-1 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${!notification.isRead ? 'bg-background shadow-sm border border-primary/20' : 'bg-muted/50'}`}>
+                  <div className={`mt-1 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${!isRead(notification) ? 'bg-background shadow-sm border border-primary/20' : 'bg-muted/50'}`}>
                     {getIcon(notification.type)}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start gap-4">
-                      <h4 className={`text-base ${!notification.isRead ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}>
+                      <h4 className={`text-base ${!isRead(notification) ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}>
                         {notification.title}
                       </h4>
                       <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -81,18 +83,18 @@ export default function Notifications() {
                     <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                       {notification.message}
                     </p>
-                    
+
                     <div className="flex items-center gap-4 mt-3">
                       {notification.link && (
                         <Button variant="link" className="p-0 h-auto text-xs" asChild>
                           <a href={notification.link}>View Details <ExternalLink className="w-3 h-3 ml-1" /></a>
                         </Button>
                       )}
-                      
-                      {!notification.isRead && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+
+                      {!isRead(notification) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="h-auto py-0 text-xs text-muted-foreground"
                           onClick={() => handleMarkRead(notification.id)}
                         >
@@ -101,7 +103,7 @@ export default function Notifications() {
                       )}
                     </div>
                   </div>
-                  {!notification.isRead && (
+                  {!isRead(notification) && (
                     <div className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0"></div>
                   )}
                 </div>

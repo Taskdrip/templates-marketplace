@@ -8,37 +8,21 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Search, MessageSquarePlus } from "lucide-react";
-import { io, Socket } from "socket.io-client";
 
 export default function Messages() {
   const { user } = useAuth();
   const [activeId, setActiveId] = useState<number | null>(null);
   const [message, setMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
-  
-  const { data: convosData } = useListConversations();
-  const { data: messagesData, refetch } = useGetMessages(activeId as number, {
-    query: { enabled: !!activeId }
+
+  const { data: convosData, refetch: refetchConvos } = useListConversations({
+    query: { refetchInterval: 5000 }
   });
-  
+  const { data: messagesData, refetch: refetchMessages } = useGetMessages(activeId as number, {
+    query: { enabled: !!activeId, refetchInterval: 3000 }
+  });
+
   const sendMessage = useSendMessage();
-
-  const [socket, setSocket] = useState<Socket | null>(null);
-
-  useEffect(() => {
-    // Setup socket connection
-    const newSocket = io({ path: '/ws/socket.io' });
-    setSocket(newSocket);
-
-    newSocket.on('message', () => {
-      // In a real app we'd append the message to state, but simple refetch works for now
-      if (activeId) refetch();
-    });
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [activeId, refetch]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -48,18 +32,20 @@ export default function Messages() {
 
   const handleSend = () => {
     if (!message.trim() || !activeId) return;
-    
+
     sendMessage.mutate({
       data: { content: message, conversationId: activeId }
     }, {
       onSuccess: () => {
         setMessage("");
-        refetch();
-        // Emit through socket for real-time to other party
-        socket?.emit('message', { conversationId: activeId });
+        refetchMessages();
+        refetchConvos();
       }
     });
   };
+
+  const conversations = (convosData as any)?.conversations ?? [];
+  const messages = (messagesData as any)?.messages ?? [];
 
   return (
     <div className="h-[calc(100vh-12rem)] flex gap-6">
@@ -72,11 +58,11 @@ export default function Messages() {
             <Input className="pl-9 bg-background" placeholder="Search conversations..." />
           </div>
         </div>
-        
+
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {convosData?.conversations.map(conv => (
-              <button 
+            {conversations.map((conv: any) => (
+              <button
                 key={conv.id}
                 onClick={() => setActiveId(conv.id)}
                 className={`w-full text-left p-3 rounded-lg transition-colors flex items-start gap-3 ${
@@ -105,8 +91,8 @@ export default function Messages() {
                 )}
               </button>
             ))}
-            
-            {(!convosData || convosData.conversations.length === 0) && (
+
+            {conversations.length === 0 && (
               <div className="text-center py-8 text-muted-foreground text-sm">
                 No conversations yet
               </div>
@@ -130,12 +116,12 @@ export default function Messages() {
                 </div>
               </div>
             </div>
-            
-            <div 
+
+            <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto p-4 space-y-4"
             >
-              {messagesData?.messages.map(msg => {
+              {messages.map((msg: any) => {
                 const isMe = msg.senderId === user?.id;
                 return (
                   <div key={msg.id} className={`flex gap-3 max-w-[80%] ${isMe ? 'ml-auto flex-row-reverse' : ''}`}>
@@ -150,15 +136,15 @@ export default function Messages() {
                 );
               })}
             </div>
-            
+
             <div className="p-4 border-t border-border/50 bg-background/50">
-              <form 
+              <form
                 className="flex gap-2"
                 onSubmit={(e) => { e.preventDefault(); handleSend(); }}
               >
-                <Input 
-                  className="flex-1 bg-background" 
-                  placeholder="Type your message..." 
+                <Input
+                  className="flex-1 bg-background"
+                  placeholder="Type your message..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />

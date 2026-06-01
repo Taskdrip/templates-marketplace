@@ -80,14 +80,14 @@ export default function AdminOrders() {
                   ))}
                 </TableRow>
               ))
-            ) : !ordersData?.orders?.length ? (
+            ) : !ordersData?.length ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                   No orders yet.
                 </TableCell>
               </TableRow>
             ) : (
-              ordersData.orders.map((order) => (
+              (ordersData as any[]).map((order) => (
                 <TableRow key={order.id} className={order.status === "delivered" ? "bg-emerald-500/5" : ""}>
                   <TableCell className="font-medium">
                     <p className="font-semibold">#{order.id}</p>

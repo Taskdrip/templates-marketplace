@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getListFavoritesQueryKey } from "@workspace/api-client-react";
 
 export default function Wishlist() {
-  const { data: favoritesData, isLoading } = useListFavorites();
+  const { data: favorites, isLoading } = useListFavorites();
   const removeFavorite = useRemoveFavorite();
   const queryClient = useQueryClient();
 
@@ -38,7 +38,7 @@ export default function Wishlist() {
               </CardHeader>
             </Card>
           ))
-        ) : !favoritesData?.products || favoritesData.products.length === 0 ? (
+        ) : !favorites?.length ? (
           <div className="col-span-full py-24 text-center bg-card/30 border border-border/50 rounded-2xl">
             <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-30" />
             <h3 className="text-xl font-medium">Your wishlist is empty</h3>
@@ -50,7 +50,7 @@ export default function Wishlist() {
             </Button>
           </div>
         ) : (
-          favoritesData.products.map((product) => (
+          favorites.map((product: any) => (
             <Card key={product.id} className="bg-card/50 border-border/50 overflow-hidden flex flex-col group">
               <div className="h-48 overflow-hidden relative">
                 {product.previewImages?.[0] ? (
@@ -61,9 +61,9 @@ export default function Wishlist() {
                   </div>
                 )}
                 <div className="absolute top-3 right-3 flex gap-2">
-                  <Button 
-                    size="icon" 
-                    variant="destructive" 
+                  <Button
+                    size="icon"
+                    variant="destructive"
                     className="h-8 w-8 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={(e) => { e.preventDefault(); handleRemove(product.id); }}
                   >

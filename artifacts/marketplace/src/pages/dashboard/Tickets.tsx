@@ -1,6 +1,6 @@
 import { useListTickets } from "@workspace/api-client-react";
 import { useCreateTicket } from "@/hooks/useMutations";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ const ticketSchema = z.object({
 });
 
 export default function Tickets() {
-  const { data: ticketsData, isLoading } = useListTickets();
+  const { data: tickets, isLoading } = useListTickets();
   const createTicket = useCreateTicket();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -75,7 +75,7 @@ export default function Tickets() {
           <h1 className="text-3xl font-bold tracking-tight">Support Tickets</h1>
           <p className="text-muted-foreground mt-1">Get help with your purchases or account.</p>
         </div>
-        
+
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -101,7 +101,7 @@ export default function Tickets() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="priority"
@@ -132,17 +132,17 @@ export default function Tickets() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Provide details about your issue..." 
-                          className="min-h-[150px] bg-background/50" 
-                          {...field} 
+                        <Textarea
+                          placeholder="Provide details about your issue..."
+                          className="min-h-[150px] bg-background/50"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <div className="flex justify-end pt-4">
                   <Button type="submit" disabled={createTicket.isPending}>
                     {createTicket.isPending ? "Submitting..." : "Submit Ticket"}
@@ -159,7 +159,7 @@ export default function Tickets() {
           Array.from({ length: 3 }).map((_, i) => (
             <Card key={i} className="bg-card/50 border-border/50 animate-pulse h-32"></Card>
           ))
-        ) : ticketsData?.tickets.length === 0 ? (
+        ) : !tickets?.length ? (
           <div className="py-24 text-center bg-card/30 border border-border/50 rounded-2xl">
             <TicketIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-30" />
             <h3 className="text-xl font-medium">No support tickets</h3>
@@ -168,7 +168,7 @@ export default function Tickets() {
             </p>
           </div>
         ) : (
-          ticketsData?.tickets.map((ticket) => (
+          tickets.map((ticket: any) => (
             <Card key={ticket.id} className="bg-card/50 border-border/50 hover:bg-muted/20 transition-colors">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -185,7 +185,7 @@ export default function Tickets() {
                     <h3 className="text-lg font-semibold">{ticket.subject}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-2">{ticket.description}</p>
                   </div>
-                  
+
                   <div className="flex flex-col sm:items-end justify-between shrink-0">
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {new Date(ticket.createdAt).toLocaleDateString()}
@@ -196,7 +196,7 @@ export default function Tickets() {
                     </Button>
                   </div>
                 </div>
-                
+
                 {ticket.adminReply && (
                   <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/10">
                     <p className="text-xs font-semibold text-primary mb-1">Latest Reply from Support:</p>

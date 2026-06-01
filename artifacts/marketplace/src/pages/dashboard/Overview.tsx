@@ -6,14 +6,17 @@ import { Button } from "@/components/ui/button";
 
 export default function Overview() {
   const { data: user } = useGetMe();
-  const { data: ordersData } = useListOrders({ limit: 5 });
-  const { data: notificationsData } = useListNotifications({ limit: 5 });
+  const { data: orders } = useListOrders();
+  const { data: notifications } = useListNotifications();
+
+  const recentOrders = (orders ?? []).slice(0, 5);
+  const recentNotifications = (notifications ?? []).slice(0, 5);
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
-        <p className="text-muted-foreground mt-1">Welcome back, {user?.username}.</p>
+        <p className="text-muted-foreground mt-1">Welcome back, {(user as any)?.displayName || user?.username}.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -23,7 +26,29 @@ export default function Overview() {
             <ShoppingBag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{user?.totalPurchases || 0}</div>
+            <div className="text-2xl font-bold">{(user as any)?.totalPurchases || orders?.length || 0}</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card/50 border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Unread Notifications</CardTitle>
+            <Bell className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {(notifications ?? []).filter((n: any) => n.isRead === "false" || n.isRead === false).length}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card/50 border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {(orders ?? []).filter((o: any) => o.status === "pending" || o.status === "awaiting_confirmation").length}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -36,13 +61,13 @@ export default function Overview() {
               <CardDescription>Your latest purchases</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/orders">View All</Link>
+              <Link href="/dashboard/orders">View All <ArrowRight className="w-3 h-3 ml-1" /></Link>
             </Button>
           </CardHeader>
           <CardContent>
-            {ordersData?.orders && ordersData.orders.length > 0 ? (
-              <div className="space-y-4">
-                {ordersData.orders.map(order => (
+            {recentOrders.length > 0 ? (
+              <div className="space-y-3">
+                {recentOrders.map((order: any) => (
                   <div key={order.id} className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-background/50">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center">
@@ -56,11 +81,11 @@ export default function Overview() {
                     <div className="text-right">
                       <p className="font-medium text-sm">${order.amount.toFixed(2)}</p>
                       <p className={`text-xs capitalize ${
-                        order.status === 'delivered' ? 'text-emerald-500' :
+                        order.status === 'delivered' || order.status === 'funds_released' ? 'text-emerald-500' :
                         order.status === 'rejected' ? 'text-destructive' :
                         'text-yellow-500'
                       }`}>
-                        {order.status.replace('_', ' ')}
+                        {order.status.replace(/_/g, ' ')}
                       </p>
                     </div>
                   </div>
@@ -85,19 +110,19 @@ export default function Overview() {
               <CardDescription>Recent account activity</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/notifications">View All</Link>
+              <Link href="/dashboard/notifications">View All <ArrowRight className="w-3 h-3 ml-1" /></Link>
             </Button>
           </CardHeader>
           <CardContent>
-            {notificationsData?.notifications && notificationsData.notifications.length > 0 ? (
-              <div className="space-y-4">
-                {notificationsData.notifications.map(notification => (
-                  <div key={notification.id} className={`flex gap-3 p-3 rounded-lg border border-border/50 ${!notification.isRead ? 'bg-primary/5 border-primary/20' : 'bg-background/50'}`}>
+            {recentNotifications.length > 0 ? (
+              <div className="space-y-3">
+                {recentNotifications.map((notification: any) => (
+                  <div key={notification.id} className={`flex gap-3 p-3 rounded-lg border border-border/50 ${!(notification.isRead === "true" || notification.isRead === true) ? 'bg-primary/5 border-primary/20' : 'bg-background/50'}`}>
                     <div className="mt-1">
-                      <Bell className={`w-4 h-4 ${!notification.isRead ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <Bell className={`w-4 h-4 ${!(notification.isRead === "true" || notification.isRead === true) ? 'text-primary' : 'text-muted-foreground'}`} />
                     </div>
                     <div>
-                      <p className={`font-medium text-sm ${!notification.isRead ? 'text-foreground' : 'text-muted-foreground'}`}>{notification.title}</p>
+                      <p className={`font-medium text-sm ${!(notification.isRead === "true" || notification.isRead === true) ? 'text-foreground' : 'text-muted-foreground'}`}>{notification.title}</p>
                       <p className="text-xs text-muted-foreground mt-1">{notification.message}</p>
                       <p className="text-[10px] text-muted-foreground/60 mt-1">{new Date(notification.createdAt).toLocaleDateString()}</p>
                     </div>
