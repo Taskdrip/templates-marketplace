@@ -4,6 +4,7 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { verifyToken } from "./lib/jwt";
 import { setIO } from "./socketInstance";
+import { ensureDemoUsers } from "./lib/ensure-demo-users";
 
 const rawPort = process.env["PORT"];
 
@@ -85,3 +86,6 @@ httpServer.listen(port, (err?: Error) => {
   if (err) { logger.error({ err }, "Error listening on port"); process.exit(1); }
   logger.info({ port }, "Server listening");
 });
+
+// Ensure demo users exist after startup (non-blocking)
+ensureDemoUsers();

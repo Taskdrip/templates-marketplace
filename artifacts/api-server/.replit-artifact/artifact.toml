@@ -1,31 +1,35 @@
 kind = "api"
-previewPath = "/api"
-title = "API Server"
-version = "1.0.0"
-id = "3B4_FFSkEVBkAeYMFRJ2e"
+  previewPath = "/api"
+  title = "API Server"
+  version = "1.0.0"
+  id = "3B4_FFSkEVBkAeYMFRJ2e"
 
-[[services]]
-localPort = 8080
-name = "API Server"
-paths = ["/api", "/ws"]
+  [[services]]
+  localPort = 8089
+  name = "API Server"
+  paths = ["/api", "/ws"]
 
-[services.development]
-run = "pnpm --filter @workspace/api-server run dev"
+  [services.env]
+  PORT = "8089"
 
-[services.production]
+  [services.development]
+  run = "pnpm --filter @workspace/api-server run dev"
 
-[services.production.build]
-args = ["pnpm", "--filter", "@workspace/api-server", "run", "build"]
+  [services.production]
 
-[services.production.build.env]
-NODE_ENV = "production"
+  [services.production.build]
+  args = ["pnpm", "--filter", "@workspace/api-server", "run", "build"]
 
-[services.production.run]
-args = ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
+  [services.production.build.env]
+  NODE_ENV = "production"
 
-[services.production.run.env]
-PORT = "8080"
-NODE_ENV = "production"
+  [services.production.run]
+  args = ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
 
-[services.production.health.startup]
-path = "/api/healthz"
+  [services.production.run.env]
+  PORT = "8089"
+  NODE_ENV = "production"
+
+  [services.production.health.startup]
+  path = "/api/healthz"
+  
