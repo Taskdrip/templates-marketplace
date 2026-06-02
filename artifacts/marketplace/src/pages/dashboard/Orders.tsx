@@ -61,7 +61,7 @@ export default function Orders() {
               </TableRow>
             ) : (
               orders.map((order) => (
-                <TableRow key={order.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setLocation(`/dashboard/orders/${order.id}`)}>
+                <TableRow key={order.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setLocation(`/orders/${order.id}`)}>
                   <TableCell className="font-medium">#{order.id}</TableCell>
                   <TableCell>{(order as any).productName || "Unknown Product"}</TableCell>
                   <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>

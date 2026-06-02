@@ -80,7 +80,7 @@ export default function SellerAddProduct() {
       onSuccess: () => {
         toast({ title: "Product submitted!", description: "Your product is now under admin review." });
         queryClient.invalidateQueries({ queryKey: ["seller-products"] });
-        setLocation("/seller/products");
+        setLocation("/products");
       },
       onError: (err: any) => {
         toast({ title: "Submission failed", description: err.message, variant: "destructive" });

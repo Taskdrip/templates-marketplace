@@ -32,11 +32,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: "/seller/earnings",     label: "Earnings",      icon: TrendingUp },
   ];
 
+  const pathname = typeof window !== "undefined" ? window.location.pathname : location;
   const NavLink = ({ href, label, icon: Icon }: { href: string; label: string; icon: any }) => (
     <Link key={href} href={href}>
       <div className={cn(
         "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
-        location === href || (location.startsWith(href) && href !== "/dashboard")
+        pathname === href || (pathname.startsWith(href) && href !== "/dashboard")
           ? "bg-primary/10 text-primary border border-primary/20"
           : "text-muted-foreground hover:bg-secondary hover:text-foreground border border-transparent"
       )}>

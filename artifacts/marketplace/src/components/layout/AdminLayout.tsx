@@ -28,9 +28,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/settings", label: "Settings",           icon: Settings },
   ];
 
+  const pathname = typeof window !== "undefined" ? window.location.pathname : location;
   const isActive = (href: string, exact = false) => {
-    if (exact) return location === href;
-    return location === href || (location.startsWith(href) && href !== "/admin");
+    if (exact) return pathname === href;
+    return pathname === href || (pathname.startsWith(href) && href !== "/admin");
   };
 
   return (

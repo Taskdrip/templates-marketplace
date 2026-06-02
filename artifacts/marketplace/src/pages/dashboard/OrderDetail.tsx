@@ -137,7 +137,7 @@ function EscrowChat({ orderId }: EscrowChatProps) {
 // ─── Main OrderDetail ─────────────────────────────────────────────────────────
 
 export default function OrderDetail() {
-  const [, params] = useRoute("/dashboard/orders/:id");
+  const [, params] = useRoute("/orders/:id");
   const [, setLocation] = useLocation();
   const id = Number(params?.id);
   const { toast } = useToast();
@@ -154,7 +154,7 @@ export default function OrderDetail() {
   const submitPayment = useSubmitPayment();
   const confirmReceipt = useConfirmReceipt();
   
-  const [selectedChain, setSelectedChain] = useState<string>("USDT_TRC20");
+  const [selectedChain, setSelectedChain] = useState<string>("USDT_TON");
   const [txHash, setTxHash] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -460,7 +460,7 @@ export default function OrderDetail() {
                 <Button
                   variant="outline"
                   className="w-full gap-2"
-                  onClick={() => setLocation("/dashboard/messages")}
+                  onClick={() => setLocation("/messages")}
                 >
                   <MessageCircle className="w-4 h-4" /> Open Support Chat
                 </Button>

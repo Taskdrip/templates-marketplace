@@ -18,18 +18,18 @@ export default function AdminRouter() {
   return (
     <AdminLayout>
       <Switch>
-        <Route path="/admin" component={AdminOverview} />
-        <Route path="/admin/products" component={AdminProducts} />
-        <Route path="/admin/orders" component={AdminOrders} />
-        <Route path="/admin/users" component={AdminUsers} />
-        <Route path="/admin/payments" component={AdminPayments} />
-        <Route path="/admin/wallets" component={AdminWallets} />
-        <Route path="/admin/messages" component={AdminMessages} />
-        <Route path="/admin/tickets" component={AdminTickets} />
-        <Route path="/admin/revenue" component={AdminRevenue} />
-        <Route path="/admin/settings" component={AdminSettings} />
-        <Route path="/admin/blog" component={AdminBlog} />
-        <Route path="/admin/push" component={AdminPushNotifications} />
+        <Route path="/" component={AdminOverview} />
+        <Route path="/products" component={AdminProducts} />
+        <Route path="/orders" component={AdminOrders} />
+        <Route path="/users" component={AdminUsers} />
+        <Route path="/payments" component={AdminPayments} />
+        <Route path="/wallets" component={AdminWallets} />
+        <Route path="/messages" component={AdminMessages} />
+        <Route path="/tickets" component={AdminTickets} />
+        <Route path="/revenue" component={AdminRevenue} />
+        <Route path="/settings" component={AdminSettings} />
+        <Route path="/blog" component={AdminBlog} />
+        <Route path="/push" component={AdminPushNotifications} />
       </Switch>
     </AdminLayout>
   );

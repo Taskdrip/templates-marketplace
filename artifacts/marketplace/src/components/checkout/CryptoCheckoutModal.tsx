@@ -11,6 +11,7 @@ import { useGetWalletAddresses, useSubmitPayment } from "@workspace/api-client-r
 import { useSettings } from "@/hooks/useSettings";
 import { useQueryClient } from "@tanstack/react-query";
 import { Copy, Check, Clock, Shield, Upload, AlertTriangle, Zap, ChevronRight } from "lucide-react";
+import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 
 const CHAIN_META: Record<string, { name: string; network: string; color: string; bg: string; border: string; icon: string }> = {
   USDT_TRC20: { name: "TRON",      network: "TRC20",  color: "text-red-400",    bg: "bg-red-500/10",    border: "border-red-500/30",    icon: "🔴" },
@@ -78,12 +79,13 @@ interface Props {
 export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId, amount, productName }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedChain, setSelectedChain] = useState("USDT_TRC20");
+  const [selectedChain, setSelectedChain] = useState("USDT_TON");
   const [txHash, setTxHash] = useState("");
   const [proofUrl, setProofUrl] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [expiresAt] = useState(() => new Date(Date.now() + 30 * 60 * 1000));
   const [expired, setExpired] = useState(false);
+  const tonWallet = useTonWallet();
 
   const { data: walletData } = useGetWalletAddresses({ query: { enabled: open } });
   const { data: settings } = useSettings();
@@ -192,6 +194,21 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
                 const meta = CHAIN_META[chain];
                 return (
                   <TabsContent key={chain} value={chain} className="mt-4 space-y-3">
+                    {chain === "USDT_TON" && (
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                        <div>
+                          <p className="text-xs font-medium text-blue-300">TON Wallet</p>
+                          {tonWallet ? (
+                            <p className="text-[10px] text-blue-400/70 font-mono mt-0.5 break-all">
+                              {tonWallet.account.address.slice(0, 8)}...{tonWallet.account.address.slice(-6)}
+                            </p>
+                          ) : (
+                            <p className="text-[10px] text-muted-foreground mt-0.5">Connect to use Tonkeeper, OpenMask &amp; more</p>
+                          )}
+                        </div>
+                        <TonConnectButton />
+                      </div>
+                    )}
                     {wallet ? (
                       <div className={`rounded-xl border p-4 space-y-3 ${meta.bg} ${meta.border}`}>
                         <QRCode data={wallet.address} />
