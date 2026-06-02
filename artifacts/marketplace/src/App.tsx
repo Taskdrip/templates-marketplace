@@ -61,14 +61,14 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
 function Router() {
   return (
     <Switch>
-      {/* Protected Dashboards */}
-      <Route path="/dashboard*">
+      {/* Protected Dashboards — regex paths do prefix matching without nested context */}
+      <Route path={/^\/dashboard(\/|$)/i}>
         <ProtectedRoute component={DashboardRouter} />
       </Route>
-      <Route path="/admin*">
+      <Route path={/^\/admin(\/|$)/i}>
         <ProtectedRoute component={AdminRouter} adminOnly={true} />
       </Route>
-      <Route path="/seller*">
+      <Route path={/^\/seller(\/|$)/i}>
         <ProtectedRoute component={DashboardRouter} />
       </Route>
 

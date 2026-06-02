@@ -3,3 +3,4 @@
 - [Vaultrade API client exports](vaultrade-api-exports.md) — ALL mutation hooks exist in generated api.ts (useUpdateOrderStatus, useSubmitPayment, useSendMessage, useCreateOrder etc.); customFetch also exported; only useGetSettings was never generated.
 - [DigiMarket non-spec routes](digimarket-admin-routes.md) — Settings, Blog, PushNotif routes exist in API but not in OpenAPI spec; frontend uses raw fetch with cm_token.
 - [Vaultrade escrow flow](vaultrade-escrow.md) — Order statuses, seller routes, SQL tips, auth prefix.
+- [Wouter v3 prefix routing](wouter-prefix-routing.md) — Use RegExp paths (not glob `*`) for prefix matching in wouter v3 with regexparam.

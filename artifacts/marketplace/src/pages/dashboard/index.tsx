@@ -19,19 +19,19 @@ export default function DashboardRouter() {
   return (
     <DashboardLayout>
       <Switch>
-        <Route path="/" component={Overview} />
-        <Route path="/orders/:id" component={OrderDetail} />
-        <Route path="/orders" component={Orders} />
-        <Route path="/downloads" component={Downloads} />
-        <Route path="/wallet" component={WalletPage} />
-        <Route path="/messages" component={Messages} />
-        <Route path="/notifications" component={Notifications} />
-        <Route path="/wishlist" component={Wishlist} />
-        <Route path="/tickets" component={Tickets} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/products/new" component={SellerAddProduct} />
-        <Route path="/products" component={SellerProducts} />
-        <Route path="/earnings" component={SellerEarnings} />
+        <Route path="/dashboard" component={Overview} />
+        <Route path="/dashboard/orders/:id" component={OrderDetail} />
+        <Route path="/dashboard/orders" component={Orders} />
+        <Route path="/dashboard/downloads" component={Downloads} />
+        <Route path="/dashboard/wallet" component={WalletPage} />
+        <Route path="/dashboard/messages" component={Messages} />
+        <Route path="/dashboard/notifications" component={Notifications} />
+        <Route path="/dashboard/wishlist" component={Wishlist} />
+        <Route path="/dashboard/tickets" component={Tickets} />
+        <Route path="/dashboard/profile" component={Profile} />
+        <Route path="/seller/products/new" component={SellerAddProduct} />
+        <Route path="/seller/products" component={SellerProducts} />
+        <Route path="/seller/earnings" component={SellerEarnings} />
       </Switch>
     </DashboardLayout>
   );
