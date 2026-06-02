@@ -4,3 +4,4 @@
 - [DigiMarket non-spec routes](digimarket-admin-routes.md) — Settings, Blog, PushNotif routes exist in API but not in OpenAPI spec; frontend uses raw fetch with cm_token.
 - [Vaultrade escrow flow](vaultrade-escrow.md) — Order statuses, seller routes, SQL tips, auth prefix.
 - [Wouter v3 prefix routing](wouter-prefix-routing.md) — Use RegExp paths (not glob `*`) for prefix matching in wouter v3 with regexparam.
+- [CJS modules in esbuild ESM output](cjs-esm-interop.md) — otplib, qrcode and similar CJS modules need createRequire(import.meta.url) for named imports; static `import { x } from "cjs-module"` fails at runtime.

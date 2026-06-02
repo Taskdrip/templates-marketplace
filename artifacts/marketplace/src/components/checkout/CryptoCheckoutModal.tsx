@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useGetWalletAddresses, useSubmitPayment } from "@workspace/api-client-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useQueryClient } from "@tanstack/react-query";
-import { Copy, Check, Clock, Shield, Upload, AlertTriangle, Zap, ChevronRight } from "lucide-react";
-import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { Copy, Check, Clock, Shield, Upload, AlertTriangle, Zap, ChevronRight, X, ImageIcon, Loader2 } from "lucide-react";
+import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
 
 const CHAIN_META: Record<string, { name: string; network: string; color: string; bg: string; border: string; icon: string }> = {
   USDT_TRC20: { name: "TRON",      network: "TRC20",  color: "text-red-400",    bg: "bg-red-500/10",    border: "border-red-500/30",    icon: "🔴" },
@@ -79,9 +79,13 @@ interface Props {
 export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId, amount, productName }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [selectedChain, setSelectedChain] = useState("USDT_TON");
   const [txHash, setTxHash] = useState("");
   const [proofUrl, setProofUrl] = useState("");
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [expiresAt] = useState(() => new Date(Date.now() + 30 * 60 * 1000));
   const [expired, setExpired] = useState(false);
@@ -103,6 +107,60 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
   };
 
   const handleExpire = useCallback(() => setExpired(true), []);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please upload an image file (JPEG, PNG, WebP).", variant: "destructive" });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Maximum file size is 10 MB.", variant: "destructive" });
+      return;
+    }
+
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = (ev) => setProofPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+
+    // Upload to server
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const token = localStorage.getItem("cm_token");
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as any).error || "Upload failed");
+      }
+
+      const data = await res.json();
+      setProofUrl(data.url);
+      toast({ description: "Screenshot uploaded ✓" });
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+      setProofPreview(null);
+      setProofUrl("");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeProof = () => {
+    setProofUrl("");
+    setProofPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = () => {
     if (!txHash.trim()) {
@@ -262,20 +320,54 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
               <p className="text-[10px] text-muted-foreground">Copy the TXID from your crypto wallet transaction history.</p>
             </div>
 
+            {/* Screenshot Upload */}
             <div className="space-y-2">
               <Label className="text-sm flex items-center gap-1.5">
                 <Upload className="w-3.5 h-3.5 text-purple-400" />
-                Payment Screenshot URL <span className="text-muted-foreground text-xs">(optional)</span>
+                Payment Screenshot <span className="text-muted-foreground text-xs">(optional but recommended)</span>
               </Label>
-              <Input
-                placeholder="https://imgbb.com/... or imgur.com/..."
-                className="bg-black/30 border-white/10 text-xs h-10 focus:border-purple-500/50"
-                value={proofUrl}
-                onChange={e => setProofUrl(e.target.value)}
+
+              {proofPreview ? (
+                <div className="relative rounded-xl overflow-hidden border border-purple-500/30 bg-black/30">
+                  <img src={proofPreview} alt="Payment proof" className="w-full max-h-48 object-contain" />
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 text-white animate-spin" />
+                      <span className="ml-2 text-white text-sm">Uploading…</span>
+                    </div>
+                  )}
+                  {!isUploading && proofUrl && (
+                    <div className="absolute top-2 right-2 flex items-center gap-1 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded-full">
+                      <Check className="w-3 h-3" /> Uploaded
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={removeProof}
+                    className="absolute top-2 left-2 bg-black/70 hover:bg-black text-white rounded-full p-1 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full border-2 border-dashed border-purple-500/30 hover:border-purple-500/60 bg-purple-500/5 hover:bg-purple-500/10 rounded-xl p-6 transition-all flex flex-col items-center gap-2 text-muted-foreground hover:text-purple-300"
+                >
+                  <ImageIcon className="w-8 h-8 opacity-60" />
+                  <span className="text-sm font-medium">Click to upload screenshot</span>
+                  <span className="text-xs opacity-60">JPEG, PNG, WebP up to 10 MB</span>
+                </button>
+              )}
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={handleFileChange}
               />
-              <p className="text-[10px] text-muted-foreground">
-                Upload your screenshot to imgbb.com or imgur.com and paste the URL here.
-              </p>
             </div>
           </div>
 
@@ -289,7 +381,7 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
           <Button
             className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold text-sm gap-2 shadow-lg shadow-purple-500/25"
             onClick={handleSubmit}
-            disabled={submitPayment.isPending || expired || !txHash.trim()}
+            disabled={submitPayment.isPending || expired || !txHash.trim() || isUploading}
           >
             {submitPayment.isPending ? (
               <span className="flex items-center gap-2">
