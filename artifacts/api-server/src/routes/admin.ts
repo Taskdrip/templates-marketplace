@@ -90,10 +90,15 @@ router.patch("/admin/users/:id", requireAuth, requireAdmin, async (req, res): Pr
   const id = parseInt(raw, 10);
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
 
-  const { isActive, role } = req.body;
+  const { isActive, role, username, email, displayName, phone, telegramHandle } = req.body;
   const updateData: any = {};
   if (isActive !== undefined) updateData.isActive = isActive;
   if (role) updateData.role = role;
+  if (username) updateData.username = username;
+  if (email) updateData.email = email;
+  if (displayName !== undefined) updateData.displayName = displayName;
+  if (phone !== undefined) updateData.phone = phone;
+  if (telegramHandle !== undefined) updateData.telegramHandle = telegramHandle;
 
   const [user] = await db.update(usersTable).set(updateData).where(eq(usersTable.id, id)).returning();
   if (!user) { res.status(404).json({ error: "Not found" }); return; }
@@ -104,6 +109,9 @@ router.patch("/admin/users/:id", requireAuth, requireAdmin, async (req, res): Pr
     email: user.email,
     role: user.role,
     avatarUrl: user.avatarUrl ?? null,
+    displayName: user.displayName ?? null,
+    phone: user.phone ?? null,
+    telegramHandle: user.telegramHandle ?? null,
     isActive: user.isActive,
     createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
     totalPurchases: 0,

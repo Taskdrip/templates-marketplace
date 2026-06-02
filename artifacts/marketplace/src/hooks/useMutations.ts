@@ -104,6 +104,13 @@ export function useUpdateAdminUser() {
   });
 }
 
+export function useDeleteAdminUser() {
+  return useMutation({
+    mutationFn: ({ id }: { id: number }) =>
+      apiFetch("DELETE", `/admin/users/${id}`),
+  });
+}
+
 export function useCreateWallet() {
   return useMutation({
     mutationFn: ({ data }: { data: Record<string, unknown> }) =>
