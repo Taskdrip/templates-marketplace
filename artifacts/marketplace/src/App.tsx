@@ -25,6 +25,8 @@ import Contact from "@/pages/public/Contact";
 import BlogPage from "@/pages/public/BlogPage";
 import Terms from "@/pages/public/Terms";
 import Privacy from "@/pages/public/Privacy";
+import HireDeveloper from "@/pages/public/HireDeveloper";
+import HireSubmit from "@/pages/public/HireSubmit";
 
 // Protected Routers
 import DashboardRouter from "@/pages/dashboard/index";
@@ -96,6 +98,12 @@ function Router() {
       </Route>
       <Route path="/privacy">
         <PublicLayout><Privacy /></PublicLayout>
+      </Route>
+      <Route path="/hire/submit">
+        <PublicLayout><ProtectedRoute component={HireSubmit} /></PublicLayout>
+      </Route>
+      <Route path="/hire">
+        <PublicLayout><HireDeveloper /></PublicLayout>
       </Route>
       <Route path="/login">
         <PublicLayout><Login /></PublicLayout>

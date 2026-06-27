@@ -12,3 +12,4 @@ export * from "./tickets";
 export * from "./downloads";
 export * from "./siteSettings";
 export * from "./blogPosts";
+export * from "./hireRequests";

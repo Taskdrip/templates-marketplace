@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Package, Users, ShoppingCart, Wallet,
   MessageSquare, Ticket, LineChart, LogOut, ShieldAlert,
-  Settings, FileText, Bell, CreditCard, Menu, X
+  Settings, FileText, Bell, CreditCard, Menu, X, Cpu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -22,8 +22,9 @@ const links = [
   { href: "/admin/tickets",  label: "Tickets",            icon: Ticket },
   { href: "/admin/revenue",  label: "Revenue",            icon: LineChart },
   { href: "/admin/blog",     label: "Blog",               icon: FileText },
-  { href: "/admin/push",     label: "Push Notifications", icon: Bell },
-  { href: "/admin/settings", label: "Settings",           icon: Settings },
+  { href: "/admin/hire-requests", label: "Hire Requests",     icon: Cpu },
+  { href: "/admin/push",         label: "Push Notifications", icon: Bell },
+  { href: "/admin/settings",     label: "Settings",           icon: Settings },
 ];
 
 function NavLinks({ pathname, onNavigate, logout }: { pathname: string; onNavigate?: () => void; logout: () => void }) {
@@ -106,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-violet-400 shrink-0" />
             <h2 className="font-semibold text-sm text-muted-foreground hidden sm:block">
-              Vaultrade.store <span className="text-foreground">Administration</span>
+              PiMarket <span className="text-foreground">Administration</span>
             </h2>
             <h2 className="font-semibold text-sm text-violet-400 sm:hidden">Admin</h2>
           </div>

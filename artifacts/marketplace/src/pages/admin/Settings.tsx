@@ -22,6 +22,8 @@ export default function AdminSettings() {
     payment_instructions: "",
     site_name: "",
     support_email: "",
+    hire_whatsapp: "",
+    hire_telegram: "",
   });
 
   // 2FA state
@@ -41,6 +43,8 @@ export default function AdminSettings() {
         payment_instructions: settings.payment_instructions ?? "",
         site_name: settings.site_name ?? "",
         support_email: settings.support_email ?? "",
+        hire_whatsapp: settings.hire_whatsapp ?? "",
+        hire_telegram: settings.hire_telegram ?? "",
       });
     }
   }, [settings]);
@@ -369,6 +373,46 @@ export default function AdminSettings() {
         </CardHeader>
         <CardContent>
           <Input className="bg-background" value={form.support_email} onChange={set("support_email")} placeholder="support@digimarket.io" />
+        </CardContent>
+      </Card>
+
+      {/* Hire a Developer Contact */}
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-emerald-400" /> Hire a Developer — Contact Details
+          </CardTitle>
+          <CardDescription>
+            WhatsApp and Telegram contact info shown to users after they submit a hire request. Users will be linked directly to you.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5">
+                <span className="text-emerald-400 text-xs">📱</span> WhatsApp Number
+              </Label>
+              <Input
+                className="bg-background font-mono text-sm"
+                value={form.hire_whatsapp}
+                onChange={set("hire_whatsapp")}
+                placeholder="+1234567890"
+              />
+              <p className="text-xs text-muted-foreground">Full international number including country code</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5">
+                <span className="text-blue-400 text-xs">✈️</span> Telegram Username
+              </Label>
+              <Input
+                className="bg-background font-mono text-sm"
+                value={form.hire_telegram}
+                onChange={set("hire_telegram")}
+                placeholder="@yourusername"
+              />
+              <p className="text-xs text-muted-foreground">Telegram handle with or without @</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

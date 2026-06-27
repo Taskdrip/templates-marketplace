@@ -14,6 +14,7 @@ import Profile from "./Profile";
 import SellerProducts from "@/pages/seller/Products";
 import SellerAddProduct from "@/pages/seller/AddProduct";
 import SellerEarnings from "@/pages/seller/Earnings";
+import HireRequestsDashboard from "./HireRequests";
 
 export default function DashboardRouter() {
   return (
@@ -32,6 +33,7 @@ export default function DashboardRouter() {
         <Route path="/seller/products/new" component={SellerAddProduct} />
         <Route path="/seller/products" component={SellerProducts} />
         <Route path="/seller/earnings" component={SellerEarnings} />
+        <Route path="/dashboard/hire-requests" component={HireRequestsDashboard} />
       </Switch>
     </DashboardLayout>
   );

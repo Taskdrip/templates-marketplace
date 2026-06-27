@@ -54,6 +54,16 @@ const SLIDES = [
     accent: "from-yellow-400 to-orange-500",
     image: "https://images.unsplash.com/photo-1639762681485-074b7f4ec6ae?w=1200&auto=format&fit=crop",
   },
+  {
+    badge: "👨‍💻 Hire a Pi Developer",
+    title: `Build Your Custom\nPi Network App`,
+    subtitle: "Need a custom web app, DeFi tool, bot, or Pi SDK integration? Hire our expert developer. Submit your brief, get a quote, pay with Pi escrow.",
+    cta: "Hire a Developer",
+    ctaLink: "/hire",
+    bg: "from-[#0a1a0a] via-[#0f2a1a] to-[#050f08]",
+    accent: "from-emerald-400 to-cyan-500",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&auto=format&fit=crop",
+  },
 ];
 
 const CATEGORIES = [

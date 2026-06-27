@@ -102,6 +102,16 @@ export default function Navbar() {
             {navLink("/pricing", "Pricing")}
             {navLink("/blog", "Blog")}
             {navLink("/about", "About")}
+            <Link
+              href="/hire"
+              className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors border ${
+                location === "/hire" || location.startsWith("/hire/")
+                  ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
+                  : "text-emerald-400/80 border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400"
+              }`}
+            >
+              👨‍💻 Hire Dev
+            </Link>
           </nav>
 
           {/* Search bar - desktop */}

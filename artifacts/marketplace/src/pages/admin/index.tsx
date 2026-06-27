@@ -13,6 +13,7 @@ import AdminRevenue from "./Revenue";
 import AdminSettings from "./Settings";
 import AdminBlog from "./Blog";
 import AdminPushNotifications from "./PushNotifications";
+import AdminHireRequests from "./HireRequests";
 
 export default function AdminRouter() {
   return (
@@ -30,6 +31,7 @@ export default function AdminRouter() {
         <Route path="/admin/settings" component={AdminSettings} />
         <Route path="/admin/blog" component={AdminBlog} />
         <Route path="/admin/push" component={AdminPushNotifications} />
+        <Route path="/admin/hire-requests" component={AdminHireRequests} />
       </Switch>
     </AdminLayout>
   );

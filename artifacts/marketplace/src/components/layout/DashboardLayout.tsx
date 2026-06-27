@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, ShoppingBag, Download, Wallet,
   MessageSquare, Bell, Heart, Ticket, UserCircle, LogOut, Menu,
-  Package, TrendingUp, PlusCircle,
+  Package, TrendingUp, PlusCircle, Cpu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -15,15 +15,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { logout, user } = useAuth();
 
   const buyerLinks = [
-    { href: "/dashboard",               label: "Overview",        icon: LayoutDashboard },
-    { href: "/dashboard/orders",        label: "My Orders",       icon: ShoppingBag },
-    { href: "/dashboard/downloads",     label: "Downloads",       icon: Download },
-    { href: "/dashboard/wallet",        label: "Wallet",          icon: Wallet },
-    { href: "/dashboard/messages",      label: "Messages",        icon: MessageSquare },
-    { href: "/dashboard/notifications", label: "Notifications",   icon: Bell },
-    { href: "/dashboard/wishlist",      label: "Wishlist",        icon: Heart },
-    { href: "/dashboard/tickets",       label: "Support Tickets", icon: Ticket },
-    { href: "/dashboard/profile",       label: "Profile",         icon: UserCircle },
+    { href: "/dashboard",                  label: "Overview",        icon: LayoutDashboard },
+    { href: "/dashboard/orders",           label: "My Orders",       icon: ShoppingBag },
+    { href: "/dashboard/downloads",        label: "Downloads",       icon: Download },
+    { href: "/dashboard/wallet",           label: "Wallet",          icon: Wallet },
+    { href: "/dashboard/hire-requests",    label: "Hire Requests",   icon: Cpu },
+    { href: "/dashboard/messages",         label: "Messages",        icon: MessageSquare },
+    { href: "/dashboard/notifications",    label: "Notifications",   icon: Bell },
+    { href: "/dashboard/wishlist",         label: "Wishlist",        icon: Heart },
+    { href: "/dashboard/tickets",          label: "Support Tickets", icon: Ticket },
+    { href: "/dashboard/profile",          label: "Profile",         icon: UserCircle },
   ];
 
   const sellerLinks = [
@@ -95,7 +96,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <LogOut className="w-4 h-4 mr-2" /> Log out
         </Button>
         <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" asChild>
-          <Link href="/">← Back to Vaultrade.store</Link>
+          <Link href="/">← Back to PiMarket</Link>
         </Button>
       </div>
     </div>

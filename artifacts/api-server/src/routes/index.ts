@@ -18,6 +18,7 @@ import blogRouter from "./blog";
 import pushNotificationsRouter from "./pushNotifications";
 import sellerRouter from "./seller";
 import uploadRouter from "./upload";
+import hireRequestsRouter from "./hireRequests";
 
 const router: IRouter = Router();
 
@@ -40,5 +41,6 @@ router.use(settingsRouter);
 router.use(blogRouter);
 router.use(pushNotificationsRouter);
 router.use(uploadRouter);
+router.use(hireRequestsRouter);
 
 export default router;
