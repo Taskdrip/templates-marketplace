@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Shield, Zap, Globe, Cpu, Users, TrendingUp, Lock, CheckCircle2, ArrowRight } from "lucide-react";
-import { PiMarketLogomark, PiMarketWordmark } from "@/components/PiMarketLogo";
+import { VaultradeLogomark as PiMarketLogomark, VaultradeWordmark as PiMarketWordmark } from "@/components/VaultradeLogo";
 
 const STATS = [
   { value: "12,000+", label: "Registered Users" },
