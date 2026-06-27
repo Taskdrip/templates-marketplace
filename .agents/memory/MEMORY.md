@@ -5,3 +5,4 @@
 - [Vaultrade escrow flow](vaultrade-escrow.md) — Order statuses, seller routes, SQL tips, auth prefix.
 - [Wouter v3 prefix routing](wouter-prefix-routing.md) — Use RegExp paths (not glob `*`) for prefix matching in wouter v3 with regexparam.
 - [CJS modules in esbuild ESM output](cjs-esm-interop.md) — otplib, qrcode and similar CJS modules need createRequire(import.meta.url) for named imports; static `import { x } from "cjs-module"` fails at runtime.
+- [PiMarket Pi Network integration](pimarket-pi-integration.md) — Pi SDK, PiContext, Pi auth backend, Pi payment flow, currency display conventions.

@@ -177,6 +177,42 @@ router.post("/auth/2fa/verify", async (req, res): Promise<void> => {
   res.json({ token, user: toUserResponse(user) });
 });
 
+// ─── Pi Network Auth ──────────────────────────────────────────────────────────
+
+router.post("/auth/pi-login", async (req, res): Promise<void> => {
+  const { piUid, piUsername } = req.body;
+  if (!piUid || !piUsername) {
+    res.status(400).json({ error: "Missing Pi Network credentials" });
+    return;
+  }
+
+  const piEmail = `${piUid}@pi.network`;
+  let [user] = await db.select().from(usersTable).where(eq(usersTable.email, piEmail));
+
+  if (!user) {
+    let username = piUsername.toLowerCase().replace(/[^a-z0-9_]/g, "_");
+    const [existingUsername] = await db.select().from(usersTable).where(eq(usersTable.username, username));
+    if (existingUsername) username = `${username}_${Date.now().toString(36)}`;
+
+    [user] = await db.insert(usersTable).values({
+      username,
+      email: piEmail,
+      passwordHash: `pi_auth_${piUid}`,
+      displayName: piUsername,
+      telegramHandle: piUid,
+      isActive: true,
+    }).returning();
+  }
+
+  if (!user.isActive) {
+    res.status(403).json({ error: "Account is deactivated" });
+    return;
+  }
+
+  const token = signToken({ userId: user.id, role: user.role });
+  res.json({ token, user: toUserResponse(user) });
+});
+
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
 function toUserResponse(user: any) {

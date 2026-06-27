@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { PiProvider } from "@/contexts/PiContext";
 import NotFound from "@/pages/not-found";
-import { TonConnectUIProvider } from "@tonconnect/ui-react";
 
 // Layouts
 import PublicLayout from "@/components/layout/PublicLayout";
@@ -44,16 +44,7 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
     }
   }, [user, isAdmin, isLoading, setLocation, adminOnly]);
 
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading Vaultrade...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <PiLoadingScreen />;
   if (!user || (adminOnly && !isAdmin)) return null;
   return <Component />;
 }
@@ -124,9 +115,32 @@ function Router() {
   );
 }
 
+function PiLoadingScreen() {
+  return (
+    <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#0a0416] via-[#110a2e] to-[#0d0720]">
+      <div className="flex flex-col items-center gap-6">
+        <div className="relative">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-800 flex items-center justify-center shadow-2xl shadow-violet-500/40">
+            <span className="text-4xl font-black text-white" style={{ fontFamily: "serif" }}>π</span>
+          </div>
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-yellow-400/20 to-transparent animate-pulse" />
+        </div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex gap-1.5">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="w-2 h-2 rounded-full bg-yellow-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+            ))}
+          </div>
+          <p className="text-sm text-purple-300/60 font-medium tracking-wide">Loading PiMarket…</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
-    <TonConnectUIProvider manifestUrl={`${window.location.origin}/tonconnect-manifest.json`}>
+    <PiProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
@@ -137,7 +151,7 @@ function App() {
           </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>
-    </TonConnectUIProvider>
+    </PiProvider>
   );
 }
 

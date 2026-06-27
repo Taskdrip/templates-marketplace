@@ -62,9 +62,7 @@ async function seed() {
     console.log(`  Created wallet ${chain}`);
   };
 
-  await upsertWallet("USDT_TRC20", "TRCxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "USDT TRC20 Escrow", "Send USDT on the TRON network (TRC20). Fast and low fees. Minimum: $1 USDT.");
-  await upsertWallet("USDT_TON", "EQCxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "USDT TON Escrow", "Send USDT on The Open Network (TON). Lightning fast with near-zero fees.");
-  await upsertWallet("USDT_BEP20", "0xBEP20xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "USDT BEP20 Escrow", "Send USDT on BNB Smart Chain (BEP20). Ensure you select BEP20 network in your wallet.");
+  await upsertWallet("PI", "GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "Pi Network Escrow", "Send Pi (π) to this Pi wallet address. Ensure you are using the Pi Browser for payments. Minimum: 1 π Pi.");
 
   // --- Site Settings (idempotent by key) ---
   const upsertSetting = async (key: string, value: string) => {
@@ -74,11 +72,11 @@ async function seed() {
     console.log(`  Created setting ${key}`);
   };
 
-  await upsertSetting("telegram_link", "https://t.me/vaultrade_store");
-  await upsertSetting("thank_you_message", "🎉 Thank you for your payment! Your order is being reviewed by our team. You will receive a notification once confirmed. If you need help, chat with us below or reach us on Telegram.");
-  await upsertSetting("payment_instructions", "Complete your payment within 30 minutes. Send the exact USDT amount to the address shown, then enter your Transaction Hash (TXID) and upload a payment screenshot as proof.");
-  await upsertSetting("site_name", "Vaultrade");
-  await upsertSetting("support_email", "support@vaultrade.store");
+  await upsertSetting("telegram_link", "https://t.me/pimarket_official");
+  await upsertSetting("thank_you_message", "🎉 Thank you for your Pi payment! Your order is being reviewed by our team. You will receive a notification once your Pi payment is confirmed. If you need help, chat with us below.");
+  await upsertSetting("payment_instructions", "Complete your payment within 30 minutes. Send the exact Pi (π) amount to the escrow wallet address shown, then enter your Pi Transaction ID (TXID) and upload a payment screenshot as proof.");
+  await upsertSetting("site_name", "PiMarket");
+  await upsertSetting("support_email", "support@pimarket.app");
 
   // --- Products (idempotent — only if none exist) ---
   const existingProducts = await db.select().from(productsTable);

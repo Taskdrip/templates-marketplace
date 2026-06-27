@@ -9,9 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getListPaymentsQueryKey, getListAdminOrdersQueryKey } from "@workspace/api-client-react";
 
 const chainExplorer: Record<string, (txHash: string) => string> = {
-  USDT_TRC20: (h) => `https://tronscan.org/#/transaction/${h}`,
-  USDT_BEP20: (h) => `https://bscscan.com/tx/${h}`,
-  USDT_TON:   (h) => `https://tonscan.org/tx/${h}`,
+  PI: (h) => `https://pi.app/tx/${h}`,
 };
 
 export default function AdminPayments() {
@@ -94,7 +92,7 @@ export default function AdminPayments() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="bg-secondary border-none text-xs">
-                        {payment.chain?.replace("USDT_", "") ?? "—"}
+                        <span className="font-black text-yellow-400" style={{ fontFamily: "serif" }}>π</span>{" "}{payment.chain === "PI" ? "Pi" : payment.chain ?? "—"}
                       </Badge>
                     </TableCell>
                     <TableCell className="font-semibold">${payment.amount.toFixed(2)}</TableCell>

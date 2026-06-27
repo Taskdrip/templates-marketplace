@@ -23,9 +23,7 @@ async function fetchAdminWallets() {
 }
 
 const CHAINS = [
-  { id: "USDT_TRC20", label: "USDT — TRON (TRC20)",          network: "Tron Network",       color: "text-red-400",    bg: "bg-red-500/10",    border: "border-red-500/20",    placeholder: "TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
-  { id: "USDT_BEP20", label: "USDT — BNB Smart Chain (BEP20)", network: "BNB Chain",        color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20", placeholder: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
-  { id: "USDT_TON",   label: "USDT — TON Network",            network: "The Open Network",   color: "text-blue-400",   bg: "bg-blue-500/10",   border: "border-blue-500/20",   placeholder: "EQxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
+  { id: "PI", label: "Pi Network (π)",  network: "Pi Blockchain", color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20", placeholder: "GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" },
 ];
 
 type WalletState = { id: number; address: string; originalAddress: string; customMessage: string; originalMessage: string };
@@ -162,7 +160,7 @@ export default function AdminWallets() {
                           ...prev,
                           [chain.id]: { ...(prev[chain.id] ?? { id: 0, address: "", originalAddress: "", originalMessage: "" }), customMessage: e.target.value },
                         }))}
-                        placeholder={`e.g. Send USDT on ${chain.network}. Fast and low fees. Minimum: $1 USDT.`}
+                        placeholder={`e.g. Send Pi (π) on ${chain.network}. Minimum: 1 π Pi.`}
                       />
                     </div>
 
@@ -193,7 +191,7 @@ export default function AdminWallets() {
           <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
             <li>Customer clicks <strong className="text-foreground">"Buy with Crypto"</strong> on a product page</li>
             <li>A Web3 checkout popup opens with a 30-minute timer</li>
-            <li>Customer selects network (TRC20 / BEP20 / TON) and sends USDT</li>
+            <li>Customer opens Pi Browser, selects Pi payment and sends π Pi</li>
             <li>Customer submits their TX hash + optional proof screenshot</li>
             <li>Admin verifies the payment in the <span className="text-foreground font-medium">Payments</span> tab</li>
             <li>Admin confirms → customer gets access to the download + chat notification</li>

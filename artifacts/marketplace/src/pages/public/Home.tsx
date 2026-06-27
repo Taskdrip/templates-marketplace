@@ -4,77 +4,81 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowRight, ChevronLeft, ChevronRight, Shield, Zap, Users, Star,
-  Code2, Globe, Facebook, Instagram, Twitter, Layers, ShoppingBag,
-  TrendingUp, Lock, CheckCircle2, Store, Package, Cpu, ExternalLink,
+  Code2, Globe, Instagram, Layers, ShoppingBag,
+  TrendingUp, Lock, CheckCircle2, Store, Package, Cpu,
+  Monitor, FileCode2, Bot, Smartphone,
 } from "lucide-react";
 import { useListFeaturedProducts, useListCategories } from "@workspace/api-client-react";
+import { usePi } from "@/contexts/PiContext";
+
+const PI_SYMBOL = "π";
 
 const SLIDES = [
   {
-    badge: "🔥 #1 Digital Asset Marketplace",
-    title: "Buy & Sell Premium\nSource Code & Apps",
-    subtitle: "Access thousands of web apps, mobile apps, scripts, and templates. Instant delivery. Escrow-protected.",
-    cta: "Browse Source Code",
-    ctaLink: "/marketplace?cat=source-code-apps",
-    bg: "from-[#0f0c29] via-[#302b63] to-[#24243e]",
+    badge: `🔥 #1 Marketplace on Pi Network`,
+    title: `Buy & Sell Digital\nProducts with ${PI_SYMBOL}i`,
+    subtitle: "The premier marketplace for developers, creators and entrepreneurs on the Pi Network ecosystem. Escrow-protected.",
+    cta: "Browse Products",
+    ctaLink: "/marketplace",
+    bg: "from-[#0a0416] via-[#1a0b40] to-[#0d1030]",
     accent: "from-violet-500 to-purple-700",
     image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop",
   },
   {
-    badge: "✅ Verified Accounts Available",
-    title: "Premium Social Media\nAccounts & Pages",
-    subtitle: "Buy aged Facebook, Instagram, Twitter, and TikTok accounts with real followers. Verified and ready to use.",
-    cta: "View Accounts",
-    ctaLink: "/marketplace?cat=social-media-accounts",
-    bg: "from-[#0f2027] via-[#203a43] to-[#2c5364]",
-    accent: "from-sky-500 to-cyan-600",
-    image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&auto=format&fit=crop",
-  },
-  {
-    badge: "🌐 Turnkey Digital Business",
-    title: "Ready-Made Websites\n& Premium Domains",
-    subtitle: "Launch your business instantly. Buy complete website packages, premium domain names, and landing pages.",
-    cta: "Shop Websites",
-    ctaLink: "/marketplace?cat=websites-domains",
-    bg: "from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]",
-    accent: "from-emerald-500 to-teal-600",
+    badge: "💻 Web Apps & Software",
+    title: "Deploy Ready-Made\nWeb Applications",
+    subtitle: "Buy complete SaaS apps, admin dashboards, e-commerce systems, and business tools. Source code included.",
+    cta: "Browse Web Apps",
+    ctaLink: "/marketplace?cat=web-apps",
+    bg: "from-[#060b2e] via-[#0f1a50] to-[#080e30]",
+    accent: "from-blue-500 to-indigo-600",
     image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&auto=format&fit=crop",
   },
   {
+    badge: "✅ Verified Social Accounts",
+    title: "Premium Social Media\nAccounts & Pages",
+    subtitle: "Buy aged, verified Facebook, Instagram, Twitter and TikTok accounts with real followers. Ready to use.",
+    cta: "View Accounts",
+    ctaLink: "/marketplace?cat=social-media-accounts",
+    bg: "from-[#0f1a20] via-[#152535] to-[#0a1520]",
+    accent: "from-pink-500 to-rose-600",
+    image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&auto=format&fit=crop",
+  },
+  {
     badge: "🛡️ Admin Escrow Protection",
-    title: "Safe P2P Trading\nWith Escrow",
-    subtitle: "Every trade is protected by our admin escrow system. Crypto payments in USDT TRC20, BEP20, and TON.",
+    title: `Safe P2P Trading\nWith ${PI_SYMBOL}i Escrow`,
+    subtitle: `Every trade is protected by our admin escrow system. Pay safely with Pi (${PI_SYMBOL}) — the world's fastest growing crypto.`,
     cta: "Start Selling",
     ctaLink: "/seller-register",
-    bg: "from-[#1a0533] via-[#2d1b69] to-[#11998e]",
-    accent: "from-orange-500 to-yellow-500",
+    bg: "from-[#1a0533] via-[#2d1b69] to-[#0d0420]",
+    accent: "from-yellow-400 to-orange-500",
     image: "https://images.unsplash.com/photo-1639762681485-074b7f4ec6ae?w=1200&auto=format&fit=crop",
   },
 ];
 
 const CATEGORIES = [
-  { name: "Source Code & Apps", slug: "source-code-apps", icon: <Code2 className="w-6 h-6" />, color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
-  { name: "HTML Templates", slug: "templates", icon: <Layers className="w-6 h-6" />, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
+  { name: "Web Apps & SaaS", slug: "web-apps", icon: <Monitor className="w-6 h-6" />, color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
+  { name: "Scripts & Software", slug: "scripts-software", icon: <FileCode2 className="w-6 h-6" />, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
   { name: "Social Media Accounts", slug: "social-media-accounts", icon: <Instagram className="w-6 h-6" />, color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20" },
-  { name: "Facebook Accounts", slug: "facebook-accounts", icon: <Facebook className="w-6 h-6" />, color: "text-blue-500", bg: "bg-blue-600/10 border-blue-600/20" },
+  { name: "Templates & Themes", slug: "templates", icon: <Layers className="w-6 h-6" />, color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
   { name: "Websites & Domains", slug: "websites-domains", icon: <Globe className="w-6 h-6" />, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-  { name: "Landing Pages", slug: "landing-pages", icon: <ExternalLink className="w-6 h-6" />, color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
-  { name: "Crypto & DeFi Tools", slug: "crypto-defi-tools", icon: <TrendingUp className="w-6 h-6" />, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
-  { name: "SaaS Applications", slug: "saas-apps", icon: <Package className="w-6 h-6" />, color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
+  { name: "Bots & Automation", slug: "bots-automation", icon: <Bot className="w-6 h-6" />, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
+  { name: "Mobile Apps", slug: "mobile-apps", icon: <Smartphone className="w-6 h-6" />, color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
+  { name: "Pi Network Tools", slug: "pi-network-tools", icon: <TrendingUp className="w-6 h-6" />, color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
 ];
 
 const STATS = [
   { label: "Digital Products", value: "12,000+" },
-  { label: "Active Sellers", value: "3,500+" },
+  { label: "Pi Pioneers Selling", value: "3,500+" },
   { label: "Happy Buyers", value: "85,000+" },
   { label: "Escrow Protected", value: "100%" },
 ];
 
 const TRUST = [
-  { icon: <Lock className="w-5 h-5 text-emerald-400" />, title: "Escrow Protection", desc: "Admin holds funds until delivery is confirmed" },
-  { icon: <CheckCircle2 className="w-5 h-5 text-blue-400" />, title: "Verified Sellers", desc: "All sellers are ID-verified before listing" },
-  { icon: <Zap className="w-5 h-5 text-yellow-400" />, title: "Instant Delivery", desc: "Digital files delivered immediately after payment" },
-  { icon: <Shield className="w-5 h-5 text-violet-400" />, title: "Dispute Resolution", desc: "24/7 admin support for any transaction issues" },
+  { icon: <Lock className="w-5 h-5 text-yellow-400" />, title: "Pi Escrow Protection", desc: "Admin holds Pi funds until delivery is confirmed by buyer" },
+  { icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />, title: "Verified Pi Pioneers", desc: "All sellers verified through Pi Network KYC process" },
+  { icon: <Zap className="w-5 h-5 text-violet-400" />, title: "Instant Delivery", desc: "Digital products delivered immediately after Pi payment confirmed" },
+  { icon: <Shield className="w-5 h-5 text-blue-400" />, title: "Dispute Resolution", desc: "24/7 admin support for any Pi transaction issues" },
 ];
 
 export default function Home() {
@@ -82,6 +86,7 @@ export default function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { data: featuredProducts, isLoading: loadingProducts } = useListFeaturedProducts();
+  const { isInPiBrowser } = usePi();
 
   const goToSlide = useCallback((index: number) => {
     if (isTransitioning) return;
@@ -103,19 +108,33 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full">
 
+      {/* Pi Browser Banner */}
+      {!isInPiBrowser && (
+        <div className="w-full bg-gradient-to-r from-yellow-500/20 via-yellow-400/10 to-yellow-500/20 border-b border-yellow-500/30 py-2 px-4 text-center">
+          <p className="text-xs text-yellow-300 font-medium">
+            🌐 For the best experience and Pi payments, open PiMarket in the{" "}
+            <span className="font-bold text-yellow-400">Pi Browser</span>
+          </p>
+        </div>
+      )}
+
       {/* ─── HERO SLIDER ─── */}
       <section className="relative w-full overflow-hidden" style={{ minHeight: "580px" }}>
+        <div className={`absolute inset-0 bg-gradient-to-br ${slide.bg} transition-all duration-700`} />
         <div
-          className={`absolute inset-0 bg-gradient-to-br ${slide.bg} transition-all duration-700`}
-        />
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-10 transition-all duration-700"
+          className="absolute inset-0 bg-cover bg-center opacity-8 transition-all duration-700"
           style={{ backgroundImage: `url(${slide.image})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+
+        {/* Pi network grid background */}
+        <div className="absolute inset-0 opacity-5" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(167,139,250,0.8) 1px, transparent 0)`,
+          backgroundSize: "40px 40px"
+        }} />
 
         <div className="relative z-10 container max-w-screen-xl mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm px-4 py-1.5 text-sm font-medium text-white/80 mb-6 animate-in fade-in duration-500">
+          <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/20 bg-yellow-400/5 backdrop-blur-sm px-4 py-1.5 text-sm font-medium text-yellow-300/90 mb-6 animate-in fade-in duration-500">
             {slide.badge}
           </div>
 
@@ -148,33 +167,27 @@ export default function Home() {
               className="h-13 px-8 text-base font-semibold rounded-full border-white/20 text-white hover:bg-white/10 bg-white/5 backdrop-blur-sm"
               onClick={() => setLocation("/register")}
             >
-              Create Free Account
+              Join PiMarket Free
             </Button>
+          </div>
+
+          {/* Pi payment badge */}
+          <div className="mt-8 inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs text-white/60">
+            <span className="text-yellow-400 font-bold text-base">π</span>
+            Pay with Pi Network · Escrow Protected · Instant Delivery
           </div>
         </div>
 
-        {/* Slider controls */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors backdrop-blur-sm"
-        >
+        <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors backdrop-blur-sm">
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors backdrop-blur-sm"
-        >
+        <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors backdrop-blur-sm">
           <ChevronRight className="w-5 h-5" />
         </button>
 
-        {/* Dots */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
           {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goToSlide(i)}
-              className={`rounded-full transition-all duration-300 ${i === activeSlide ? "w-8 h-2 bg-white" : "w-2 h-2 bg-white/30"}`}
-            />
+            <button key={i} onClick={() => goToSlide(i)} className={`rounded-full transition-all duration-300 ${i === activeSlide ? "w-8 h-2 bg-yellow-400" : "w-2 h-2 bg-white/30"}`} />
           ))}
         </div>
       </section>
@@ -185,10 +198,33 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {STATS.map((s) => (
               <div key={s.label} className="text-center">
-                <div className="text-2xl md:text-3xl font-extrabold text-primary">{s.value}</div>
+                <div className="text-2xl md:text-3xl font-extrabold text-yellow-400">{s.value}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── PI NETWORK INFO BAR ─── */}
+      <section className="w-full py-8 px-4 bg-gradient-to-r from-violet-900/20 via-purple-900/10 to-violet-900/20 border-b border-violet-500/20">
+        <div className="container max-w-screen-xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-purple-800 flex items-center justify-center shadow-lg shadow-violet-500/30 shrink-0">
+                <span className="text-2xl font-black text-white" style={{ fontFamily: "serif" }}>π</span>
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-white">Powered by Pi Network</h3>
+                <p className="text-xs text-muted-foreground">The world's most inclusive cryptocurrency ecosystem</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap justify-center md:justify-end gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Pi Browser Compatible</div>
+              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Pi KYC Verified Sellers</div>
+              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Pi Escrow Payments</div>
+              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Mobile-First Design</div>
+            </div>
           </div>
         </div>
       </section>
@@ -198,7 +234,7 @@ export default function Home() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Browse by Category</h2>
-            <p className="text-muted-foreground mt-1 text-sm">Find exactly what you need</p>
+            <p className="text-muted-foreground mt-1 text-sm">Everything a Pi Pioneer needs</p>
           </div>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/categories">All categories <ArrowRight className="ml-1.5 w-4 h-4" /></Link>
@@ -227,7 +263,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Featured Listings</h2>
-              <p className="text-muted-foreground mt-1 text-sm">Top picks curated by our team</p>
+              <p className="text-muted-foreground mt-1 text-sm">Top picks curated for Pi Pioneers</p>
             </div>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/marketplace">View all <ArrowRight className="ml-1.5 w-4 h-4" /></Link>
@@ -260,17 +296,35 @@ export default function Home() {
       {/* ─── HOW IT WORKS ─── */}
       <section className="w-full py-16 px-4 container max-w-screen-xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
-          <p className="text-muted-foreground mt-2">Simple, safe, and fast</p>
+          <h2 className="text-2xl md:text-3xl font-bold">How PiMarket Works</h2>
+          <p className="text-muted-foreground mt-2">Simple, safe, and built for Pi Pioneers</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { step: "01", icon: <Store className="w-7 h-7" />, title: "Browse & Select", desc: "Search thousands of digital products. Filter by category, price, and rating to find the perfect match.", color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
-            { step: "02", icon: <Lock className="w-7 h-7" />, title: "Pay with Crypto", desc: "Send USDT (TRC20, BEP20, or TON) to our escrow wallet. Funds are held securely until delivery is confirmed.", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-            { step: "03", icon: <Zap className="w-7 h-7" />, title: "Instant Delivery", desc: "Once payment is verified, you get immediate access to your digital files and full seller support.", color: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20" },
+            {
+              step: "01",
+              icon: <Store className="w-7 h-7" />,
+              title: "Browse & Select",
+              desc: "Search thousands of digital products — web apps, scripts, social accounts, templates and more. Filter by category, price, and rating.",
+              color: "text-violet-400 bg-violet-500/10 border-violet-500/20"
+            },
+            {
+              step: "02",
+              icon: <span className="text-3xl font-black" style={{ fontFamily: "serif" }}>π</span>,
+              title: "Pay with Pi",
+              desc: "Send Pi to our escrow wallet through the Pi Browser. Funds are held securely until your delivery is confirmed.",
+              color: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20"
+            },
+            {
+              step: "03",
+              icon: <Zap className="w-7 h-7" />,
+              title: "Instant Delivery",
+              desc: "Once your Pi payment is verified by admin, you get immediate access to your digital files and full seller support.",
+              color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+            },
           ].map((step) => (
             <div key={step.step} className="relative flex flex-col items-center text-center p-8 rounded-2xl bg-card border border-border/50">
-              <div className="absolute -top-3 -right-3 text-xs font-bold text-muted-foreground/30 text-5xl font-black select-none">{step.step}</div>
+              <div className="absolute -top-3 -right-3 text-5xl font-black text-muted-foreground/10 select-none">{step.step}</div>
               <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center mb-5 ${step.color}`}>
                 {step.icon}
               </div>
@@ -282,10 +336,10 @@ export default function Home() {
       </section>
 
       {/* ─── TRUST BADGES ─── */}
-      <section className="w-full py-16 px-4 bg-gradient-to-br from-primary/5 via-purple-500/5 to-transparent border-y border-border/30">
+      <section className="w-full py-16 px-4 bg-gradient-to-br from-violet-950/30 via-purple-900/10 to-transparent border-y border-border/30">
         <div className="container max-w-screen-xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold">Why Trust Us</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">Why Pi Pioneers Trust Us</h2>
             <p className="text-muted-foreground mt-2">Your security is our top priority</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -302,20 +356,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── BECOME A SELLER CTA ─── */}
+      {/* ─── SELLER CTA ─── */}
       <section className="w-full py-16 px-4 container max-w-screen-xl mx-auto">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-violet-600 to-purple-800 p-10 md:p-16 text-white text-center">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format')] bg-cover bg-center opacity-10" />
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-700 via-purple-700 to-indigo-800 p-10 md:p-16 text-white text-center">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format')] bg-cover bg-center opacity-5" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400/10 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="relative z-10 max-w-2xl mx-auto">
-            <Badge className="bg-white/20 text-white border-white/20 mb-5 text-xs">💼 Seller Program</Badge>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Start Selling Today</h2>
+            <Badge className="bg-yellow-400/20 text-yellow-300 border-yellow-400/30 mb-5 text-xs">
+              <span className="mr-1 font-black" style={{ fontFamily: "serif" }}>π</span> Pi Pioneer Seller Program
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Start Earning Pi Today</h2>
             <p className="text-white/80 text-lg mb-8 leading-relaxed">
-              List your source code, templates, social media accounts, websites, or any digital product. Reach 85,000+ buyers globally.
+              List your web apps, scripts, software, social accounts, templates, or websites. Reach 85,000+ Pi Pioneers globally and earn Pi cryptocurrency.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                className="bg-white text-primary hover:bg-white/90 font-bold rounded-full h-12 px-8"
+                className="bg-yellow-400 text-purple-900 hover:bg-yellow-300 font-bold rounded-full h-12 px-8"
                 onClick={() => setLocation("/seller-register")}
               >
                 <Users className="mr-2 w-4 h-4" /> Become a Seller
@@ -340,11 +397,10 @@ export default function Home() {
 function ProductCard({ product, onClick }: { product: any; onClick: () => void }) {
   const isNew = Date.now() - new Date(product.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000;
   const isHot = product.salesCount > 200;
-  const hasSale = product.originalPrice && Number(product.originalPrice) > Number(product.price);
 
   return (
     <div
-      className="group rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer flex flex-col"
+      className="group rounded-2xl bg-card border border-border/50 overflow-hidden hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer flex flex-col"
       onClick={onClick}
     >
       <div className="relative h-44 overflow-hidden bg-muted/30">
@@ -355,21 +411,21 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-purple-500/10">
-            <Cpu className="w-10 h-10 text-primary/30" />
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500/10 to-purple-500/10">
+            <Cpu className="w-10 h-10 text-violet-400/30" />
           </div>
         )}
         <div className="absolute top-2.5 left-2.5 flex gap-1.5">
           {isHot && <span className="text-[10px] font-bold bg-red-500 text-white px-2 py-0.5 rounded-full">HOT</span>}
           {isNew && <span className="text-[10px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded-full">NEW</span>}
-          {hasSale && <span className="text-[10px] font-bold bg-orange-500 text-white px-2 py-0.5 rounded-full">SALE</span>}
         </div>
-        <div className="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-white">
-          ${Number(product.price).toFixed(2)}
+        <div className="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-yellow-400 flex items-center gap-0.5">
+          <span className="font-black" style={{ fontFamily: "serif" }}>π</span>
+          {Number(product.price).toFixed(2)}
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
-        <div className="text-[11px] font-semibold text-primary uppercase tracking-wide mb-1">{product.categoryName}</div>
+        <div className="text-[11px] font-semibold text-violet-400 uppercase tracking-wide mb-1">{product.categoryName}</div>
         <h3 className="font-semibold text-sm leading-snug line-clamp-2 mb-2 flex-1">{product.name}</h3>
         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-auto">
           <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />

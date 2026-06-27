@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Shield, Zap, Globe, Cpu, Users, TrendingUp, Lock, CheckCircle2, ArrowRight } from "lucide-react";
-import { VaultradeLogomark, VaultradeWordmark } from "@/components/VaultradeLogo";
+import { PiMarketLogomark, PiMarketWordmark } from "@/components/PiMarketLogo";
 
 const STATS = [
   { value: "12,000+", label: "Registered Users" },
@@ -31,21 +31,21 @@ const VALUES = [
     color: "text-amber-400",
     bg: "bg-amber-500/10",
     title: "Instant Settlement",
-    desc: "Pay with USDT on TRON, BNB Chain, or TON Network. Once admin confirms, your download is available within minutes — no bank delays, ever.",
+    desc: "Pay with Pi (π) on TRON, BNB Chain, or TON Network. Once admin confirms, your download is available within minutes — no bank delays, ever.",
   },
   {
     icon: Globe,
     color: "text-blue-400",
     bg: "bg-blue-500/10",
     title: "Truly Borderless",
-    desc: "Whether you are in Lagos, Kyiv, Buenos Aires, or Bangkok — Vaultrade works for you. No geographic restrictions, no sanctions checks for digital commerce.",
+    desc: "Whether you are in Lagos, Kyiv, Buenos Aires, or Bangkok — PiMarket works for you. No geographic restrictions, no sanctions checks for digital commerce.",
   },
   {
     icon: Users,
     color: "text-pink-400",
     bg: "bg-pink-500/10",
     title: "Builder Community",
-    desc: "Join thousands of developers, traders, and digital creators who buy and sell on Vaultrade. Our community Telegram is active 24/7.",
+    desc: "Join thousands of developers, traders, and digital creators who buy and sell on PiMarket. Our community Telegram is active 24/7.",
   },
   {
     icon: TrendingUp,
@@ -74,12 +74,12 @@ export default function About() {
         <div className="container max-w-screen-xl mx-auto px-4 relative">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <VaultradeLogomark size={52} />
+              <PiMarketLogomark size={52} />
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
               About{" "}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-blue-400">
-                Vaultrade.store
+                PiMarket
               </span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed mb-8">
@@ -121,10 +121,10 @@ export default function About() {
               </div>
               <h2 className="text-3xl md:text-4xl font-bold">Vault-Level Trust for Every Digital Transaction</h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Vaultrade.store was born from a simple frustration: buying and selling digital products online was broken. PayPal chargebacks wiped out sellers. Wire transfers locked out buyers from developing nations. Intermediaries took 30%+ cuts.
+                PiMarket was born from a simple frustration: buying and selling digital products online was broken. PayPal chargebacks wiped out sellers. Wire transfers locked out buyers from developing nations. Intermediaries took 30%+ cuts.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We built Vaultrade to fix this. By anchoring every transaction to USDT and wrapping it in our escrow layer, we give both buyers and sellers the confidence they need to trade freely — across any border, at any time.
+                We built PiMarket to fix this. By anchoring every transaction to Pi (π) and wrapping it in our escrow layer, we give both buyers and sellers the confidence they need to trade freely — across any border, at any time.
               </p>
               <div className="space-y-3">
                 {[
@@ -144,7 +144,7 @@ export default function About() {
               <div className="absolute inset-0 bg-gradient-to-br from-violet-500/20 to-blue-600/20" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center space-y-4">
-                  <VaultradeLogomark size={80} />
+                  <PiMarketLogomark size={80} />
                   <p className="text-sm text-muted-foreground font-medium">Secure · Borderless · Instant</p>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function About() {
         <div className="container max-w-screen-xl mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Core Values</h2>
-            <p className="text-muted-foreground text-lg">Six principles that define how Vaultrade.store operates every day.</p>
+            <p className="text-muted-foreground text-lg">Six principles that define how PiMarket operates every day.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {VALUES.map((v) => (
@@ -195,7 +195,7 @@ export default function About() {
       <section className="py-20 border-t border-border/30">
         <div className="container max-w-screen-xl mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">The Team Behind Vaultrade</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">The Team Behind PiMarket</h2>
             <p className="text-muted-foreground text-lg">Ex-DeFi engineers, security researchers, and product builders united by one mission.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -218,9 +218,9 @@ export default function About() {
       {/* CTA */}
       <section className="py-20 border-t border-border/30 bg-gradient-to-br from-violet-950/30 to-blue-950/20">
         <div className="container max-w-screen-xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Trade on Vaultrade?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Trade on PiMarket?</h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-xl mx-auto">
-            Join thousands of buyers and sellers who trust Vaultrade.store for secure, crypto-native digital commerce.
+            Join thousands of buyers and sellers who trust PiMarket for secure, crypto-native digital commerce.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Button className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 gap-2 rounded-full px-8 h-12 text-base font-semibold shadow-xl shadow-violet-500/20" asChild>

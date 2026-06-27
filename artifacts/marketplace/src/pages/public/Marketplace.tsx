@@ -265,11 +265,11 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
         <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
           {hasSale && (
             <span className="text-[10px] line-through text-white/60 bg-black/40 px-1.5 py-0.5 rounded">
-              ${Number(product.originalPrice).toFixed(2)}
+              π{Number(product.originalPrice).toFixed(2)}
             </span>
           )}
           <span className="text-xs font-bold bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg">
-            ${Number(product.price).toFixed(2)}
+            π{Number(product.price).toFixed(2)}
           </span>
         </div>
       </div>
@@ -286,7 +286,7 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
             <span className="font-medium">4.8</span>
             <span className="text-muted-foreground ml-0.5">({product.salesCount})</span>
           </div>
-          <span className="text-[10px] text-muted-foreground">USDT</span>
+          <span className="text-[10px] text-yellow-400 font-black" style={{ fontFamily: "serif" }}>π Pi</span>
         </div>
       </div>
     </div>

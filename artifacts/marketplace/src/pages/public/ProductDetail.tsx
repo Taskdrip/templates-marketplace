@@ -131,11 +131,12 @@ export default function ProductDetail() {
           <Card className="bg-card/50 border-border/50 backdrop-blur-sm sticky top-24">
             <CardContent className="p-6">
               <div className="flex items-end gap-2 mb-6">
-                <span className="text-4xl font-bold text-foreground">${product.price.toFixed(2)}</span>
+                <span className="text-yellow-400 text-4xl font-black mb-1" style={{ fontFamily: "serif" }}>π</span>
+                <span className="text-4xl font-bold text-foreground">{product.price.toFixed(2)}</span>
                 {product.originalPrice && (
-                  <span className="text-xl text-muted-foreground line-through mb-1">${product.originalPrice.toFixed(2)}</span>
+                  <span className="text-xl text-muted-foreground line-through mb-1">{product.originalPrice.toFixed(2)}</span>
                 )}
-                <span className="text-muted-foreground mb-1">USDT</span>
+                <span className="text-muted-foreground mb-1 text-sm">Pi</span>
               </div>
               
               <Button 

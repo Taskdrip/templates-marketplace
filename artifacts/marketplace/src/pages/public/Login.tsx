@@ -4,12 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePi } from "@/contexts/PiContext";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { customFetch } from "@workspace/api-client-react";
-import { Mail, Phone, Send, Store, ArrowRight, ShieldCheck, KeyRound } from "lucide-react";
+import { Mail, Phone, Send, ArrowRight, ShieldCheck, KeyRound, Loader2 } from "lucide-react";
 
 type LoginMethod = "email" | "phone" | "telegram";
 
@@ -155,16 +156,64 @@ export default function Login() {
     );
   }
 
+  const { isInPiBrowser, piSdkReady, authenticateWithPi, isAuthenticating } = usePi();
+
+  const handlePiAuth = async () => {
+    const piResult = await authenticateWithPi();
+    if (!piResult) {
+      toast({ title: "Pi authentication failed", description: "Could not authenticate with Pi Network.", variant: "destructive" });
+      return;
+    }
+    try {
+      const res = await customFetch<any>("/api/auth/pi-login", {
+        method: "POST",
+        body: JSON.stringify({ piUid: piResult.uid, piUsername: piResult.username, accessToken: piResult.accessToken }),
+      });
+      setAuth(res.token, res.user);
+      toast({ title: `Welcome, ${piResult.username}! 🎉`, description: "Signed in with Pi Network." });
+      setLocation(res.user.role === "admin" ? "/admin" : "/dashboard");
+    } catch {
+      toast({ title: "Pi login failed", description: "Could not link your Pi account. Please try email login.", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 animate-in fade-in zoom-in-95 duration-500">
         <div className="text-center">
-          <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center mb-5 shadow-lg shadow-primary/20">
-            <Store className="w-6 h-6 text-white" />
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-800 flex items-center justify-center mb-5 shadow-2xl shadow-violet-500/30">
+            <span className="text-3xl font-black text-white" style={{ fontFamily: "serif" }}>π</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Welcome back</h2>
-          <p className="text-muted-foreground mt-2 text-sm">Sign in to your Vaultrade.store account</p>
+          <p className="text-muted-foreground mt-2 text-sm">Sign in to your PiMarket account</p>
         </div>
+
+        {/* Pi Browser Sign In */}
+        {isInPiBrowser && piSdkReady && (
+          <div className="space-y-3">
+            <Button
+              type="button"
+              className="w-full h-13 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-purple-900 font-bold rounded-xl gap-3 shadow-lg shadow-yellow-500/20"
+              onClick={handlePiAuth}
+              disabled={isAuthenticating}
+            >
+              {isAuthenticating ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Authenticating with Pi…</>
+              ) : (
+                <>
+                  <span className="text-2xl font-black leading-none" style={{ fontFamily: "serif" }}>π</span>
+                  Sign in with Pi Network
+                </>
+              )}
+            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">or sign in with email</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex rounded-xl overflow-hidden border border-border/50 bg-card/50 p-1 gap-1">
           {METHODS.map(m => (

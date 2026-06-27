@@ -3,21 +3,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useGetWalletAddresses, useSubmitPayment } from "@workspace/api-client-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useQueryClient } from "@tanstack/react-query";
-import { Copy, Check, Clock, Shield, Upload, AlertTriangle, Zap, ChevronRight, X, ImageIcon, Loader2 } from "lucide-react";
-import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
+import { usePi } from "@/contexts/PiContext";
+import {
+  Copy, Check, Clock, Shield, Upload, AlertTriangle, Zap,
+  ChevronRight, X, ImageIcon, Loader2, ExternalLink,
+} from "lucide-react";
 
-const CHAIN_META: Record<string, { name: string; network: string; color: string; bg: string; border: string; icon: string }> = {
-  USDT_TRC20: { name: "TRON",      network: "TRC20",  color: "text-red-400",    bg: "bg-red-500/10",    border: "border-red-500/30",    icon: "🔴" },
-  USDT_TON:   { name: "TON",       network: "TON",    color: "text-blue-400",   bg: "bg-blue-500/10",   border: "border-blue-500/30",   icon: "💎" },
-  USDT_BEP20: { name: "BNB Chain", network: "BEP20",  color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/30", icon: "🟡" },
-};
+const PI_SYMBOL = "π";
 
 function QRCode({ data }: { data: string }) {
   const encoded = encodeURIComponent(data);
@@ -80,24 +78,29 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isInPiBrowser, piSdkReady, createPiPayment } = usePi();
 
-  const [selectedChain, setSelectedChain] = useState("USDT_TON");
   const [txHash, setTxHash] = useState("");
   const [proofUrl, setProofUrl] = useState("");
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isPiPaymentPending, setIsPiPaymentPending] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [expiresAt] = useState(() => new Date(Date.now() + 30 * 60 * 1000));
   const [expired, setExpired] = useState(false);
-  const tonWallet = useTonWallet();
+  const [paymentMode, setPaymentMode] = useState<"pi-sdk" | "manual">(
+    isInPiBrowser && piSdkReady ? "pi-sdk" : "manual"
+  );
 
   const { data: walletData } = useGetWalletAddresses({ query: { enabled: open } });
   const { data: settings } = useSettings();
   const submitPayment = useSubmitPayment();
 
-  const wallets = (walletData?.wallets ?? []) as Array<{
-    id: number; chain: string; address: string; label: string | null; customMessage?: string | null; isActive: boolean;
-  }>;
+  const piWallet = (walletData?.wallets as any[] ?? []).find((w: any) => w.chain === "PI");
+
+  useEffect(() => {
+    setPaymentMode(isInPiBrowser && piSdkReady ? "pi-sdk" : "manual");
+  }, [isInPiBrowser, piSdkReady]);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text).catch(() => {});
@@ -111,44 +114,30 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith("image/")) {
-      toast({ title: "Invalid file", description: "Please upload an image file (JPEG, PNG, WebP).", variant: "destructive" });
+      toast({ title: "Invalid file", description: "Please upload an image file.", variant: "destructive" });
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Maximum file size is 10 MB.", variant: "destructive" });
-      return;
-    }
-
-    // Show local preview immediately
     const reader = new FileReader();
     reader.onload = (ev) => setProofPreview(ev.target?.result as string);
     reader.readAsDataURL(file);
 
-    // Upload to server
     setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append("image", file);
-
       const token = localStorage.getItem("cm_token");
       const res = await fetch("/api/upload", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as any).error || "Upload failed");
-      }
-
+      if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
       setProofUrl(data.url);
       toast({ description: "Screenshot uploaded ✓" });
-    } catch (err: any) {
-      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload screenshot.", variant: "destructive" });
       setProofPreview(null);
       setProofUrl("");
     } finally {
@@ -162,39 +151,83 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = () => {
+  const handlePiPayment = () => {
+    setIsPiPaymentPending(true);
+    createPiPayment(
+      {
+        amount,
+        memo: `PiMarket: ${productName.slice(0, 50)}`,
+        metadata: { orderId, productName },
+      },
+      {
+        onReadyForServerApproval: (paymentId) => {
+          console.log("Pi payment ready for approval:", paymentId);
+          setTxHash(paymentId);
+        },
+        onReadyForServerCompletion: (paymentId, txid) => {
+          submitPayment.mutate(
+            { data: { orderId, chain: "PI", txHash: txid || paymentId, amount } },
+            {
+              onSuccess: () => {
+                queryClient.invalidateQueries();
+                setIsPiPaymentPending(false);
+                onSuccess(orderId);
+              },
+              onError: () => {
+                setIsPiPaymentPending(false);
+                toast({ title: "Submission error", description: "Pi payment sent but submission failed. Contact support.", variant: "destructive" });
+              },
+            }
+          );
+        },
+        onCancel: (paymentId) => {
+          console.log("Pi payment cancelled:", paymentId);
+          setIsPiPaymentPending(false);
+          toast({ title: "Payment cancelled", description: "You cancelled the Pi payment." });
+        },
+        onError: (error) => {
+          console.error("Pi payment error:", error);
+          setIsPiPaymentPending(false);
+          toast({ title: "Pi payment error", description: error.message, variant: "destructive" });
+        },
+      }
+    );
+  };
+
+  const handleManualSubmit = () => {
     if (!txHash.trim()) {
-      toast({ title: "Required", description: "Please enter your Transaction Hash (TXID).", variant: "destructive" });
+      toast({ title: "Required", description: "Please enter your Pi Transaction ID (TXID).", variant: "destructive" });
       return;
     }
-    submitPayment.mutate({
-      data: { orderId, chain: selectedChain, txHash: txHash.trim(), amount, screenshotUrl: proofUrl || undefined }
-    }, {
-      onSuccess: () => {
-        queryClient.invalidateQueries();
-        onSuccess(orderId);
-      },
-      onError: (err: any) => {
-        toast({ title: "Submission Failed", description: err?.message || "Please try again.", variant: "destructive" });
+    submitPayment.mutate(
+      { data: { orderId, chain: "PI", txHash: txHash.trim(), amount, screenshotUrl: proofUrl || undefined } },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries();
+          onSuccess(orderId);
+        },
+        onError: (err: any) => {
+          toast({ title: "Submission Failed", description: err?.message || "Please try again.", variant: "destructive" });
+        },
       }
-    });
+    );
   };
 
   const paymentInstructions = settings?.payment_instructions ??
-    "Send the exact USDT amount to the address shown, then submit your TXID and proof screenshot.";
+    `Send exactly ${PI_SYMBOL}${amount.toFixed(2)} Pi to the escrow wallet address below, then submit your Pi Transaction ID as proof.`;
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-lg w-full bg-[#0f0f1a] border border-purple-500/20 p-0 overflow-hidden max-h-[92vh] overflow-y-auto">
+      <DialogContent className="max-w-lg w-full bg-[#08041a] border border-violet-500/20 p-0 overflow-hidden max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="relative bg-gradient-to-br from-purple-900/50 to-blue-900/30 px-6 pt-6 pb-4 border-b border-purple-500/20">
+        <div className="relative bg-gradient-to-br from-violet-900/60 to-purple-900/40 px-6 pt-6 pb-4 border-b border-violet-500/20">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" />
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-purple-800 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                  <span className="text-lg font-black text-white" style={{ fontFamily: "serif" }}>π</span>
                 </div>
-                <DialogTitle className="text-lg font-bold text-white">Crypto Checkout</DialogTitle>
+                <DialogTitle className="text-lg font-bold text-white">Pi Checkout</DialogTitle>
               </div>
               {!expired ? (
                 <CountdownTimer expiresAt={expiresAt} onExpire={handleExpire} />
@@ -205,10 +238,13 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
               )}
             </div>
             <div className="mt-3 flex items-center justify-between">
-              <p className="text-xs text-purple-300/70 truncate max-w-[240px]">{productName}</p>
+              <p className="text-xs text-violet-300/70 truncate max-w-[200px]">{productName}</p>
               <div className="text-right">
-                <p className="text-2xl font-bold text-white">${amount.toFixed(2)}</p>
-                <p className="text-xs text-purple-300/70">USDT</p>
+                <p className="text-2xl font-bold text-white flex items-center gap-1">
+                  <span className="text-yellow-400 font-black" style={{ fontFamily: "serif" }}>π</span>
+                  {amount.toFixed(2)}
+                </p>
+                <p className="text-xs text-violet-300/70">Pi Network</p>
               </div>
             </div>
           </DialogHeader>
@@ -216,188 +252,213 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
 
         <div className="p-5 space-y-5">
           {/* Instructions */}
-          <div className="bg-purple-500/5 border border-purple-500/20 rounded-xl p-3 text-xs text-purple-200/70 leading-relaxed">
-            <Shield className="w-3.5 h-3.5 inline mr-1.5 text-purple-400" />
+          <div className="bg-violet-500/5 border border-violet-500/20 rounded-xl p-3 text-xs text-violet-200/70 leading-relaxed">
+            <Shield className="w-3.5 h-3.5 inline mr-1.5 text-violet-400" />
             {paymentInstructions}
           </div>
 
-          {/* Network Selection */}
-          <div>
-            <Label className="text-xs text-muted-foreground mb-2 block">Select Payment Network</Label>
-            <Tabs value={selectedChain} onValueChange={setSelectedChain}>
-              <TabsList className="grid grid-cols-3 gap-1 h-auto bg-transparent p-0">
-                {(["USDT_TRC20", "USDT_TON", "USDT_BEP20"] as const).map(chain => {
-                  const meta = CHAIN_META[chain];
-                  const active = selectedChain === chain;
-                  return (
-                    <TabsTrigger
-                      key={chain}
-                      value={chain}
-                      className={`flex flex-col gap-0.5 py-2 px-3 rounded-xl border transition-all data-[state=active]:shadow-none ${
-                        active
-                          ? `${meta.bg} ${meta.border} ${meta.color}`
-                          : "bg-white/[0.03] border-white/10 text-muted-foreground hover:border-white/20"
-                      }`}
-                    >
-                      <span className="text-base">{meta.icon}</span>
-                      <span className="text-[11px] font-semibold">{meta.name}</span>
-                      <span className="text-[9px] opacity-70">{meta.network}</span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-
-              {(["USDT_TRC20", "USDT_TON", "USDT_BEP20"] as const).map(chain => {
-                const wallet = wallets.find(w => w.chain === chain);
-                const meta = CHAIN_META[chain];
-                return (
-                  <TabsContent key={chain} value={chain} className="mt-4 space-y-3">
-                    {chain === "USDT_TON" && (
-                      <div className="flex items-center justify-between p-3 rounded-xl bg-blue-500/5 border border-blue-500/20">
-                        <div>
-                          <p className="text-xs font-medium text-blue-300">TON Wallet</p>
-                          {tonWallet ? (
-                            <p className="text-[10px] text-blue-400/70 font-mono mt-0.5 break-all">
-                              {tonWallet.account.address.slice(0, 8)}...{tonWallet.account.address.slice(-6)}
-                            </p>
-                          ) : (
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Connect to use Tonkeeper, OpenMask &amp; more</p>
-                          )}
-                        </div>
-                        <TonConnectButton />
-                      </div>
-                    )}
-                    {wallet ? (
-                      <div className={`rounded-xl border p-4 space-y-3 ${meta.bg} ${meta.border}`}>
-                        <QRCode data={wallet.address} />
-                        <div>
-                          <Label className="text-xs text-muted-foreground mb-1 block text-center">
-                            Send exactly <strong>{amount} USDT</strong> to:
-                          </Label>
-                          <div className="flex items-center gap-2 bg-black/40 rounded-lg p-2 border border-white/10">
-                            <code className={`text-xs flex-1 break-all ${meta.color}`}>{wallet.address}</code>
-                            <Button
-                              variant="ghost" size="icon"
-                              className="h-7 w-7 shrink-0 hover:bg-white/10"
-                              onClick={() => handleCopy(wallet.address)}
-                            >
-                              {copied === wallet.address
-                                ? <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                : <Copy className="w-3.5 h-3.5" />}
-                            </Button>
-                          </div>
-                        </div>
-                        {wallet.customMessage && (
-                          <p className={`text-xs ${meta.color} opacity-80 text-center`}>{wallet.customMessage}</p>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-center py-6 text-muted-foreground text-sm bg-muted/20 rounded-xl border border-border/30">
-                        This network is not configured yet.
-                      </div>
-                    )}
-                  </TabsContent>
-                );
-              })}
-            </Tabs>
-          </div>
-
-          <Separator className="bg-white/5" />
-
-          {/* Payment Proof */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm flex items-center gap-1.5">
-                <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
-                Transaction Hash (TXID) <span className="text-red-400">*</span>
-              </Label>
-              <Input
-                placeholder="e.g. 0x8f3b2c1d... or TxHash from your wallet"
-                className="bg-black/30 border-white/10 font-mono text-xs h-10 focus:border-purple-500/50"
-                value={txHash}
-                onChange={e => setTxHash(e.target.value)}
-              />
-              <p className="text-[10px] text-muted-foreground">Copy the TXID from your crypto wallet transaction history.</p>
-            </div>
-
-            {/* Screenshot Upload */}
-            <div className="space-y-2">
-              <Label className="text-sm flex items-center gap-1.5">
-                <Upload className="w-3.5 h-3.5 text-purple-400" />
-                Payment Screenshot <span className="text-muted-foreground text-xs">(optional but recommended)</span>
-              </Label>
-
-              {proofPreview ? (
-                <div className="relative rounded-xl overflow-hidden border border-purple-500/30 bg-black/30">
-                  <img src={proofPreview} alt="Payment proof" className="w-full max-h-48 object-contain" />
-                  {isUploading && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 text-white animate-spin" />
-                      <span className="ml-2 text-white text-sm">Uploading…</span>
-                    </div>
-                  )}
-                  {!isUploading && proofUrl && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded-full">
-                      <Check className="w-3 h-3" /> Uploaded
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={removeProof}
-                    className="absolute top-2 left-2 bg-black/70 hover:bg-black text-white rounded-full p-1 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ) : (
+          {/* Pi Browser SDK payment */}
+          {isInPiBrowser && piSdkReady && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-xs text-muted-foreground">Payment Method</Label>
+              </div>
+              <div className="flex gap-2">
                 <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full border-2 border-dashed border-purple-500/30 hover:border-purple-500/60 bg-purple-500/5 hover:bg-purple-500/10 rounded-xl p-6 transition-all flex flex-col items-center gap-2 text-muted-foreground hover:text-purple-300"
+                  onClick={() => setPaymentMode("pi-sdk")}
+                  className={`flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-sm font-medium ${
+                    paymentMode === "pi-sdk"
+                      ? "bg-yellow-400/10 border-yellow-400/40 text-yellow-400"
+                      : "bg-white/[0.03] border-white/10 text-muted-foreground hover:border-white/20"
+                  }`}
                 >
-                  <ImageIcon className="w-8 h-8 opacity-60" />
-                  <span className="text-sm font-medium">Click to upload screenshot</span>
-                  <span className="text-xs opacity-60">JPEG, PNG, WebP up to 10 MB</span>
+                  <span className="text-2xl font-black" style={{ fontFamily: "serif" }}>π</span>
+                  <span className="text-xs">Pi Browser Pay</span>
+                  <span className="text-[9px] opacity-60">Recommended</span>
                 </button>
+                <button
+                  onClick={() => setPaymentMode("manual")}
+                  className={`flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-sm font-medium ${
+                    paymentMode === "manual"
+                      ? "bg-violet-500/10 border-violet-500/40 text-violet-400"
+                      : "bg-white/[0.03] border-white/10 text-muted-foreground hover:border-white/20"
+                  }`}
+                >
+                  <Upload className="w-5 h-5" />
+                  <span className="text-xs">Manual Proof</span>
+                  <span className="text-[9px] opacity-60">Upload TXID</span>
+                </button>
+              </div>
+
+              {paymentMode === "pi-sdk" && (
+                <div className="rounded-xl border border-yellow-400/20 bg-yellow-400/5 p-5 flex flex-col items-center gap-4">
+                  <div className="text-center">
+                    <div className="text-5xl font-black text-yellow-400 mb-1" style={{ fontFamily: "serif" }}>π</div>
+                    <p className="text-sm font-semibold text-white">{PI_SYMBOL}{amount.toFixed(2)} Pi</p>
+                    <p className="text-xs text-muted-foreground mt-1">Click below to pay via Pi Browser</p>
+                  </div>
+                  <Button
+                    className="w-full h-12 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-purple-900 font-bold text-sm gap-2 shadow-lg shadow-yellow-500/20"
+                    onClick={handlePiPayment}
+                    disabled={isPiPaymentPending || expired}
+                  >
+                    {isPiPaymentPending ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Processing Pi Payment…
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <span className="text-lg font-black" style={{ fontFamily: "serif" }}>π</span>
+                        Pay {PI_SYMBOL}{amount.toFixed(2)} with Pi
+                      </span>
+                    )}
+                  </Button>
+                </div>
               )}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </div>
-          </div>
-
-          {expired && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-center gap-2 text-red-400 text-sm">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              Payment window expired. Please close and create a new order.
             </div>
           )}
 
-          <Button
-            className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold text-sm gap-2 shadow-lg shadow-purple-500/25"
-            onClick={handleSubmit}
-            disabled={submitPayment.isPending || expired || !txHash.trim() || isUploading}
-          >
-            {submitPayment.isPending ? (
-              <span className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Submitting...
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4" />
-                I Have Completed Payment
-              </span>
-            )}
-          </Button>
+          {/* Non-Pi-Browser info */}
+          {!isInPiBrowser && (
+            <div className="bg-yellow-400/5 border border-yellow-400/20 rounded-xl p-4 flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-yellow-400/10 flex items-center justify-center shrink-0">
+                <span className="text-xl font-black text-yellow-400" style={{ fontFamily: "serif" }}>π</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-yellow-300">Pay via Pi Browser</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Open this page in the <strong className="text-yellow-400">Pi Browser</strong> app to pay directly with Pi. Or submit your Pi TXID below after paying manually.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Manual payment section */}
+          {(paymentMode === "manual" || !isInPiBrowser) && (
+            <>
+              {/* Pi wallet address */}
+              {piWallet && (
+                <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 space-y-3">
+                  <QRCode data={piWallet.address} />
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block text-center">
+                      Send exactly <strong className="text-yellow-400">{PI_SYMBOL}{amount.toFixed(2)} Pi</strong> to:
+                    </Label>
+                    <div className="flex items-center gap-2 bg-black/40 rounded-lg p-2 border border-white/10">
+                      <code className="text-xs flex-1 break-all text-violet-300">{piWallet.address}</code>
+                      <Button
+                        variant="ghost" size="icon"
+                        className="h-7 w-7 shrink-0 hover:bg-white/10"
+                        onClick={() => handleCopy(piWallet.address)}
+                      >
+                        {copied === piWallet.address
+                          ? <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          : <Copy className="w-3.5 h-3.5" />}
+                      </Button>
+                    </div>
+                    {piWallet.customMessage && (
+                      <p className="text-xs text-violet-400/80 text-center mt-2">{piWallet.customMessage}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <Separator className="bg-white/5" />
+
+              {/* TXID input */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm flex items-center gap-1.5">
+                    <ChevronRight className="w-3.5 h-3.5 text-violet-400" />
+                    Pi Transaction ID (TXID) <span className="text-red-400">*</span>
+                  </Label>
+                  <Input
+                    placeholder="Paste your Pi payment Transaction ID"
+                    className="bg-black/30 border-white/10 font-mono text-xs h-10 focus:border-violet-500/50"
+                    value={txHash}
+                    onChange={e => setTxHash(e.target.value)}
+                  />
+                  <p className="text-[10px] text-muted-foreground">Find the TXID in Pi Browser → Wallet → Transaction History.</p>
+                </div>
+
+                {/* Screenshot Upload */}
+                <div className="space-y-2">
+                  <Label className="text-sm flex items-center gap-1.5">
+                    <Upload className="w-3.5 h-3.5 text-violet-400" />
+                    Payment Screenshot <span className="text-muted-foreground text-xs">(optional but recommended)</span>
+                  </Label>
+
+                  {proofPreview ? (
+                    <div className="relative rounded-xl overflow-hidden border border-violet-500/30 bg-black/30">
+                      <img src={proofPreview} alt="Payment proof" className="w-full max-h-48 object-contain" />
+                      {isUploading && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                          <Loader2 className="w-6 h-6 text-white animate-spin" />
+                          <span className="ml-2 text-white text-sm">Uploading…</span>
+                        </div>
+                      )}
+                      {!isUploading && proofUrl && (
+                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded-full">
+                          <Check className="w-3 h-3" /> Uploaded
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={removeProof}
+                        className="absolute top-2 left-2 bg-black/70 hover:bg-black text-white rounded-full p-1 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full border-2 border-dashed border-violet-500/30 hover:border-violet-500/60 bg-violet-500/5 hover:bg-violet-500/10 rounded-xl p-6 transition-all flex flex-col items-center gap-2 text-muted-foreground hover:text-violet-300"
+                    >
+                      <ImageIcon className="w-8 h-8 opacity-60" />
+                      <span className="text-sm font-medium">Click to upload screenshot</span>
+                      <span className="text-xs opacity-60">JPEG, PNG, WebP up to 10 MB</span>
+                    </button>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </div>
+
+              {expired && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-center gap-2 text-red-400 text-sm">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  Payment window expired. Please close and create a new order.
+                </div>
+              )}
+
+              <Button
+                className="w-full h-12 bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-500 hover:to-purple-600 text-white font-semibold text-sm gap-2 shadow-lg shadow-violet-500/25"
+                onClick={handleManualSubmit}
+                disabled={submitPayment.isPending || expired || !txHash.trim() || isUploading}
+              >
+                {submitPayment.isPending ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Submitting...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    I've Completed Pi Payment
+                  </span>
+                )}
+              </Button>
+            </>
+          )}
 
           <p className="text-[10px] text-center text-muted-foreground">
-            Order #{orderId} · Secured by Vaultrade Escrow
+            Order #{orderId} · Secured by PiMarket Escrow · <span className="font-black" style={{ fontFamily: "serif" }}>π</span> Pi Network
           </p>
         </div>
       </DialogContent>

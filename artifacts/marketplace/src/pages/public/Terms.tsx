@@ -34,7 +34,7 @@ export default function Terms() {
         {/* Header */}
         <div className="mb-10">
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mb-6">
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Vaultrade.store
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to PiMarket
           </Link>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
@@ -46,7 +46,7 @@ export default function Terms() {
             </div>
           </div>
           <div className="bg-card/50 border border-border/50 rounded-xl p-4 text-sm text-muted-foreground leading-relaxed">
-            Please read these Terms of Service carefully before using <strong className="text-foreground">Vaultrade.store</strong>. By accessing or using our platform, you agree to be bound by these terms. If you do not agree, please do not use our services.
+            Please read these Terms of Service carefully before using <strong className="text-foreground">PiMarket</strong>. By accessing or using our platform, you agree to be bound by these terms. If you do not agree, please do not use our services.
           </div>
         </div>
 
@@ -68,19 +68,19 @@ export default function Terms() {
           {/* Body */}
           <div className="flex-1 space-y-12 text-sm">
             <Section id="acceptance" title="1. Acceptance of Terms">
-              <p>By creating an account, making a purchase, listing a product, or otherwise accessing Vaultrade.store (the "Platform"), you agree to these Terms of Service ("Terms") and our <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>, which is incorporated by reference.</p>
-              <p>These Terms constitute a legally binding agreement between you and Vaultrade.store Ltd. ("Vaultrade", "we", "us", or "our"). If you are using the Platform on behalf of an organization, you represent that you have authority to bind that organization.</p>
+              <p>By creating an account, making a purchase, listing a product, or otherwise accessing PiMarket (the "Platform"), you agree to these Terms of Service ("Terms") and our <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>, which is incorporated by reference.</p>
+              <p>These Terms constitute a legally binding agreement between you and PiMarket Ltd. ("PiMarket", "we", "us", or "our"). If you are using the Platform on behalf of an organization, you represent that you have authority to bind that organization.</p>
               <p>We reserve the right to modify these Terms at any time. Material changes will be communicated via email or a prominent notice on the Platform. Your continued use after such changes constitutes acceptance.</p>
             </Section>
 
             <Section id="description" title="2. Platform Description">
-              <p>Vaultrade.store is a peer-to-peer digital asset marketplace that enables sellers to list and sell digital products, and buyers to purchase them using USDT (Tether) cryptocurrency. Categories include but are not limited to: source code, trading bots, DeFi tools, social media accounts, website templates, landing pages, SaaS applications, and websites.</p>
-              <p>Vaultrade acts as an intermediary and escrow agent for transactions. We do not own, create, or warrant any of the products listed by third-party sellers. We are a technology platform, not a party to the underlying sale contracts between buyers and sellers.</p>
+              <p>PiMarket is a peer-to-peer digital asset marketplace that enables sellers to list and sell digital products, and buyers to purchase them using Pi Network (π) cryptocurrency. Categories include but are not limited to: source code, trading bots, DeFi tools, social media accounts, website templates, landing pages, SaaS applications, and websites.</p>
+              <p>PiMarket acts as an intermediary and escrow agent for transactions. We do not own, create, or warrant any of the products listed by third-party sellers. We are a technology platform, not a party to the underlying sale contracts between buyers and sellers.</p>
             </Section>
 
             <Section id="accounts" title="3. Accounts & Registration">
               <p>To access most features, you must register for an account. You agree to provide accurate, complete, and current information. You are responsible for maintaining the confidentiality of your login credentials.</p>
-              <p>You must be at least 18 years old (or the age of majority in your jurisdiction, whichever is higher) to use Vaultrade.store. By creating an account, you represent that you meet this requirement.</p>
+              <p>You must be at least 18 years old (or the age of majority in your jurisdiction, whichever is higher) to use PiMarket. By creating an account, you represent that you meet this requirement.</p>
               <p>You may not create more than one account per person without prior written approval. Accounts are non-transferable. We reserve the right to terminate accounts that violate these Terms.</p>
             </Section>
 
@@ -102,14 +102,14 @@ export default function Terms() {
             </Section>
 
             <Section id="payments" title="5. Payments & Escrow">
-              <p>All transactions on Vaultrade.store are conducted in USDT (Tether) via the TRON (TRC20), BNB Smart Chain (BEP20), or TON Network. We do not accept fiat currency payments.</p>
+              <p>All transactions on PiMarket are conducted in Pi Network (π) via the TRON (TRC20), BNB Smart Chain (BEP20), or TON Network. We do not accept fiat currency payments.</p>
               <p><strong className="text-foreground">Escrow Process:</strong> When a buyer submits payment, funds are held in escrow pending admin verification. Once we confirm the transaction on-chain, the order status is updated and the digital asset is released to the buyer. The seller's payout is processed according to our payout schedule.</p>
               <p><strong className="text-foreground">Transaction Finality:</strong> Cryptocurrency transactions are irreversible. Once a payment is confirmed on-chain, it cannot be reversed. Ensure you are sending to the correct address and amount before broadcasting a transaction.</p>
-              <p><strong className="text-foreground">Platform Fee:</strong> Vaultrade charges a platform fee on each successful transaction. The current fee schedule is displayed on our <Link href="/pricing" className="text-primary hover:underline">Pricing page</Link>. Fees are subject to change with 14 days' notice to sellers.</p>
+              <p><strong className="text-foreground">Platform Fee:</strong> PiMarket charges a platform fee on each successful transaction. The current fee schedule is displayed on our <Link href="/pricing" className="text-primary hover:underline">Pricing page</Link>. Fees are subject to change with 14 days' notice to sellers.</p>
             </Section>
 
             <Section id="sellers" title="6. Seller Obligations">
-              <p>By listing products on Vaultrade.store, sellers agree to:</p>
+              <p>By listing products on PiMarket, sellers agree to:</p>
               <ul className="list-disc list-inside space-y-1.5 ml-3">
                 <li>Provide accurate, complete descriptions and preview materials for all listings</li>
                 <li>Ensure they own or have full rights to sell the listed digital assets</li>
@@ -117,9 +117,9 @@ export default function Terms() {
                 <li>Not list products that violate applicable laws or these Terms</li>
                 <li>Maintain product quality consistent with the listing description</li>
                 <li>Not artificially inflate reviews or manipulate ratings</li>
-                <li>Accept that Vaultrade may remove listings that violate our quality standards</li>
+                <li>Accept that PiMarket may remove listings that violate our quality standards</li>
               </ul>
-              <p>Sellers are solely responsible for the accuracy of their listings and for the products they deliver. Vaultrade is not liable for seller misrepresentation.</p>
+              <p>Sellers are solely responsible for the accuracy of their listings and for the products they deliver. PiMarket is not liable for seller misrepresentation.</p>
             </Section>
 
             <Section id="buyers" title="7. Buyer Obligations">
@@ -134,7 +134,7 @@ export default function Terms() {
             </Section>
 
             <Section id="refunds" title="8. Refund Policy">
-              <p><strong className="text-foreground">General Policy:</strong> Due to the digital nature of products sold on Vaultrade.store, all sales are generally final once a product is delivered. Refunds are granted only in specific circumstances.</p>
+              <p><strong className="text-foreground">General Policy:</strong> Due to the digital nature of products sold on PiMarket, all sales are generally final once a product is delivered. Refunds are granted only in specific circumstances.</p>
               <p><strong className="text-foreground">Eligible Refund Cases:</strong></p>
               <ul className="list-disc list-inside space-y-1.5 ml-3">
                 <li>Product is significantly different from its description</li>
@@ -147,8 +147,8 @@ export default function Terms() {
             </Section>
 
             <Section id="intellectual-property" title="9. Intellectual Property">
-              <p>All content on Vaultrade.store — including our logo, brand identity, platform design, and documentation — is owned by Vaultrade and protected by copyright and trademark law.</p>
-              <p>Sellers retain ownership of their digital assets. By listing on Vaultrade, sellers grant us a non-exclusive license to display their products for marketing purposes.</p>
+              <p>All content on PiMarket — including our logo, brand identity, platform design, and documentation — is owned by PiMarket and protected by copyright and trademark law.</p>
+              <p>Sellers retain ownership of their digital assets. By listing on PiMarket, sellers grant us a non-exclusive license to display their products for marketing purposes.</p>
               <p>Buyers receive a non-exclusive, non-transferable license to use purchased digital assets per the terms specified in each listing. Unless explicitly stated, you may not resell or sublicense purchased items.</p>
             </Section>
 
@@ -159,7 +159,7 @@ export default function Terms() {
             </Section>
 
             <Section id="dmca" title="11. DMCA Policy">
-              <p>We respect intellectual property rights and respond to valid DMCA takedown notices. If you believe content on Vaultrade.store infringes your copyright, send a written notice to our DMCA agent at <strong className="text-foreground">dmca@vaultrade.store</strong> including:</p>
+              <p>We respect intellectual property rights and respond to valid DMCA takedown notices. If you believe content on PiMarket infringes your copyright, send a written notice to our DMCA agent at <strong className="text-foreground">dmca@pimarket.app</strong> including:</p>
               <ul className="list-disc list-inside space-y-1.5 ml-3">
                 <li>A description of the copyrighted work claimed to be infringed</li>
                 <li>A description of the infringing material and its location on our Platform</li>
@@ -172,21 +172,21 @@ export default function Terms() {
             </Section>
 
             <Section id="termination" title="12. Termination">
-              <p>We may suspend or terminate your access to Vaultrade.store at our sole discretion, with or without notice, for any violation of these Terms or for any conduct we deem harmful to the Platform or other users.</p>
-              <p>You may terminate your account at any time by contacting us at <strong className="text-foreground">support@vaultrade.store</strong>. Termination does not affect any outstanding transaction obligations.</p>
+              <p>We may suspend or terminate your access to PiMarket at our sole discretion, with or without notice, for any violation of these Terms or for any conduct we deem harmful to the Platform or other users.</p>
+              <p>You may terminate your account at any time by contacting us at <strong className="text-foreground">support@pimarket.app</strong>. Termination does not affect any outstanding transaction obligations.</p>
             </Section>
 
             <Section id="governing-law" title="13. Governing Law">
-              <p>These Terms are governed by and construed in accordance with applicable laws. Any disputes arising from these Terms or your use of Vaultrade.store shall be resolved through binding arbitration, except where prohibited by law.</p>
+              <p>These Terms are governed by and construed in accordance with applicable laws. Any disputes arising from these Terms or your use of PiMarket shall be resolved through binding arbitration, except where prohibited by law.</p>
               <p>Nothing in these Terms prevents either party from seeking emergency injunctive relief in a court of competent jurisdiction.</p>
             </Section>
 
             <Section id="contact-legal" title="14. Contact">
               <p>For questions about these Terms, contact us at:</p>
               <div className="bg-card/50 border border-border/50 rounded-xl p-4 space-y-1">
-                <p><strong className="text-foreground">Vaultrade.store Legal Team</strong></p>
-                <p>Email: <a href="mailto:legal@vaultrade.store" className="text-primary hover:underline">legal@vaultrade.store</a></p>
-                <p>Support: <Link href="/contact" className="text-primary hover:underline">vaultrade.store/contact</Link></p>
+                <p><strong className="text-foreground">PiMarket Legal Team</strong></p>
+                <p>Email: <a href="mailto:legal@pimarket.app" className="text-primary hover:underline">legal@pimarket.app</a></p>
+                <p>Support: <Link href="/contact" className="text-primary hover:underline">pimarket.app/contact</Link></p>
               </div>
             </Section>
           </div>

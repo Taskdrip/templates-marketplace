@@ -96,10 +96,10 @@ export default function AdminOrders() {
                   <TableCell>
                     <p className="font-medium text-sm max-w-[160px] truncate">{order.productName || `Product #${order.productId}`}</p>
                     {order.payment && (
-                      <p className="text-xs text-muted-foreground">{order.payment.chain?.replace("USDT_", "")}</p>
+                      <p className="text-xs text-yellow-400 font-black" style={{ fontFamily: "serif" }}>π {order.payment.chain === "PI" ? "Pi" : order.payment.chain}</p>
                     )}
                   </TableCell>
-                  <TableCell className="font-semibold">${order.amount.toFixed(2)}</TableCell>
+                  <TableCell className="font-semibold flex items-center gap-1"><span className="text-yellow-400 font-black" style={{ fontFamily: "serif" }}>π</span>{order.amount.toFixed(2)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={`${getStatusStyle(order.status)} capitalize text-xs`}>
