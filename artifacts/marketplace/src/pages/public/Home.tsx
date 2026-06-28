@@ -414,11 +414,12 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
       onClick={onClick}
     >
       <div className="relative h-44 overflow-hidden bg-muted/30">
-        {product.previewImages?.[0] ? (
+        {true ? (
           <img
-            src={product.previewImages[0]}
+            src={product.previewImages?.[0] || "/default-product.svg"}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => { e.currentTarget.src = "/default-product.svg"; }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500/10 to-purple-500/10">

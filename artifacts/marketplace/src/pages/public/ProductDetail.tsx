@@ -80,20 +80,19 @@ export default function ProductDetail() {
         <div className="lg:col-span-2 space-y-8">
           {/* Main Image */}
           <div className="rounded-2xl overflow-hidden border border-border/50 bg-card aspect-video relative">
-            {product.previewImages?.[0] ? (
-              <img src={product.previewImages[0]} alt={product.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted/30">
-                <Cpu className="w-20 h-20 text-muted-foreground/20" />
-              </div>
-            )}
+            <img
+              src={product.previewImages?.[0] || "/default-product.svg"}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.src = "/default-product.svg"; }}
+            />
           </div>
           
           {product.previewImages && product.previewImages.length > 1 && (
             <div className="flex gap-4 overflow-x-auto pb-2">
               {product.previewImages.map((img, i) => (
-                <div key={i} className="w-24 h-24 rounded-lg overflow-hidden border border-border/50 shrink-0 cursor-pointer">
-                  <img src={img} alt={`${product.name} preview ${i+1}`} className="w-full h-full object-cover" />
+                <div key={i} className="w-24 h-24 rounded-lg overflow-hidden border border-border/50 shrink-0 cursor-pointer bg-[#0a0416]">
+                  <img src={img} alt={`${product.name} preview ${i+1}`} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/default-product.svg"; }} />
                 </div>
               ))}
             </div>

@@ -110,8 +110,8 @@ async function seed() {
       categoryId: catBySlug.get("defi-tools")!.id,
       tags: ["flash-loan", "arbitrage", "defi", "uniswap", "aave", "ethereum"],
       previewImages: [
-        "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80",
-        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80",
+        "https://picsum.photos/seed/flashloan/800/450",
+        "https://picsum.photos/seed/arbitrage/800/450",
       ],
       demoUrl: "https://youtu.be/demo1",
       downloadUrl: "https://vaultrade.store/files/flash-loan-bot-v2.1.zip",
@@ -132,8 +132,8 @@ async function seed() {
       categoryId: catBySlug.get("trading-bots")!.id,
       tags: ["grid-trading", "binance", "bybit", "automated", "bot"],
       previewImages: [
-        "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=800&q=80",
-        "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=800&q=80",
+        "https://picsum.photos/seed/gridbot/800/450",
+        "https://picsum.photos/seed/trading/800/450",
       ],
       demoUrl: "https://youtu.be/demo2",
       downloadUrl: "https://vaultrade.store/files/grid-trading-bot-v3.0.zip",
@@ -152,7 +152,7 @@ async function seed() {
       categoryId: catBySlug.get("arbitrage-scripts")!.id,
       tags: ["arbitrage", "scanner", "cex", "dex", "real-time"],
       previewImages: [
-        "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=800&q=80",
+        "https://picsum.photos/seed/crossarb/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/arb-scanner-v1.5.zip",
       version: "1.5.1",
@@ -170,7 +170,7 @@ async function seed() {
       categoryId: catBySlug.get("analytics")!.id,
       tags: ["portfolio", "tracker", "multichain", "analytics", "defi"],
       previewImages: [
-        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80",
+        "https://picsum.photos/seed/portfolio/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/portfolio-tracker-v1.2.zip",
       version: "1.2.0",
@@ -189,7 +189,7 @@ async function seed() {
       categoryId: catBySlug.get("nft-tools")!.id,
       tags: ["nft", "sniper", "opensea", "blur", "floor-price", "ethereum"],
       previewImages: [
-        "https://images.unsplash.com/photo-1646463394040-93f26f0f6e2a?w=800&q=80",
+        "https://picsum.photos/seed/nftsniper/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/nft-sniper-v2.3.zip",
       version: "2.3.0",
@@ -207,7 +207,7 @@ async function seed() {
       categoryId: catBySlug.get("price-trackers")!.id,
       tags: ["price-alerts", "telegram", "discord", "monitoring", "crypto"],
       previewImages: [
-        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80",
+        "https://picsum.photos/seed/pricealert/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/price-alerts-v1.0.zip",
       version: "1.0.3",
@@ -225,7 +225,7 @@ async function seed() {
       categoryId: catBySlug.get("trading-bots")!.id,
       tags: ["sniper", "new-tokens", "uniswap", "pancakeswap", "mempool", "defi"],
       previewImages: [
-        "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80",
+        "https://picsum.photos/seed/tokensniper/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/token-sniper-v4.1.zip",
       version: "4.1.0",
@@ -243,7 +243,7 @@ async function seed() {
       categoryId: catBySlug.get("smart-contracts")!.id,
       tags: ["solidity", "smart-contracts", "erc20", "nft", "hardhat", "templates"],
       previewImages: [
-        "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
+        "https://picsum.photos/seed/solidity/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/solidity-templates-v1.3.zip",
       version: "1.3.0",
@@ -261,7 +261,7 @@ async function seed() {
       categoryId: catBySlug.get("security-tools")!.id,
       tags: ["ledger", "trezor", "security", "audit", "token-approvals", "phishing"],
       previewImages: [
-        "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80",
+        "https://picsum.photos/seed/hardware/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/hw-security-scanner-v1.1.zip",
       version: "1.1.0",
@@ -279,7 +279,7 @@ async function seed() {
       categoryId: catBySlug.get("defi-tools")!.id,
       tags: ["liquidity", "uniswap", "curve", "lp", "defi", "impermanent-loss"],
       previewImages: [
-        "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=800&q=80",
+        "https://picsum.photos/seed/liquidity/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/dex-liquidity-monitor-v1.0.zip",
       version: "1.0.2",
@@ -297,7 +297,7 @@ async function seed() {
       categoryId: catBySlug.get("trading-bots")!.id,
       tags: ["dca", "dollar-cost-averaging", "binance", "coinbase", "automation"],
       previewImages: [
-        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80",
+        "https://picsum.photos/seed/dcabot/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/dca-bot-v2.0.zip",
       version: "2.0.1",
@@ -315,7 +315,7 @@ async function seed() {
       categoryId: catBySlug.get("wallet-tools")!.id,
       tags: ["wallet-tracking", "whale-watching", "alerts", "copy-trade", "ethereum"],
       previewImages: [
-        "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80",
+        "https://picsum.photos/seed/walletmon/800/450",
       ],
       downloadUrl: "https://vaultrade.store/files/wallet-monitor-v1.4.zip",
       version: "1.4.0",

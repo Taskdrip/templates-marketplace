@@ -53,13 +53,12 @@ export default function Wishlist() {
           favorites.map((product: any) => (
             <Card key={product.id} className="bg-card/50 border-border/50 overflow-hidden flex flex-col group">
               <div className="h-48 overflow-hidden relative">
-                {product.previewImages?.[0] ? (
-                  <img src={product.previewImages[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                    <Cpu className="w-10 h-10 text-muted-foreground/30" />
-                  </div>
-                )}
+                <img
+                  src={product.previewImages?.[0] || "/default-product.svg"}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => { e.currentTarget.src = "/default-product.svg"; }}
+                />
                 <div className="absolute top-3 right-3 flex gap-2">
                   <Button
                     size="icon"

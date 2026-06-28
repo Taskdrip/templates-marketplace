@@ -287,29 +287,12 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
       onClick={onClick}
     >
       <div className="relative h-44 overflow-hidden bg-muted/20">
-        {product.previewImages?.[0] ? (
-          <img
-            src={product.previewImages[0]}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              const t = e.currentTarget;
-              t.style.display = "none";
-              t.nextElementSibling && ((t.nextElementSibling as HTMLElement).style.display = "flex");
-            }}
-          />
-        ) : null}
-        <div
-          className="w-full h-full items-center justify-center bg-gradient-to-br from-violet-950 via-purple-900 to-indigo-950 absolute inset-0"
-          style={{ display: product.previewImages?.[0] ? "none" : "flex" }}
-        >
-          <div className="flex flex-col items-center gap-2 opacity-60">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600/30 to-purple-800/30 border border-violet-500/20 flex items-center justify-center">
-              <span className="text-3xl font-black text-violet-300" style={{ fontFamily: "serif" }}>π</span>
-            </div>
-            <span className="text-[10px] text-violet-400/80 font-semibold tracking-wider uppercase">Digital Product</span>
-          </div>
-        </div>
+        <img
+          src={product.previewImages?.[0] || "/default-product.svg"}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => { e.currentTarget.src = "/default-product.svg"; }}
+        />
 
         {/* Badges */}
         <div className="absolute top-2.5 left-2.5 flex gap-1">

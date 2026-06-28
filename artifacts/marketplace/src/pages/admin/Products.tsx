@@ -210,13 +210,12 @@ export default function AdminProducts() {
                 )}>
                   <TableCell className="max-w-[200px]">
                     <div className="flex items-center gap-3">
-                      {product.previewImages?.[0] ? (
-                        <img src={product.previewImages[0]} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-border/40" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                          <Package className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      )}
+                      <img
+                        src={product.previewImages?.[0] || "/default-product.svg"}
+                        alt=""
+                        className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-border/40 bg-[#0a0416]"
+                        onError={(e) => { e.currentTarget.src = "/default-product.svg"; }}
+                      />
                       <div className="min-w-0">
                         <p className="font-medium truncate text-sm">{product.name}</p>
                         {product.shortDescription && (
