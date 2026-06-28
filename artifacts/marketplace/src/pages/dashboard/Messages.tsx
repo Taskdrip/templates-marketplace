@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Search, MessageSquarePlus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Send, Search, MessageSquarePlus, ShieldCheck, Package } from "lucide-react";
 
 export default function Messages() {
   const { user } = useAuth();
@@ -47,6 +48,34 @@ export default function Messages() {
   const conversations = (convosData as any)?.conversations ?? [];
   const messages = (messagesData as any)?.messages ?? [];
 
+  // Determine display name and avatar for a conversation from THIS user's perspective
+  const getConvPartner = (conv: any) => {
+    const isBuyer = conv.userId === user?.id;
+    const isSeller = conv.sellerId === user?.id;
+    if (isSeller) {
+      // Seller sees buyer
+      return {
+        name: conv.buyerDisplayName || conv.buyerUsername || conv.username || "Buyer",
+        avatarUrl: conv.buyerAvatarUrl || conv.avatarUrl,
+        role: "buyer",
+      };
+    } else if (isBuyer && conv.sellerId) {
+      // Buyer sees seller
+      return {
+        name: conv.sellerDisplayName || conv.sellerUsername || conv.sellerName || "Seller",
+        avatarUrl: conv.sellerAvatarUrl,
+        role: "seller",
+      };
+    }
+    return {
+      name: conv.username || "Admin Support",
+      avatarUrl: conv.avatarUrl,
+      role: "admin",
+    };
+  };
+
+  const activeConv = conversations.find((c: any) => c.id === activeId);
+
   return (
     <div className="h-[calc(100vh-12rem)] flex gap-6">
       {/* Conversations List */}
@@ -61,36 +90,41 @@ export default function Messages() {
 
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {conversations.map((conv: any) => (
-              <button
-                key={conv.id}
-                onClick={() => setActiveId(conv.id)}
-                className={`w-full text-left p-3 rounded-lg transition-colors flex items-start gap-3 ${
-                  activeId === conv.id ? 'bg-primary/10 border border-primary/20' : 'hover:bg-muted/50 border border-transparent'
-                }`}
-              >
-                <Avatar className="w-10 h-10 border border-border/50">
-                  <AvatarImage src={conv.avatarUrl || undefined} />
-                  <AvatarFallback className="bg-primary/20 text-primary">{conv.username?.substring(0, 2).toUpperCase() || 'AD'}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 overflow-hidden">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-medium text-sm truncate">{conv.username || 'Support'}</span>
-                    <span className="text-[10px] text-muted-foreground shrink-0">
-                      {conv.lastMessageAt ? new Date(conv.lastMessageAt).toLocaleDateString() : ''}
-                    </span>
+            {conversations.map((conv: any) => {
+              const partner = getConvPartner(conv);
+              return (
+                <button
+                  key={conv.id}
+                  onClick={() => setActiveId(conv.id)}
+                  className={`w-full text-left p-3 rounded-lg transition-colors flex items-start gap-3 ${
+                    activeId === conv.id ? 'bg-primary/10 border border-primary/20' : 'hover:bg-muted/50 border border-transparent'
+                  }`}
+                >
+                  <Avatar className="w-10 h-10 border border-border/50">
+                    <AvatarImage src={partner.avatarUrl || undefined} />
+                    <AvatarFallback className="bg-primary/20 text-primary">
+                      {partner.name?.substring(0, 2).toUpperCase() || 'US'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 overflow-hidden">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-medium text-sm truncate">{partner.name}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {conv.lastMessageAt ? new Date(conv.lastMessageAt).toLocaleDateString() : ''}
+                      </span>
+                    </div>
+                    <p className="text-xs truncate text-muted-foreground">
+                      {conv.orderId ? `Order #${conv.orderId}` : conv.subject || conv.lastMessage || 'Start a conversation'}
+                    </p>
                   </div>
-                  <p className={`text-xs truncate ${conv.unreadCount ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
-                    {conv.subject || conv.lastMessage || 'Start a conversation'}
-                  </p>
-                </div>
-                {!!conv.unreadCount && (
-                  <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold text-primary-foreground">
-                    {conv.unreadCount}
-                  </div>
-                )}
-              </button>
-            ))}
+                  {!!conv.unreadCount && (
+                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+                      {conv.unreadCount}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
 
             {conversations.length === 0 && (
               <div className="text-center py-8 text-muted-foreground text-sm">
@@ -103,19 +137,41 @@ export default function Messages() {
 
       {/* Chat Area */}
       <Card className="flex-1 flex flex-col bg-card/50 border-border/50 overflow-hidden">
-        {activeId ? (
+        {activeId && activeConv ? (
           <>
-            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-background/50">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10">
-                  <AvatarFallback className="bg-primary/20 text-primary">SP</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold text-sm">Support</h3>
-                  <p className="text-xs text-emerald-500">Online</p>
+            {(() => {
+              const partner = getConvPartner(activeConv);
+              return (
+                <div className="p-4 border-b border-border/50 flex justify-between items-center bg-background/50">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={partner.avatarUrl || undefined} />
+                      <AvatarFallback className="bg-primary/20 text-primary">
+                        {partner.name?.substring(0, 2).toUpperCase() || 'US'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold text-sm">{partner.name}</h3>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${
+                          partner.role === "admin" ? "text-purple-400 border-purple-500/30" :
+                          partner.role === "seller" ? "text-yellow-400 border-yellow-500/30" :
+                          "text-blue-400 border-blue-500/30"
+                        }`}>
+                          {partner.role === "admin" ? <><ShieldCheck className="w-2.5 h-2.5 mr-0.5 inline" />Admin</> :
+                           partner.role === "seller" ? "Seller" : "Buyer"}
+                        </Badge>
+                        {activeConv.orderId && (
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            <Package className="w-2.5 h-2.5" /> Order #{activeConv.orderId}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             <div
               ref={scrollRef}

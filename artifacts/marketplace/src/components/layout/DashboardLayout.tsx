@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const buyerLinks = [
     { href: "/dashboard",                  label: "Overview",        icon: LayoutDashboard },
-    { href: "/dashboard/orders",           label: "My Orders",       icon: ShoppingBag },
+    { href: "/dashboard/orders",           label: user?.isSeller ? "My Purchases" : "My Orders", icon: ShoppingBag },
     { href: "/dashboard/downloads",        label: "Downloads",       icon: Download },
     { href: "/dashboard/wallet",           label: "Wallet",          icon: Wallet },
     { href: "/dashboard/hire-requests",    label: "Hire Requests",   icon: Cpu },

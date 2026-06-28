@@ -1,7 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, User, Clock, CheckCircle2, XCircle, AlertCircle, ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Package, User, Clock, CheckCircle2, XCircle, AlertCircle, ShoppingCart, MessageCircle } from "lucide-react";
 
 function token() { return localStorage.getItem("cm_token"); }
 
@@ -10,6 +13,16 @@ async function fetchSellerOrders() {
     headers: { Authorization: `Bearer ${token()}` },
   });
   if (!res.ok) throw new Error("Failed to load orders");
+  return res.json();
+}
+
+async function startOrderConversation(orderId: number) {
+  const res = await fetch("/api/messages/start", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ orderId }),
+  });
+  if (!res.ok) throw new Error("Failed to start conversation");
   return res.json();
 }
 
@@ -23,7 +36,18 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 };
 
 export default function SellerOrders() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const { data: orders = [], isLoading } = useQuery({ queryKey: ["seller-orders"], queryFn: fetchSellerOrders });
+
+  const messageBuyer = useMutation({
+    mutationFn: (orderId: number) => startOrderConversation(orderId),
+    onSuccess: () => {
+      toast({ description: "Conversation started. Redirecting to messages…" });
+      setLocation("/dashboard/messages");
+    },
+    onError: () => toast({ title: "Error", description: "Could not start conversation.", variant: "destructive" }),
+  });
 
   const total = orders.length;
   const pending = orders.filter((o: any) => o.status === "pending" || o.status === "awaiting_confirmation").length;
@@ -133,6 +157,16 @@ export default function SellerOrders() {
                           {isPaid ? "Your cut (90%)" : "Buyer pays"}
                         </p>
                       </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs gap-1.5 border-border/50 hover:border-primary/40 hover:text-primary"
+                        onClick={() => messageBuyer.mutate(order.id)}
+                        disabled={messageBuyer.isPending}
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        Message Buyer
+                      </Button>
                     </div>
                   </div>
                 );

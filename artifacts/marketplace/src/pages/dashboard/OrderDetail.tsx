@@ -81,7 +81,7 @@ function EscrowChat({ orderId }: EscrowChatProps) {
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
             <MessageCircle className="w-8 h-8 mb-2 opacity-30" />
             <p className="text-sm">No messages yet. Start the conversation!</p>
-            <p className="text-xs mt-1 opacity-60">Admin will reply within minutes.</p>
+            <p className="text-xs mt-1 opacity-60">The seller and admin can see and reply to this conversation.</p>
           </div>
         )}
         {messages.map((msg: any) => {
@@ -359,7 +359,7 @@ export default function OrderDetail() {
                 <MessageCircle className="w-4 h-4 text-primary" />
                 Order Chat
               </CardTitle>
-              <CardDescription>Direct escrow chat with admin for this order</CardDescription>
+              <CardDescription>Chat with the seller and admin about this order</CardDescription>
             </CardHeader>
             <CardContent className="p-0 mt-3 border-t border-border/40">
               <EscrowChat orderId={id} />

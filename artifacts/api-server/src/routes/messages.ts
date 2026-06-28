@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, conversationsTable, messagesTable, usersTable, ordersTable } from "@workspace/db";
+import { db, conversationsTable, messagesTable, usersTable, ordersTable, productsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 
@@ -13,6 +13,13 @@ function toConv(c: any, userMap: Map<number, any>) {
     userId: c.userId,
     sellerId: c.sellerId ?? null,
     orderId: c.orderId ?? null,
+    buyerUsername: buyer?.username ?? null,
+    buyerDisplayName: buyer?.displayName ?? null,
+    buyerAvatarUrl: buyer?.avatarUrl ?? null,
+    sellerUsername: seller?.username ?? null,
+    sellerDisplayName: seller?.displayName ?? null,
+    sellerAvatarUrl: seller?.avatarUrl ?? null,
+    // Legacy compat: "username" = buyer, "displayName" = buyer
     username: buyer?.username ?? null,
     displayName: buyer?.displayName ?? null,
     avatarUrl: buyer?.avatarUrl ?? null,
@@ -54,14 +61,16 @@ router.post("/messages/start", requireAuth, async (req, res): Promise<void> => {
       res.status(200).json(toConv(existing, userMap));
       return;
     }
-    // Look up order to get seller
+    // Look up order → product → seller
     const [order] = await db.select().from(ordersTable).where(eq(ordersTable.id, orderId));
-    let sellerId: number | undefined;
-    // Future: when products have sellerId, look it up here
-    void order;
+    let sellerId: number | null = null;
+    if (order) {
+      const [product] = await db.select({ sellerId: productsTable.sellerId }).from(productsTable).where(eq(productsTable.id, order.productId));
+      sellerId = product?.sellerId ?? null;
+    }
     const [conv] = await db.insert(conversationsTable).values({
-      userId: uid, sellerId: sellerId ?? null, orderId,
-      subject: subject ?? `Order #${orderId} Escrow Chat`,
+      userId: uid, sellerId, orderId,
+      subject: subject ?? `Order #${orderId} Chat`,
     }).returning();
     const users = await db.select().from(usersTable);
     const userMap = new Map(users.map(u => [u.id, u]));
