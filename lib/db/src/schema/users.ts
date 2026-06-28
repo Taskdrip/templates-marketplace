@@ -15,6 +15,7 @@ export const usersTable = pgTable("users", {
   isSeller: boolean("is_seller").notNull().default(false),
   sellerBio: text("seller_bio"),
   isActive: boolean("is_active").notNull().default(true),
+  piWalletAddress: text("pi_wallet_address"),
   totpSecret: text("totp_secret"),
   totpEnabled: boolean("totp_enabled").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

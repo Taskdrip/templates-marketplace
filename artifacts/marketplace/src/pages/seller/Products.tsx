@@ -118,7 +118,7 @@ export default function SellerProducts() {
                       <p className="text-xs text-muted-foreground">{product.salesCount} sales</p>
                     </div>
                     <div className="flex gap-1.5">
-                      {product.status === "pending" && (
+                      {(product.status === "pending" || product.status === "rejected") && (
                         <Button size="sm" variant="outline" asChild className="h-8 px-2.5">
                           <Link href={`/seller/products/${product.id}/edit`}>
                             <Edit2 className="w-3.5 h-3.5" />

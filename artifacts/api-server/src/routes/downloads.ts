@@ -33,8 +33,9 @@ router.get("/downloads/:orderId", requireAuth, async (req, res): Promise<void> =
   const [order] = await db.select().from(ordersTable).where(eq(ordersTable.id, orderId));
   if (!order) { res.status(404).json({ error: "Order not found" }); return; }
   if (order.userId !== req.userId) { res.status(403).json({ error: "Forbidden" }); return; }
-  if (order.status !== "delivered" && order.status !== "confirmed") {
-    res.status(403).json({ error: "Order not yet delivered" }); return;
+  const downloadableStatuses = ["delivered", "confirmed", "funds_released"];
+  if (!downloadableStatuses.includes(order.status)) {
+    res.status(403).json({ error: "Order not yet confirmed. Complete payment first." }); return;
   }
 
   const [product] = await db.select().from(productsTable).where(eq(productsTable.id, order.productId));

@@ -200,7 +200,7 @@ router.patch("/orders/:id/status", requireAuth, requireAdmin, async (req, res): 
       userId: product.sellerId,
       type: "payment",
       title: "Funds Released to You!",
-      message: `$${sellerAmount.toFixed(2)} USDT has been released for "${product.name}" (Order #${id}).`,
+      message: `π${sellerAmount.toFixed(2)} Pi has been released for "${product.name}" (Order #${id}).`,
       link: `/dashboard`,
       isRead: "false",
     });
