@@ -26,9 +26,21 @@ async function seed() {
       { name: "Crypto & DeFi Tools", slug: "crypto-defi-tools", description: "Trading bots, DeFi scripts, blockchain utilities", iconName: "trending-up" },
       { name: "SaaS Applications", slug: "saas-apps", description: "Full SaaS app source code with billing", iconName: "package" },
       { name: "SEO & Marketing Tools", slug: "seo-marketing", description: "SEO tools, email templates, marketing automation", iconName: "bar-chart-2" },
+      { name: "Pi Apps", slug: "pi-apps", description: "Apps, games, bots, and tools built for the Pi Network ecosystem", iconName: "pi" },
     ]).returning();
     console.log(`Inserted ${categories.length} categories`);
   } else {
+    // Ensure Pi Apps category exists even if other categories were already seeded
+    const [piApps] = await db.select().from(categoriesTable).where(eq(categoriesTable.slug, "pi-apps"));
+    if (!piApps) {
+      await db.insert(categoriesTable).values({
+        name: "Pi Apps",
+        slug: "pi-apps",
+        description: "Apps, games, bots, and tools built for the Pi Network ecosystem",
+        iconName: "pi",
+      });
+      console.log("  Added missing Pi Apps category");
+    }
     console.log(`Skipped categories — already exist (${categories.length})`);
   }
 
