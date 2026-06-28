@@ -31,6 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const sellerLinks = [
     { href: "/seller/products",     label: "My Products",   icon: Package },
     { href: "/seller/products/new", label: "List Product",  icon: PlusCircle },
+    { href: "/seller/orders",       label: "My Sales",      icon: ShoppingBag },
     { href: "/seller/earnings",     label: "Earnings",      icon: TrendingUp },
   ];
 

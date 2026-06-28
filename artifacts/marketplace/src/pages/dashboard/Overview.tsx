@@ -1,16 +1,33 @@
 import { useGetMe, useListOrders, useListNotifications } from "@workspace/api-client-react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ShoppingBag, Bell, Package, ArrowRight } from "lucide-react";
+import { ShoppingBag, Bell, Package, ArrowRight, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+function token() { return localStorage.getItem("cm_token"); }
+
+async function fetchSellerOrders() {
+  const res = await fetch("/api/seller/orders", { headers: { Authorization: `Bearer ${token()}` } });
+  if (!res.ok) throw new Error("not a seller");
+  return res.json() as Promise<any[]>;
+}
 
 export default function Overview() {
   const { data: user } = useGetMe();
   const { data: orders } = useListOrders();
   const { data: notifications } = useListNotifications();
+  const isSeller = (user as any)?.isSeller === true;
+  const { data: sellerOrders = [] } = useQuery({
+    queryKey: ["seller-orders"],
+    queryFn: fetchSellerOrders,
+    enabled: isSeller,
+  });
 
   const recentOrders = (orders ?? []).slice(0, 5);
   const recentNotifications = (notifications ?? []).slice(0, 5);
+  const recentSales = sellerOrders.slice(0, 5);
 
   return (
     <div className="space-y-8">
@@ -40,18 +57,79 @@ export default function Overview() {
             </div>
           </CardContent>
         </Card>
+        {isSeller ? (
+          <Card className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
+              <TrendingUp className="h-4 w-4 text-emerald-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{sellerOrders.length}</div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {sellerOrders.filter((o: any) => o.status === "pending" || o.status === "awaiting_confirmation").length} awaiting action
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-card/50 border-border/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {(orders ?? []).filter((o: any) => o.status === "pending" || o.status === "awaiting_confirmation").length}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {isSeller && recentSales.length > 0 && (
         <Card className="bg-card/50 border-border/50">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-emerald-400" /> Recent Sales
+              </CardTitle>
+              <CardDescription>Latest orders for your products</CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/seller/orders">View All <ArrowRight className="w-3 h-3 ml-1" /></Link>
+            </Button>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {(orders ?? []).filter((o: any) => o.status === "pending" || o.status === "awaiting_confirmation").length}
+            <div className="space-y-3">
+              {recentSales.map((sale: any) => (
+                <div key={sale.id} className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-background/50">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-md bg-emerald-500/10 flex items-center justify-center shrink-0">
+                      <Package className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">{sale.productName || `Order #${sale.id}`}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {sale.buyerDisplayName || sale.buyerUsername || `Buyer #${sale.buyerId}`} · {new Date(sale.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0 ml-3">
+                    <p className="font-semibold text-sm text-emerald-400">π{sale.amount.toFixed(2)}</p>
+                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${
+                      sale.status === "funds_released" ? "text-purple-400 border-purple-500/30" :
+                      sale.status === "delivered" ? "text-emerald-400 border-emerald-500/30" :
+                      sale.status === "confirmed" ? "text-blue-400 border-blue-500/30" :
+                      "text-yellow-400 border-yellow-500/30"
+                    }`}>
+                      {sale.status.replace(/_/g, " ")}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
-      </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className="bg-card/50 border-border/50">

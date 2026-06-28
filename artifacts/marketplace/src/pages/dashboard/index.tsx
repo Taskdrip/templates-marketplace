@@ -15,6 +15,7 @@ import SellerProducts from "@/pages/seller/Products";
 import SellerAddProduct from "@/pages/seller/AddProduct";
 import SellerEditProduct from "@/pages/seller/EditProduct";
 import SellerEarnings from "@/pages/seller/Earnings";
+import SellerOrders from "@/pages/seller/Orders";
 import HireRequestsDashboard from "./HireRequests";
 
 export default function DashboardRouter() {
@@ -34,6 +35,7 @@ export default function DashboardRouter() {
         <Route path="/seller/products/new" component={SellerAddProduct} />
         <Route path="/seller/products/:id/edit" component={SellerEditProduct} />
         <Route path="/seller/products" component={SellerProducts} />
+        <Route path="/seller/orders" component={SellerOrders} />
         <Route path="/seller/earnings" component={SellerEarnings} />
         <Route path="/dashboard/hire-requests" component={HireRequestsDashboard} />
       </Switch>

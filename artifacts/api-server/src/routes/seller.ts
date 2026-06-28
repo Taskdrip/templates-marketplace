@@ -138,6 +138,68 @@ router.delete("/seller/products/:id", requireAuth, async (req, res): Promise<voi
   res.json({ message: "Deleted" });
 });
 
+router.get("/seller/orders", requireAuth, async (req, res): Promise<void> => {
+  const isSeller = await checkIsSeller(req.userId!);
+  if (!isSeller) { res.status(403).json({ error: "Seller account required" }); return; }
+
+  const myProducts = await db.select().from(productsTable)
+    .where(eq(productsTable.sellerId, req.userId!));
+
+  if (myProducts.length === 0) {
+    res.json([]);
+    return;
+  }
+
+  const productIds = myProducts.map(p => p.id);
+  const productMap = new Map(myProducts.map(p => [p.id, p]));
+
+  const allOrders = await db.select().from(ordersTable)
+    .where(inArray(ordersTable.productId, productIds))
+    .orderBy(desc(ordersTable.createdAt));
+
+  const orderIds = allOrders.map(o => o.id);
+  const payments = orderIds.length > 0
+    ? await db.select().from(paymentsTable).where(inArray(paymentsTable.orderId, orderIds))
+    : [];
+  const paymentMap = new Map(payments.map(p => [p.orderId, p]));
+
+  const buyerIds = [...new Set(allOrders.map(o => o.userId))];
+  const buyers = buyerIds.length > 0
+    ? await db.select({ id: usersTable.id, username: usersTable.username, displayName: usersTable.displayName, email: usersTable.email }).from(usersTable).where(inArray(usersTable.id, buyerIds))
+    : [];
+  const buyerMap = new Map(buyers.map(b => [b.id, b]));
+
+  const result = allOrders.map(o => {
+    const product = productMap.get(o.productId);
+    const payment = paymentMap.get(o.id);
+    const buyer = buyerMap.get(o.userId);
+    const amount = parseFloat(o.amount);
+    return {
+      id: o.id,
+      productId: o.productId,
+      productName: product?.name ?? null,
+      buyerId: o.userId,
+      buyerUsername: buyer?.username ?? null,
+      buyerDisplayName: buyer?.displayName ?? null,
+      amount,
+      sellerAmount: Math.round(amount * 0.9 * 100) / 100,
+      status: o.status,
+      adminNotes: o.adminNotes ?? null,
+      payment: payment ? {
+        id: payment.id,
+        chain: payment.chain,
+        txHash: payment.txHash ?? null,
+        status: payment.status,
+        createdAt: payment.createdAt instanceof Date ? payment.createdAt.toISOString() : payment.createdAt,
+      } : null,
+      createdAt: o.createdAt instanceof Date ? o.createdAt.toISOString() : o.createdAt,
+      updatedAt: o.updatedAt instanceof Date ? o.updatedAt.toISOString() : o.updatedAt,
+    };
+  });
+
+  res.json(result);
+});
+
 router.get("/seller/earnings", requireAuth, async (req, res): Promise<void> => {
   const isSeller = await checkIsSeller(req.userId!);
   if (!isSeller) { res.status(403).json({ error: "Seller account required" }); return; }
