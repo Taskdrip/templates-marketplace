@@ -31,6 +31,7 @@ import HireSubmit from "@/pages/public/HireSubmit";
 // Protected Routers
 import DashboardRouter from "@/pages/dashboard/index";
 import AdminRouter from "@/pages/admin/index";
+import AdminLogin from "@/pages/admin/Login";
 
 const queryClient = new QueryClient();
 
@@ -42,7 +43,7 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
     if (!isLoading && !user) {
       setLocation("/login");
     } else if (!isLoading && adminOnly && !isAdmin) {
-      setLocation("/dashboard");
+      setLocation("/admin/login");
     }
   }, [user, isAdmin, isLoading, setLocation, adminOnly]);
 
@@ -57,6 +58,9 @@ function Router() {
       {/* Protected Dashboards — regex paths do prefix matching without nested context */}
       <Route path={/^\/dashboard(\/|$)/i}>
         <ProtectedRoute component={DashboardRouter} />
+      </Route>
+      <Route path="/admin/login">
+        <AdminLogin />
       </Route>
       <Route path={/^\/admin(\/|$)/i}>
         <ProtectedRoute component={AdminRouter} adminOnly={true} />
