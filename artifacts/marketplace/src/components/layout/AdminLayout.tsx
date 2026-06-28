@@ -107,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-violet-400 shrink-0" />
             <h2 className="font-semibold text-sm text-muted-foreground hidden sm:block">
-              PiMarket <span className="text-foreground">Administration</span>
+              Breedskoolpi <span className="text-foreground">Administration</span>
             </h2>
             <h2 className="font-semibold text-sm text-violet-400 sm:hidden">Admin</h2>
           </div>

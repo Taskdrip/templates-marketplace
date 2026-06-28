@@ -46,7 +46,7 @@ export default function WalletPage() {
               <div>
                 <h3 className="font-bold text-base">Pi Network Payments</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  All transactions on PiMarket are settled in Pi cryptocurrency. Open Pi Browser to send payments and view your Pi balance.
+                  All transactions on Breedskoolpi are settled in Pi cryptocurrency. Open Pi Browser to send payments and view your Pi balance.
                 </p>
                 <a
                   href="https://minepi.com"

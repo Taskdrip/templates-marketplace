@@ -122,7 +122,7 @@ export default function Home() {
       {!isInPiBrowser && (
         <div className="w-full bg-gradient-to-r from-yellow-500/20 via-yellow-400/10 to-yellow-500/20 border-b border-yellow-500/30 py-2 px-4 text-center">
           <p className="text-xs text-yellow-300 font-medium">
-            🌐 For the best experience and Pi payments, open PiMarket in the{" "}
+            🌐 For the best experience and Pi payments, open Breedskoolpi in the{" "}
             <span className="font-bold text-yellow-400">Pi Browser</span>
           </p>
         </div>
@@ -177,7 +177,7 @@ export default function Home() {
               className="h-13 px-8 text-base font-semibold rounded-full border-white/20 text-white hover:bg-white/10 bg-white/5 backdrop-blur-sm"
               onClick={() => setLocation("/register")}
             >
-              Join PiMarket Free
+              Join Breedskoolpi Free
             </Button>
           </div>
 
@@ -306,7 +306,7 @@ export default function Home() {
       {/* ─── HOW IT WORKS ─── */}
       <section className="w-full py-16 px-4 container max-w-screen-xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold">How PiMarket Works</h2>
+          <h2 className="text-2xl md:text-3xl font-bold">How Breedskoolpi Works</h2>
           <p className="text-muted-foreground mt-2">Simple, safe, and built for Pi Pioneers</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

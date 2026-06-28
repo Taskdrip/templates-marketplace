@@ -67,7 +67,7 @@ function SelectChip({ options, value, onChange }: { options: { id: string; label
 function SuccessScreen({ request, settings }: { request: HireRequest; settings: any }) {
   const whatsappNumber = settings?.hire_whatsapp?.replace(/\D/g, "") || "";
   const telegramHandle = settings?.hire_telegram?.replace("@", "") || "";
-  const message = encodeURIComponent(`Hi! I just submitted a hire request on PiMarket (Request #${request.id}): "${request.title}". I'd like to discuss my project.`);
+  const message = encodeURIComponent(`Hi! I just submitted a hire request on Breedskoolpi (Request #${request.id}): "${request.title}". I'd like to discuss my project.`);
 
   return (
     <div className="max-w-lg mx-auto text-center space-y-8">
@@ -135,7 +135,7 @@ function SuccessScreen({ request, settings }: { request: HireRequest; settings: 
             </div>
             <div className="flex-1">
               <p className="font-semibold text-violet-400 text-sm">In-App Messages</p>
-              <p className="text-xs text-muted-foreground">Chat with admin in PiMarket</p>
+              <p className="text-xs text-muted-foreground">Chat with admin in Breedskoolpi</p>
             </div>
             <ArrowRight className="w-4 h-4 text-violet-400/60" />
           </div>

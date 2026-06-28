@@ -156,7 +156,7 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
     createPiPayment(
       {
         amount,
-        memo: `PiMarket: ${productName.slice(0, 50)}`,
+        memo: `Breedskoolpi: ${productName.slice(0, 50)}`,
         metadata: { orderId, productName },
       },
       {
@@ -458,7 +458,7 @@ export default function CryptoCheckoutModal({ open, onClose, onSuccess, orderId,
           )}
 
           <p className="text-[10px] text-center text-muted-foreground">
-            Order #{orderId} · Secured by PiMarket Escrow · <span className="font-black" style={{ fontFamily: "serif" }}>π</span> Pi Network
+            Order #{orderId} · Secured by Breedskoolpi Escrow · <span className="font-black" style={{ fontFamily: "serif" }}>π</span> Pi Network
           </p>
         </div>
       </DialogContent>

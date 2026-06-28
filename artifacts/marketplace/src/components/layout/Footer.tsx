@@ -77,18 +77,18 @@ export default function Footer() {
               <VaultradeWordmark className="text-xl" />
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              PiMarket is the premier Pi Network marketplace for digital products — web apps, scripts, social accounts, templates, and more. Every transaction is escrow-protected.
+              Breedskoolpi is the premier Pi Network marketplace for digital products — web apps, scripts, social accounts, templates, and more. Every transaction is escrow-protected.
             </p>
             <div className="flex items-center gap-3">
-              <a href="https://t.me/pimarket_official" target="_blank" rel="noopener noreferrer"
+              <a href="https://t.me/breedskoolpi_official" target="_blank" rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all hover:scale-110">
                 <Send className="w-4 h-4" />
               </a>
-              <a href="https://twitter.com/pimarket_app" target="_blank" rel="noopener noreferrer"
+              <a href="https://twitter.com/breedskoolpi_app" target="_blank" rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all hover:scale-110">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="https://github.com/pimarket-app" target="_blank" rel="noopener noreferrer"
+              <a href="https://github.com/breedskoolpi-store" target="_blank" rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-card border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all hover:scale-110">
                 <Github className="w-4 h-4" />
               </a>
@@ -164,7 +164,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="pt-6 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} <span className="text-foreground font-medium">PiMarket</span>. All rights reserved. Not financial advice. Use at your own risk.
+            &copy; {new Date().getFullYear()} <span className="text-foreground font-medium">Breedskoolpi</span>. All rights reserved. Not financial advice. Use at your own risk.
           </p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link href="/terms" className="hover:text-primary transition-colors">Terms</Link>

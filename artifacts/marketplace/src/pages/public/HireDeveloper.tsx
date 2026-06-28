@@ -77,7 +77,7 @@ export default function HireDeveloper() {
                 className="h-14 px-8 border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10 rounded-xl font-semibold text-base gap-2"
                 asChild
               >
-                <a href="https://wa.me/message/pimarket" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/breedskoolpi" target="_blank" rel="noopener noreferrer">
                   <MessageSquare className="w-5 h-5" /> Chat on WhatsApp
                 </a>
               </Button>

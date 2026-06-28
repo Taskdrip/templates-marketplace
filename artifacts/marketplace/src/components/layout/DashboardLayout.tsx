@@ -96,7 +96,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <LogOut className="w-4 h-4 mr-2" /> Log out
         </Button>
         <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" asChild>
-          <Link href="/">← Back to PiMarket</Link>
+          <Link href="/">← Back to Breedskoolpi</Link>
         </Button>
       </div>
     </div>

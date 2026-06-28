@@ -185,7 +185,7 @@ export default function Login() {
             <span className="text-3xl font-black text-white" style={{ fontFamily: "serif" }}>π</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Welcome back</h2>
-          <p className="text-muted-foreground mt-2 text-sm">Sign in to your PiMarket account</p>
+          <p className="text-muted-foreground mt-2 text-sm">Sign in to your Breedskoolpi.store account</p>
         </div>
 
         {/* Pi Browser Sign In */}
