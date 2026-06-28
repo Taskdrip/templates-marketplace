@@ -31,6 +31,23 @@ router.get("/hire-requests/:id/milestones", requireAuth, async (req, res): Promi
   res.json(milestones);
 });
 
+router.post("/hire-milestones/:id/pay", requireAuth, async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id);
+  const userId = (req as any).user.userId;
+  const { txHash } = req.body;
+  if (!txHash?.trim()) { res.status(400).json({ error: "Pi Transaction ID (TXID) is required" }); return; }
+  const [milestone] = await db.select().from(hireMilestonesTable).where(eq(hireMilestonesTable.id, id));
+  if (!milestone) { res.status(404).json({ error: "Milestone not found" }); return; }
+  if (milestone.status !== "active") { res.status(400).json({ error: "Milestone is not active for payment" }); return; }
+  const [request] = await db.select().from(hireRequestsTable).where(eq(hireRequestsTable.id, milestone.requestId));
+  if (!request || request.userId !== userId) { res.status(403).json({ error: "Unauthorized" }); return; }
+  const [updated] = await db.update(hireMilestonesTable)
+    .set({ status: "payment_submitted", paidTxHash: txHash.trim(), paidAt: new Date() })
+    .where(eq(hireMilestonesTable.id, id))
+    .returning();
+  res.json(updated);
+});
+
 router.get("/admin/hire-requests", requireAdmin, async (_req, res): Promise<void> => {
   const requests = await db.select().from(hireRequestsTable).orderBy(desc(hireRequestsTable.createdAt));
   res.json(requests);

@@ -8,6 +8,8 @@ export const hireMilestonesTable = pgTable("hire_milestones", {
   amountPi: numeric("amount_pi", { precision: 12, scale: 2 }).notNull(),
   orderIndex: integer("order_index").notNull().default(0),
   status: text("status").notNull().default("locked"),
+  paidTxHash: text("paid_tx_hash"),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
   releasedAt: timestamp("released_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

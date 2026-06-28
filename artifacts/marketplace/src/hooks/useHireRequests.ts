@@ -26,6 +26,7 @@ export interface HireRequest {
 export interface HireMilestone {
   id: number; requestId: number; title: string; description: string | null;
   amountPi: string; orderIndex: number; status: string;
+  paidTxHash: string | null; paidAt: string | null;
   releasedAt: string | null; createdAt: string;
 }
 
@@ -109,5 +110,17 @@ export function useDeleteMilestone() {
     mutationFn: ({ id, requestId }: { id: number; requestId: number }) =>
       authFetch(`/admin/hire-milestones/${id}`, "DELETE"),
     onSuccess: (_d, v) => queryClient.invalidateQueries({ queryKey: ["admin-hire-milestones", v.requestId] }),
+  });
+}
+
+export function useSubmitMilestonePayment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, txHash }: { id: number; txHash: string; requestId: number }) =>
+      authFetch(`/hire-milestones/${id}/pay`, "POST", { txHash }),
+    onSuccess: (_d, v) => {
+      queryClient.invalidateQueries({ queryKey: ["hire-milestones", v.requestId] });
+      queryClient.invalidateQueries({ queryKey: ["hire-requests"] });
+    },
   });
 }

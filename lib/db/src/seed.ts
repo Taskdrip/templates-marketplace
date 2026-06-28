@@ -88,22 +88,11 @@ async function seed() {
   // ─── Wallets ─────────────────────────────────────────────────────────────
   await db.insert(schema.walletsTable).values([
     {
-      chain: "USDT_TRC20",
-      address: "TFrCYMpT5d9VRLB1hBVwFtjLK6hDzK4pGv",
-      label: "USDT (TRC-20) — Tron Network",
+      chain: "PI",
+      address: "GBREEDSKOOLPI000000000000000000000000000000000000",
+      label: "Pi Network Escrow Wallet",
       isActive: true,
-    },
-    {
-      chain: "USDT_BEP20",
-      address: "0x742d35Cc6549C56B46b9e23c3D7e76A6Df8c4bF",
-      label: "USDT (BEP-20) — Binance Smart Chain",
-      isActive: true,
-    },
-    {
-      chain: "USDT_TON",
-      address: "UQBvI0aFLnw2QbZgjMPCLRdtRHxhUyinQudg6sdiohIwg5jL",
-      label: "USDT (TON) — The Open Network",
-      isActive: true,
+      customMessage: "Send Pi to this escrow address and submit your TXID as proof of payment.",
     },
   ]);
   console.log("  ✓ Wallets created");

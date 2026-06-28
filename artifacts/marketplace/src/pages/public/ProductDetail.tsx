@@ -141,14 +141,14 @@ export default function ProductDetail() {
               
               <Button 
                 size="lg" 
-                className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-[0_0_20px_rgba(139,92,246,0.4)] mb-4 gap-2"
+                className="w-full h-14 text-lg bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-purple-900 shadow-[0_0_20px_rgba(234,179,8,0.35)] mb-4 gap-2 font-bold"
                 onClick={handlePurchase}
                 disabled={createOrder.isPending}
               >
                 {createOrder.isPending ? (
-                  <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing...</>
+                  <><div className="w-5 h-5 border-2 border-purple-900/30 border-t-purple-900 rounded-full animate-spin" /> Processing...</>
                 ) : (
-                  <><ShoppingCart className="w-5 h-5" /> Buy with Crypto</>
+                  <><span className="text-xl font-black" style={{ fontFamily: "serif" }}>π</span> Buy with Pi</>
                 )}
               </Button>
               
@@ -167,13 +167,14 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {/* Payment methods */}
+              {/* Payment method */}
               <div className="mt-4 pt-4 border-t border-border/50">
-                <p className="text-xs text-muted-foreground mb-2 text-center">Accepted payment networks</p>
-                <div className="flex justify-center gap-2">
-                  {["🔴 TRC20", "💎 TON", "🟡 BEP20"].map(n => (
-                    <span key={n} className="text-xs bg-muted/40 px-2 py-1 rounded-md border border-border/30 text-muted-foreground">{n}</span>
-                  ))}
+                <p className="text-xs text-muted-foreground mb-2 text-center">Payment powered by</p>
+                <div className="flex justify-center">
+                  <span className="flex items-center gap-2 text-sm bg-yellow-500/10 border border-yellow-500/20 px-4 py-2 rounded-xl text-yellow-400 font-semibold">
+                    <span className="text-xl font-black" style={{ fontFamily: "serif" }}>π</span>
+                    Pi Network
+                  </span>
                 </div>
               </div>
             </CardContent>
