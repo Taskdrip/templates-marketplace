@@ -41,7 +41,10 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
 
   useEffect(() => {
     if (!isLoading && !user) {
-      setLocation("/login");
+      const current = window.location.pathname + window.location.search;
+      const isTrivial = current === "/" || current === "/login" || current === "/register";
+      const loginUrl = isTrivial ? "/login" : `/login?redirect=${encodeURIComponent(current)}`;
+      setLocation(loginUrl);
     } else if (!isLoading && adminOnly && !isAdmin) {
       setLocation("/admin/login");
     }

@@ -39,7 +39,10 @@ export default function HireDeveloper() {
   const [, setLocation] = useLocation();
 
   const handleCTA = () => {
-    if (!user) { setLocation("/login"); return; }
+    if (!user) {
+      setLocation(`/login?redirect=${encodeURIComponent("/hire/submit")}`);
+      return;
+    }
     setLocation("/hire/submit");
   };
 

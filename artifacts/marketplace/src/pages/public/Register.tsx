@@ -25,12 +25,18 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+function getRedirectParam(): string | null {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("redirect");
+}
+
 export default function Register() {
   const [, setLocation] = useLocation();
   const { login: setAuth } = useAuth();
   const { toast } = useToast();
   const [accountType, setAccountType] = useState<"buyer" | "seller">("buyer");
   const [isLoading, setIsLoading] = useState(false);
+  const redirectTo = getRedirectParam();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -56,7 +62,8 @@ export default function Register() {
       });
       setAuth(res.token, res.user);
       toast({ title: "Welcome to Breedskoolpi.store 🎉", description: "Your account has been created successfully." });
-      setLocation(accountType === "seller" ? "/dashboard" : "/marketplace");
+      const dest = redirectTo || (accountType === "seller" ? "/dashboard" : "/marketplace");
+      setLocation(dest);
     } catch (err: any) {
       toast({ title: "Registration failed", description: err.message || "Could not create account.", variant: "destructive" });
     } finally {
@@ -181,7 +188,10 @@ export default function Register() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-primary hover:underline">Sign in</Link>
+          <Link
+            href={redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login"}
+            className="font-semibold text-primary hover:underline"
+          >Sign in</Link>
         </p>
       </div>
     </div>

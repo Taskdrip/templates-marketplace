@@ -26,12 +26,18 @@ const METHODS: { key: LoginMethod; label: string; icon: React.ReactNode; placeho
   { key: "telegram", label: "Telegram", icon: <Send className="w-4 h-4" />, placeholder: "@username" },
 ];
 
+function getRedirectParam(): string | null {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("redirect");
+}
+
 export default function Login() {
   const [, setLocation] = useLocation();
   const { login: setAuth } = useAuth();
   const { toast } = useToast();
   const [method, setMethod] = useState<LoginMethod>("email");
   const [isLoading, setIsLoading] = useState(false);
+  const redirectTo = getRedirectParam();
 
   // 2FA state
   const [requires2fa, setRequires2fa] = useState(false);
@@ -67,7 +73,8 @@ export default function Login() {
 
       setAuth(res.token, res.user);
       toast({ title: "Welcome back! 👋", description: "You've been signed in successfully." });
-      setLocation(res.user.role === "admin" ? "/admin" : "/dashboard");
+      const dest = redirectTo || (res.user.role === "admin" ? "/admin" : "/dashboard");
+      setLocation(dest);
     } catch (err: any) {
       toast({ title: "Sign in failed", description: err?.data?.error || err.message || "Invalid credentials.", variant: "destructive" });
     } finally {
@@ -171,7 +178,8 @@ export default function Login() {
       });
       setAuth(res.token, res.user);
       toast({ title: `Welcome, ${piResult.username}! 🎉`, description: "Signed in with Pi Network." });
-      setLocation(res.user.role === "admin" ? "/admin" : "/dashboard");
+      const dest = redirectTo || (res.user.role === "admin" ? "/admin" : "/dashboard");
+      setLocation(dest);
     } catch {
       toast({ title: "Pi login failed", description: "Could not link your Pi account. Please try email login.", variant: "destructive" });
     }
@@ -272,11 +280,17 @@ export default function Login() {
         <div className="text-center space-y-2">
           <p className="text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/register" className="font-semibold text-primary hover:underline">Create one free</Link>
+            <Link
+              href={redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}` : "/register"}
+              className="font-semibold text-primary hover:underline"
+            >Create one free</Link>
           </p>
           <p className="text-sm text-muted-foreground">
             Want to sell?{" "}
-            <Link href="/seller-register" className="font-semibold text-primary hover:underline">Become a seller</Link>
+            <Link
+              href={redirectTo ? `/seller-register?redirect=${encodeURIComponent(redirectTo)}` : "/seller-register"}
+              className="font-semibold text-primary hover:underline"
+            >Become a seller</Link>
           </p>
         </div>
       </div>

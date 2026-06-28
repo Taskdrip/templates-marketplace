@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { useGetProduct, useListRelatedProducts, useCreateOrder } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import PaymentThankYouModal from "@/components/checkout/PaymentThankYouModal";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/marketplace/:id");
+  const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -34,7 +35,8 @@ export default function ProductDetail() {
 
   const handlePurchase = () => {
     if (!user) {
-      toast({ title: "Authentication required", description: "Please log in to purchase this product." });
+      const current = window.location.pathname;
+      setLocation(`/login?redirect=${encodeURIComponent(current)}`);
       return;
     }
     createOrder.mutate({ data: { productId: id } }, {
