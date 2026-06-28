@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { VaultradeLogomark, VaultradeWordmark } from "@/components/VaultradeLogo";
+import Footer from "./Footer";
 
 const links = [
   { href: "/admin",          label: "Analytics",          icon: LayoutDashboard, exact: true },
@@ -118,10 +119,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">
-            {children}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-8">
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
           </div>
+          <Footer />
         </main>
       </div>
     </div>
