@@ -2,11 +2,13 @@ import { useListNotifications } from "@workspace/api-client-react";
 import { useMarkAllNotificationsRead, useMarkNotificationRead } from "@/hooks/useMutations";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bell, Check, ExternalLink, Package, Wallet } from "lucide-react";
+import { Bell, Check, ArrowRight, Package, Wallet } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListNotificationsQueryKey } from "@workspace/api-client-react";
+import { useLocation } from "wouter";
 
 export default function Notifications() {
+  const [, setLocation] = useLocation();
   const { data: notifications, isLoading } = useListNotifications();
   const markAllRead = useMarkAllNotificationsRead();
   const markRead = useMarkNotificationRead();
@@ -86,8 +88,12 @@ export default function Notifications() {
 
                     <div className="flex items-center gap-4 mt-3">
                       {notification.link && (
-                        <Button variant="link" className="p-0 h-auto text-xs" asChild>
-                          <a href={notification.link}>View Details <ExternalLink className="w-3 h-3 ml-1" /></a>
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto text-xs text-primary"
+                          onClick={() => setLocation(notification.link!)}
+                        >
+                          View Details <ArrowRight className="w-3 h-3 ml-1" />
                         </Button>
                       )}
 
