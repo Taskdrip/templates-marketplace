@@ -9,8 +9,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, XCircle, Search, Eye, Trash2, Clock, Package, User, ExternalLink } from "lucide-react";
+import { CheckCircle2, XCircle, Search, Eye, Trash2, Clock, Package, User, ExternalLink, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ProductImageUploader from "@/components/product/ProductImageUploader";
 
 type StatusFilter = "all" | "pending" | "active" | "rejected";
 
@@ -78,7 +79,10 @@ export default function AdminProducts() {
   const [rejectReason, setRejectReason] = useState("");
   const [viewProduct, setViewProduct] = useState<AdminProduct | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [editingImages, setEditingImages] = useState<string[]>([]);
+  const [savingImages, setSavingImages] = useState(false);
   const deleteProduct = useDeleteProduct();
+  const updateProduct = useUpdateProduct();
 
   const { data: products = [], isLoading, refetch } = useQuery<AdminProduct[]>({
     queryKey: ["admin-products", statusFilter],
@@ -284,7 +288,7 @@ export default function AdminProducts() {
                           <CheckCircle2 className="w-3.5 h-3.5" /> Re-approve
                         </Button>
                       )}
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setViewProduct(product)}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setViewProduct(product); setEditingImages(product.previewImages ?? []); }}>
                         <Eye className="w-3.5 h-3.5 text-blue-400" />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDeleteId(product.id)}>
@@ -323,7 +327,7 @@ export default function AdminProducts() {
       </Dialog>
 
       {/* Product Preview Dialog */}
-      <Dialog open={viewProduct !== null} onOpenChange={open => !open && setViewProduct(null)}>
+      <Dialog open={viewProduct !== null} onOpenChange={open => { if (!open) { setViewProduct(null); setEditingImages([]); } }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           {viewProduct && (
             <>
@@ -337,9 +341,37 @@ export default function AdminProducts() {
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                {viewProduct.previewImages?.[0] && (
-                  <img src={viewProduct.previewImages[0]} alt="" className="w-full h-48 object-cover rounded-lg" />
-                )}
+                {/* Editable image section */}
+                <div className="space-y-2">
+                  <ProductImageUploader
+                    images={editingImages}
+                    onChange={setEditingImages}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full gap-2 border-violet-500/30 text-violet-400 hover:bg-violet-500/10 text-xs"
+                    disabled={savingImages}
+                    onClick={async () => {
+                      setSavingImages(true);
+                      updateProduct.mutate(
+                        { id: viewProduct.id, data: { previewImages: editingImages } as any },
+                        {
+                          onSuccess: () => {
+                            toast({ description: "Product images updated successfully." });
+                            setViewProduct(p => p ? { ...p, previewImages: editingImages } : p);
+                            refetch();
+                          },
+                          onError: () => toast({ title: "Failed to save images", variant: "destructive" }),
+                          onSettled: () => setSavingImages(false),
+                        }
+                      );
+                    }}
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    {savingImages ? "Saving…" : "Save Images"}
+                  </Button>
+                </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-1">
                     <p className="text-muted-foreground">Seller</p>

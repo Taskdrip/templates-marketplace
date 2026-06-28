@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Upload, Info } from "lucide-react";
 import { Link } from "wouter";
+import ProductImageUploader from "@/components/product/ProductImageUploader";
 
 function token() { return localStorage.getItem("cm_token"); }
 
@@ -49,8 +50,8 @@ export default function SellerAddProduct() {
     downloadUrl: "",
     documentation: "",
     tags: "",
-    previewImages: "",
   });
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
@@ -74,7 +75,7 @@ export default function SellerAddProduct() {
         downloadUrl: form.downloadUrl || undefined,
         documentation: form.documentation || undefined,
         tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
-        previewImages: form.previewImages ? form.previewImages.split("\n").map(u => u.trim()).filter(Boolean) : [],
+        previewImages,
       },
     }, {
       onSuccess: () => {
@@ -169,10 +170,7 @@ export default function SellerAddProduct() {
                 <Input id="downloadUrl" type="url" value={form.downloadUrl} onChange={set("downloadUrl")} placeholder="https://drive.google.com/... or direct link" className="bg-background/50" />
                 <p className="text-xs text-muted-foreground">This will only be shared with buyers after admin confirms payment.</p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="previewImages">Preview Image URLs (one per line)</Label>
-                <Textarea id="previewImages" value={form.previewImages} onChange={set("previewImages")} rows={3} placeholder={"https://i.imgur.com/example.png\nhttps://i.imgur.com/example2.png"} className="bg-background/50 resize-none" />
-              </div>
+              <ProductImageUploader images={previewImages} onChange={setPreviewImages} />
               <div className="space-y-2">
                 <Label htmlFor="docs">Documentation / Setup Guide</Label>
                 <Textarea id="docs" value={form.documentation} onChange={set("documentation")} rows={5} placeholder="Step-by-step setup instructions. Supports Markdown." className="bg-background/50 resize-none" />
