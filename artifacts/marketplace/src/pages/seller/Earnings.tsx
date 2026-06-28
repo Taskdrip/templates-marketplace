@@ -50,7 +50,7 @@ export default function SellerEarnings() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Earnings</h1>
-        <p className="text-muted-foreground mt-1">Your revenue from product sales on Vaultrade.store.</p>
+        <p className="text-muted-foreground mt-1">Your revenue from product sales on Breedskoolpi.store.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -117,7 +117,7 @@ export default function SellerEarnings() {
                     <div>
                       <p className="font-medium text-sm">{order.productName}</p>
                       <p className="text-xs text-muted-foreground">Order #{order.id} · {new Date(order.createdAt).toLocaleDateString()}</p>
-                      {order.chain && <p className="text-xs text-muted-foreground">{order.chain.replace("USDT_", "USDT ")}</p>}
+                      {order.chain && <p className="text-xs text-muted-foreground">Pi Network</p>}
                     </div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-1.5">
@@ -151,7 +151,7 @@ export default function SellerEarnings() {
             <li>Buyer completes purchase and submits payment proof</li>
             <li>Admin verifies payment on the blockchain</li>
             <li>Buyer receives download access and confirms receipt</li>
-            <li>Admin releases 90% of the sale amount to your USDT wallet</li>
+            <li>Admin releases 90% of the sale amount to your Pi wallet</li>
             <li>You receive a notification when funds are released</li>
           </ol>
           <p className="text-xs text-muted-foreground mt-4">Contact support if you have not received a payout within 48 hours of buyer confirmation.</p>

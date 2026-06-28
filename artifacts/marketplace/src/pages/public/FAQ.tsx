@@ -4,11 +4,11 @@ export default function FAQ() {
   const faqs = [
     {
       question: "How do I purchase a product?",
-      answer: "Create an account, find the product you want, and click 'Buy Now'. You'll be presented with a crypto wallet address. Send the exact amount in USDT (TRC20, BEP20, or TON), enter your transaction hash, and once verified, your download will be available instantly."
+      answer: "Create an account, find the product you want, and click 'Buy Now'. You'll receive a Pi wallet address. Send the exact amount in Pi (π), submit your transaction ID, and once verified by admin, your download will be available instantly."
     },
     {
       question: "What cryptocurrencies do you accept?",
-      answer: "We currently accept USDT (Tether) on three networks: TRON (TRC20), BNB Smart Chain (BEP20), and TON Network. We chose USDT to avoid price volatility during the checkout process."
+      answer: "We exclusively accept Pi (π) — the native cryptocurrency of the Pi Network. Payments are made directly inside Pi Browser using the Pi SDK, ensuring fast, secure, and native transactions on the Pi blockchain."
     },
     {
       question: "How long does it take to receive my download?",

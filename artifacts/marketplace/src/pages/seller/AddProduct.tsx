@@ -113,7 +113,7 @@ export default function SellerAddProduct() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price (USDT) *</Label>
+                  <Label htmlFor="price">Price (π Pi) *</Label>
                   <Input id="price" type="number" min="1" step="0.01" value={form.price} onChange={set("price")} placeholder="99.00" className="bg-background/50" required />
                 </div>
                 <div className="space-y-2">
@@ -220,7 +220,7 @@ export default function SellerAddProduct() {
                 <span className="font-semibold">10%</span>
               </div>
               <div className="h-px bg-border/50" />
-              <p className="text-xs text-muted-foreground">Funds are held in escrow until the buyer confirms receipt, then released to your USDT wallet.</p>
+              <p className="text-xs text-muted-foreground">Funds are held in escrow until the buyer confirms receipt, then released to your Pi wallet.</p>
             </CardContent>
           </Card>
         </div>

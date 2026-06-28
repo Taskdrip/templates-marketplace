@@ -76,6 +76,59 @@ export default function Marketplace() {
 
   return (
     <div className="min-h-screen">
+      {/* Hero banner */}
+      <div className="relative overflow-hidden border-b border-border/30">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0d0b1e] via-[#13103a] to-[#0b0d2a]" />
+        <div className="absolute inset-0 opacity-30"
+          style={{ background: "radial-gradient(ellipse 80% 60% at 50% -20%, rgba(130,80,255,0.35) 0%, transparent 70%)" }} />
+        {/* Grid lines */}
+        <div className="absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: "linear-gradient(rgba(150,100,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(150,100,255,1) 1px,transparent 1px)", backgroundSize: "48px 48px" }} />
+        {/* Floating orbs */}
+        <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
+        <div className="relative container max-w-screen-xl mx-auto px-4 py-10 md:py-14 flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/5 px-3 py-1 text-xs font-medium text-yellow-400 mb-4">
+              <span className="font-black" style={{ fontFamily: "serif" }}>π</span> Pi Network Marketplace
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">
+              Buy & Sell{" "}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-300 to-yellow-400">
+                Digital Products
+              </span>
+            </h1>
+            <p className="text-muted-foreground text-sm md:text-base max-w-lg">
+              Apps, scripts, templates, social accounts, websites & more — all powered by <span className="text-yellow-400 font-semibold">Pi (π)</span> on Breedskoolpi.store
+            </p>
+            <div className="flex flex-wrap gap-3 mt-5 justify-center md:justify-start">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Cpu className="w-3.5 h-3.5 text-violet-400" /> <span>{productsData?.products.length ?? "100"}+ Products</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Star className="w-3.5 h-3.5 text-yellow-400" /> <span>Verified Sellers</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Flame className="w-3.5 h-3.5 text-orange-400" /> <span>Escrow Protected</span>
+              </div>
+            </div>
+          </div>
+          {/* Category pills */}
+          <div className="hidden md:grid grid-cols-2 gap-2 shrink-0 max-w-xs w-full">
+            {Object.entries(CATEGORY_ICONS).slice(0, 6).map(([slug, icon]) => (
+              <button
+                key={slug}
+                onClick={() => setCategory(slug)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium transition-all ${category === slug ? "bg-primary/20 border-primary/40 text-primary" : "bg-card/50 border-border/30 text-muted-foreground hover:border-violet-500/30 hover:text-foreground"}`}
+              >
+                {icon}
+                <span className="truncate">{slug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Header bar */}
       <div className="border-b border-border/40 bg-card/30 backdrop-blur-sm sticky top-16 z-30">
         <div className="container max-w-screen-xl mx-auto px-4 py-3 flex flex-col sm:flex-row gap-3 items-start sm:items-center">

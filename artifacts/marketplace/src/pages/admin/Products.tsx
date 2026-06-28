@@ -280,7 +280,7 @@ export default function AdminProducts() {
                 <Textarea rows={4} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Detailed product description..." />
               </div>
               <div className="space-y-1.5">
-                <Label>Price (USDT) *</Label>
+                <Label>Price (π Pi) *</Label>
                 <Input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="99.00" />
               </div>
               <div className="space-y-1.5">

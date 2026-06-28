@@ -154,7 +154,7 @@ export default function OrderDetail() {
   const submitPayment = useSubmitPayment();
   const confirmReceipt = useConfirmReceipt();
   
-  const [selectedChain, setSelectedChain] = useState<string>("USDT_TON");
+  const [selectedChain, setSelectedChain] = useState<string>("PI");
   const [txHash, setTxHash] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -291,13 +291,13 @@ export default function OrderDetail() {
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-lg">${order.amount.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">USDT</p>
+                  <p className="text-xs text-muted-foreground">Pi (π)</p>
                 </div>
               </div>
               <Separator className="my-4" />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span className="text-primary">${order.amount.toFixed(2)} USDT</span>
+                <span className="text-primary"><span style={{ fontFamily: "serif" }}>π</span>{order.amount.toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>
@@ -373,14 +373,12 @@ export default function OrderDetail() {
             <Card className="bg-card/50 border-border/50">
               <CardHeader>
                 <CardTitle>Complete Payment</CardTitle>
-                <CardDescription>Send exactly {order.amount} USDT to one of our addresses</CardDescription>
+                <CardDescription>Send exactly <span style={{ fontFamily: "serif" }}>π</span>{order.amount} Pi to our wallet address below</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <Tabs value={selectedChain} onValueChange={setSelectedChain}>
-                  <TabsList className="grid grid-cols-3 mb-4">
-                    <TabsTrigger value="USDT_TRC20">TRC20</TabsTrigger>
-                    <TabsTrigger value="USDT_BEP20">BEP20</TabsTrigger>
-                    <TabsTrigger value="USDT_TON">TON</TabsTrigger>
+                  <TabsList className="grid grid-cols-1 mb-4">
+                    <TabsTrigger value="PI">Pi Network</TabsTrigger>
                   </TabsList>
                   {walletData?.wallets.map(wallet => (
                     <TabsContent key={wallet.chain} value={wallet.chain} className="space-y-4">
@@ -434,11 +432,11 @@ export default function OrderDetail() {
                   <>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Network</span>
-                      <span>{order.payment.chain.replace("USDT_", "USDT ")}</span>
+                      <span>Pi Network</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Amount</span>
-                      <span className="font-semibold">${order.payment.amount.toFixed(2)} USDT</span>
+                      <span className="font-semibold"><span style={{ fontFamily: "serif" }}>π</span>{order.payment.amount.toFixed(2)}</span>
                     </div>
                     <div className="space-y-1 text-sm">
                       <span className="text-muted-foreground">TX Hash</span>

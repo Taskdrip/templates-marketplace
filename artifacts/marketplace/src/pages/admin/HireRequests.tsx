@@ -2,11 +2,20 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useAdminHireRequests, useUpdateHireRequest } from "@/hooks/useHireRequests";
-import { Clock, CheckCircle2, XCircle, AlertCircle, Wrench, Phone, Send, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  useAdminHireRequests, useUpdateHireRequest,
+  useAdminHireMilestones, useCreateMilestone, useReleaseMilestone,
+  useActivateMilestone, useDeleteMilestone,
+} from "@/hooks/useHireRequests";
+import {
+  Clock, CheckCircle2, XCircle, AlertCircle, Wrench, Phone, Send,
+  ChevronDown, ChevronUp, Plus, Trash2, PlayCircle, Unlock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -22,6 +31,141 @@ const TYPE_LABELS: Record<string, string> = {
   "bot": "Bot/Automation", "script-api": "Script/API", "pi-tool": "Pi Tool", "other": "Other",
 };
 
+const MILESTONE_COLORS: Record<string, string> = {
+  locked:   "bg-muted/50 text-muted-foreground border-border/50",
+  active:   "bg-blue-500/10 text-blue-400 border-blue-500/30",
+  released: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+};
+
+function MilestonePanel({ requestId }: { requestId: number }) {
+  const { data: milestones, isLoading } = useAdminHireMilestones(requestId);
+  const create = useCreateMilestone();
+  const release = useReleaseMilestone();
+  const activate = useActivateMilestone();
+  const del = useDeleteMilestone();
+  const { toast } = useToast();
+
+  const [form, setForm] = useState({ title: "", description: "", amountPi: "" });
+
+  const handleCreate = () => {
+    if (!form.title || !form.amountPi) return;
+    create.mutate(
+      { requestId, title: form.title, description: form.description, amountPi: Number(form.amountPi), orderIndex: (milestones?.length ?? 0) },
+      {
+        onSuccess: () => { toast({ title: "Milestone added" }); setForm({ title: "", description: "", amountPi: "" }); },
+        onError: () => toast({ title: "Failed to add milestone", variant: "destructive" }),
+      }
+    );
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Payment Milestones</p>
+        {milestones?.length ? (
+          <span className="text-xs text-muted-foreground">
+            Total: <span className="text-yellow-400 font-semibold font-serif">π</span>
+            {milestones.reduce((s, m) => s + Number(m.amountPi), 0).toFixed(2)} Pi
+          </span>
+        ) : null}
+      </div>
+
+      {isLoading ? (
+        <div className="h-12 bg-muted animate-pulse rounded-lg" />
+      ) : milestones?.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">No milestones yet. Add payment milestones below.</p>
+      ) : (
+        <div className="space-y-2">
+          {milestones!.map((m, i) => (
+            <div key={m.id} className={`flex items-center gap-3 p-3 rounded-xl border ${MILESTONE_COLORS[m.status]}`}>
+              <div className="w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold shrink-0">
+                {i + 1}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold">{m.title}</p>
+                {m.description && <p className="text-[10px] text-muted-foreground truncate">{m.description}</p>}
+                {m.releasedAt && <p className="text-[10px] text-emerald-400">Released {new Date(m.releasedAt).toLocaleDateString()}</p>}
+              </div>
+              <span className="text-xs font-bold shrink-0">
+                <span className="font-serif">π</span>{Number(m.amountPi).toFixed(2)}
+              </span>
+              <Badge variant="outline" className={`text-[10px] capitalize shrink-0 ${MILESTONE_COLORS[m.status]}`}>
+                {m.status}
+              </Badge>
+              <div className="flex gap-1 shrink-0">
+                {m.status === "locked" && (
+                  <Button size="icon" variant="ghost" className="h-6 w-6 text-blue-400 hover:text-blue-300"
+                    title="Activate"
+                    onClick={() => activate.mutate({ id: m.id, requestId }, {
+                      onSuccess: () => toast({ title: "Milestone activated" }),
+                    })}>
+                    <PlayCircle className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+                {m.status === "active" && (
+                  <Button size="icon" variant="ghost" className="h-6 w-6 text-emerald-400 hover:text-emerald-300"
+                    title="Release funds"
+                    onClick={() => release.mutate({ id: m.id, requestId }, {
+                      onSuccess: () => toast({ title: "Funds released!" }),
+                    })}>
+                    <Unlock className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+                {m.status !== "released" && (
+                  <Button size="icon" variant="ghost" className="h-6 w-6 text-red-400 hover:text-red-300"
+                    title="Delete"
+                    onClick={() => del.mutate({ id: m.id, requestId }, {
+                      onSuccess: () => toast({ title: "Milestone deleted" }),
+                    })}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add milestone form */}
+      <div className="p-3 bg-background/50 border border-border/40 rounded-xl space-y-2">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Add Milestone</p>
+        <div className="grid grid-cols-3 gap-2">
+          <Input
+            placeholder="Title (e.g. Design Phase)"
+            value={form.title}
+            onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+            className="col-span-2 h-8 text-xs bg-background/60"
+          />
+          <Input
+            placeholder="π Amount"
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.amountPi}
+            onChange={e => setForm(f => ({ ...f, amountPi: e.target.value }))}
+            className="h-8 text-xs bg-background/60"
+          />
+        </div>
+        <Input
+          placeholder="Description (optional)"
+          value={form.description}
+          onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+          className="h-8 text-xs bg-background/60"
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs gap-1 border-violet-500/30 text-violet-400"
+          onClick={handleCreate}
+          disabled={create.isPending || !form.title || !form.amountPi}
+        >
+          <Plus className="w-3 h-3" /> Add Milestone
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function RequestCard({ req }: { req: any }) {
   const [expanded, setExpanded] = useState(false);
   const [status, setStatus] = useState(req.status);
@@ -30,8 +174,8 @@ function RequestCard({ req }: { req: any }) {
   const { toast } = useToast();
 
   const statusInfo = STATUS_MAP[req.status] ?? STATUS_MAP.pending;
-  const waMsg = encodeURIComponent(`Hi! This is PiMarket regarding your project request #${req.id}: "${req.title}".`);
-  const tgMsg = encodeURIComponent(`Hi! This is PiMarket regarding your project request #${req.id}: "${req.title}".`);
+  const waMsg = encodeURIComponent(`Hi! This is Breedskoolpi.store regarding your project request #${req.id}: "${req.title}".`);
+  const tgMsg = encodeURIComponent(`Hi! This is Breedskoolpi.store regarding your project request #${req.id}: "${req.title}".`);
 
   const handleUpdate = () => {
     update.mutate({ id: req.id, status, adminNotes: notes }, {
@@ -93,7 +237,7 @@ function RequestCard({ req }: { req: any }) {
         </div>
 
         {expanded && (
-          <div className="space-y-4 border-t border-border/40 pt-4 mt-2">
+          <div className="space-y-5 border-t border-border/40 pt-4 mt-2">
             {req.features && (
               <div>
                 <p className="text-xs font-semibold text-muted-foreground mb-1">Features Requested:</p>
@@ -101,9 +245,12 @@ function RequestCard({ req }: { req: any }) {
               </div>
             )}
 
+            {/* Milestone section */}
+            <MilestonePanel requestId={req.id} />
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground">Update Status</label>
+                <Label className="text-xs font-semibold text-muted-foreground">Update Status</Label>
                 <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger className="h-9 text-sm bg-background/50">
                     <SelectValue />
@@ -118,7 +265,7 @@ function RequestCard({ req }: { req: any }) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">Admin Notes (visible to user)</label>
+              <Label className="text-xs font-semibold text-muted-foreground">Admin Notes (visible to user)</Label>
               <Textarea
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
@@ -160,10 +307,8 @@ export default function AdminHireRequests() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            Hire Requests
-          </h1>
-          <p className="text-muted-foreground mt-1">Manage custom development requests from users</p>
+          <h1 className="text-2xl font-bold tracking-tight">Hire Requests</h1>
+          <p className="text-muted-foreground mt-1">Manage custom development requests — set milestones and release funds per phase</p>
         </div>
         <Badge className="bg-violet-500/10 text-violet-400 border-violet-500/20 text-base px-3 py-1">
           {requests?.length ?? 0} total

@@ -286,7 +286,7 @@ export default function AdminSettings() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Site Name</Label>
-              <Input className="bg-background" value={form.site_name} onChange={set("site_name")} placeholder="Vaultrade.store" />
+              <Input className="bg-background" value={form.site_name} onChange={set("site_name")} placeholder="Breedskoolpi.store" />
             </div>
             <div className="space-y-1.5">
               <Label>Support Email</Label>
@@ -358,7 +358,7 @@ export default function AdminSettings() {
             className="bg-background min-h-[100px] resize-none"
             value={form.payment_instructions}
             onChange={set("payment_instructions")}
-            placeholder="Send the exact USDT amount to the address shown, then submit your TXID..."
+            placeholder="Send the exact Pi amount to the address shown, then submit your transaction ID..."
           />
         </CardContent>
       </Card>

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 const PERKS = [
-  { icon: <DollarSign className="w-5 h-5 text-emerald-400" />, title: "Earn in USDT", desc: "Receive payments in stable crypto. No bank needed." },
+  { icon: <DollarSign className="w-5 h-5 text-emerald-400" />, title: "Earn in Pi", desc: "Receive Pi payments directly. No bank needed." },
   { icon: <Shield className="w-5 h-5 text-blue-400" />, title: "Escrow Protection", desc: "Admin holds buyer funds securely until delivery." },
   { icon: <Users className="w-5 h-5 text-violet-400" />, title: "85K+ Buyers", desc: "Instantly reach a global audience of active buyers." },
   { icon: <BarChart2 className="w-5 h-5 text-orange-400" />, title: "Seller Analytics", desc: "Track views, sales, and revenue in real time." },
@@ -110,10 +110,10 @@ export default function SellerRegister() {
             <Store className="w-4 h-4" /> Seller Program
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-            Start Selling on Vaultrade.store
+            Start Selling on Breedskoolpi.store
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            List your digital products and reach 85,000+ buyers globally. Receive USDT payments with full escrow protection.
+            List your digital products and reach 85,000+ Pi Pioneers globally. Receive Pi payments with full escrow protection.
           </p>
         </div>
       </div>
@@ -154,7 +154,7 @@ export default function SellerRegister() {
 
             <div className="p-5 rounded-xl bg-gradient-to-br from-primary/10 to-violet-500/10 border border-primary/20 text-sm space-y-2">
               <p className="font-semibold text-foreground">Commission Structure</p>
-              <p className="text-muted-foreground">Platform takes a flat <span className="text-primary font-semibold">10% commission</span> on each sale. You keep the rest in USDT.</p>
+              <p className="text-muted-foreground">Platform takes a flat <span className="text-primary font-semibold">10% commission</span> on each sale. You keep the rest in Pi.</p>
               <p className="text-muted-foreground">All payments go through our escrow wallet — funds are released to sellers after buyer confirms delivery.</p>
             </div>
           </div>

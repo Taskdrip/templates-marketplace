@@ -55,7 +55,7 @@ export default function Register() {
         }),
       });
       setAuth(res.token, res.user);
-      toast({ title: "Welcome to Vaultrade.store 🎉", description: "Your account has been created successfully." });
+      toast({ title: "Welcome to Breedskoolpi.store 🎉", description: "Your account has been created successfully." });
       setLocation(accountType === "seller" ? "/dashboard" : "/marketplace");
     } catch (err: any) {
       toast({ title: "Registration failed", description: err.message || "Could not create account.", variant: "destructive" });
@@ -69,7 +69,7 @@ export default function Register() {
       <div className="w-full max-w-lg space-y-6 animate-in fade-in zoom-in-95 duration-500">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight">Create your account</h2>
-          <p className="text-muted-foreground mt-2 text-sm">Join thousands of buyers and sellers on Vaultrade.store</p>
+          <p className="text-muted-foreground mt-2 text-sm">Join thousands of buyers and sellers on Breedskoolpi.store</p>
         </div>
 
         {/* Account type toggle */}
@@ -95,7 +95,7 @@ export default function Register() {
             <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
             <div>
               <p className="font-medium text-foreground">Seller Benefits</p>
-              <p className="text-muted-foreground mt-0.5">List unlimited products, receive USDT payments, and access seller analytics. 10% platform fee.</p>
+              <p className="text-muted-foreground mt-0.5">List unlimited products, receive Pi payments, and access seller analytics. 10% platform fee.</p>
             </div>
           </div>
         )}

@@ -87,12 +87,18 @@ export default function Pricing() {
       </div>
 
       <div className="mt-24 max-w-4xl mx-auto bg-card/30 border border-border/50 rounded-2xl p-8 md:p-12 text-center">
-        <h2 className="text-2xl font-bold mb-4">Crypto Payments Accepted</h2>
-        <p className="text-muted-foreground mb-8">We accept USDT across multiple networks for fast, secure, and low-fee transactions.</p>
+        <h2 className="text-2xl font-bold mb-4">Pi Network Payments</h2>
+        <p className="text-muted-foreground mb-8">We accept Pi (π) — the fastest growing crypto. Pay natively inside Pi Browser using the Pi SDK.</p>
         <div className="flex flex-wrap justify-center gap-6">
-          <div className="px-6 py-3 bg-card border border-border/50 rounded-xl font-medium">USDT (TRC20)</div>
-          <div className="px-6 py-3 bg-card border border-border/50 rounded-xl font-medium">USDT (BEP20)</div>
-          <div className="px-6 py-3 bg-card border border-border/50 rounded-xl font-medium">USDT (TON)</div>
+          <div className="px-6 py-3 bg-card border border-border/50 rounded-xl font-medium flex items-center gap-2">
+            <span className="text-yellow-400 font-black text-lg" style={{ fontFamily: "serif" }}>π</span> Pi Network
+          </div>
+          <div className="px-6 py-3 bg-card border border-border/50 rounded-xl font-medium flex items-center gap-2">
+            <span className="text-emerald-400">🛡️</span> Escrow Protected
+          </div>
+          <div className="px-6 py-3 bg-card border border-border/50 rounded-xl font-medium flex items-center gap-2">
+            <span className="text-violet-400">⚡</span> Instant Delivery
+          </div>
         </div>
       </div>
     </div>

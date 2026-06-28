@@ -58,7 +58,7 @@ export default function BlogPage() {
           <Rss className="w-7 h-7 text-violet-400" />
         </div>
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-          Vaultrade{" "}
+          Breedskoolpi{" "}
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-blue-400">Blog</span>
         </h1>
         <p className="text-xl text-muted-foreground">
@@ -99,7 +99,7 @@ export default function BlogPage() {
 
       {/* Bottom CTA */}
       <div className="mt-20 text-center py-12 border-t border-border/30">
-        <p className="text-muted-foreground mb-4">Want to write for Vaultrade?</p>
+        <p className="text-muted-foreground mb-4">Want to write for Breedskoolpi.store?</p>
         <Link href="/contact" className="text-violet-400 hover:text-violet-300 font-semibold text-sm flex items-center justify-center gap-1">
           Get in touch <ArrowRight className="w-3.5 h-3.5" />
         </Link>
