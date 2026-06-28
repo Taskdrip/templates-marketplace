@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, CheckCircle2, AlertCircle, Clock, Check, Download, Package, MessageCircle, Send, User, ShieldCheck, ThumbsUp } from "lucide-react";
+import { Copy, CheckCircle2, AlertCircle, Clock, Check, Download, Package, MessageCircle, Send, User, ShieldCheck, ThumbsUp, ExternalLink } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetOrderQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -419,51 +419,90 @@ export default function OrderDetail() {
               </CardFooter>
             </Card>
           ) : (
-            <Card className="bg-card/50 border-border/50">
-              <CardHeader><CardTitle>Payment Status</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Order Status</span>
-                  <Badge variant="outline" className="capitalize">
-                    {order.status === "funds_released" ? "Complete" : order.status.replace(/_/g, " ")}
-                  </Badge>
-                </div>
-                {order.payment && (
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Network</span>
-                      <span>Pi Network</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Amount</span>
-                      <span className="font-semibold"><span style={{ fontFamily: "serif" }}>π</span>{order.payment.amount.toFixed(2)}</span>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <span className="text-muted-foreground">TX Hash</span>
-                      <p className="break-all font-mono text-xs bg-muted/50 p-2 rounded border border-border/40">{order.payment.txHash}</p>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Payment</span>
-                      <Badge variant="outline" className={cn("capitalize text-xs", {
-                        "bg-emerald-500/10 text-emerald-400 border-emerald-500/30": order.payment.status === "confirmed",
-                        "bg-red-500/10 text-red-400 border-red-500/30": order.payment.status === "rejected",
-                        "bg-amber-500/10 text-amber-400 border-amber-500/30": order.payment.status === "pending",
-                      })}>
-                        {order.payment.status}
-                      </Badge>
-                    </div>
-                  </>
-                )}
-                <Separator />
-                <Button
-                  variant="outline"
-                  className="w-full gap-2"
-                  onClick={() => setLocation("/messages")}
-                >
-                  <MessageCircle className="w-4 h-4" /> Open Support Chat
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="space-y-4">
+              {/* Transaction Breakdown */}
+              <Card className="bg-card/50 border-border/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Transaction Breakdown</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-0 p-0">
+                  <div className="flex justify-between items-center px-6 py-3 border-b border-border/30">
+                    <span className="text-sm text-muted-foreground">Product Price</span>
+                    <span className="font-bold"><span style={{ fontFamily: "serif" }}>π</span>{order.amount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center px-6 py-3 border-b border-border/30">
+                    <span className="text-sm text-muted-foreground">Platform Fee (10%)</span>
+                    <span className="text-red-400 font-medium text-sm">-<span style={{ fontFamily: "serif" }}>π</span>{(order.amount * 0.1).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center px-6 py-3 bg-emerald-500/5">
+                    <span className="text-sm font-medium text-emerald-400">Seller Receives (90%)</span>
+                    <span className="text-emerald-400 font-bold"><span style={{ fontFamily: "serif" }}>π</span>{(order.amount * 0.9).toFixed(2)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Payment Status Card */}
+              <Card className="bg-card/50 border-border/50">
+                <CardHeader className="pb-3"><CardTitle className="text-base">Payment Status</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Order Status</span>
+                    <Badge variant="outline" className="capitalize">
+                      {order.status === "funds_released" ? "Complete" : order.status.replace(/_/g, " ")}
+                    </Badge>
+                  </div>
+                  {order.payment && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Network</span>
+                        <span className="text-yellow-400 font-medium flex items-center gap-1">
+                          <span style={{ fontFamily: "serif" }}>π</span> Pi Network
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Amount Paid</span>
+                        <span className="font-semibold"><span style={{ fontFamily: "serif" }}>π</span>{order.payment.amount.toFixed(2)}</span>
+                      </div>
+                      <div className="space-y-1.5 text-sm">
+                        <span className="text-muted-foreground">Pi Transaction Hash</span>
+                        <div className="flex items-start gap-2 bg-muted/50 p-2 rounded border border-border/40">
+                          <code className="break-all font-mono text-xs text-primary flex-1">{order.payment.txHash}</code>
+                          <Button
+                            variant="ghost" size="icon" className="h-6 w-6 shrink-0"
+                            onClick={() => { navigator.clipboard.writeText(order.payment!.txHash); toast({ description: "TX hash copied" }); }}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <a
+                          href="https://minepi.com/explorer"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Verify on Pi Blockchain Explorer
+                        </a>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Payment Verification</span>
+                        <Badge variant="outline" className={cn("capitalize text-xs", {
+                          "bg-emerald-500/10 text-emerald-400 border-emerald-500/30": order.payment.status === "confirmed",
+                          "bg-red-500/10 text-red-400 border-red-500/30": order.payment.status === "rejected",
+                          "bg-amber-500/10 text-amber-400 border-amber-500/30": order.payment.status === "pending",
+                        })}>
+                          {order.payment.status}
+                        </Badge>
+                      </div>
+                    </>
+                  )}
+                  <Separator />
+                  <Button variant="outline" className="w-full gap-2" onClick={() => setLocation("/messages")}>
+                    <MessageCircle className="w-4 h-4" /> Open Support Chat
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           )}
         </div>
       </div>

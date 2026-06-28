@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { db, usersTable, productsTable, ordersTable, paymentsTable, categoriesTable } from "@workspace/db";
-import { eq, desc, sql } from "drizzle-orm";
+import { db, usersTable, productsTable, ordersTable, paymentsTable, categoriesTable, notificationsTable } from "@workspace/db";
+import { eq, desc, sql, inArray } from "drizzle-orm";
 import { requireAuth, requireAdmin } from "../middlewares/auth";
 
 const router = Router();
@@ -134,16 +134,35 @@ router.get("/admin/orders", requireAuth, requireAdmin, async (_req, res): Promis
   const payments = await db.select().from(paymentsTable);
   const paymentMap = new Map(payments.map(p => [p.orderId, p]));
 
+  const allUserIds = [...new Set([
+    ...orders.map(o => o.userId),
+    ...products.map(p => p.sellerId).filter(Boolean) as number[],
+  ])];
+  const allUsers = allUserIds.length > 0
+    ? await db.select({ id: usersTable.id, email: usersTable.email, displayName: usersTable.displayName }).from(usersTable).where(inArray(usersTable.id, allUserIds))
+    : [];
+  const userMap = new Map(allUsers.map(u => [u.id, u]));
+
   res.json(orders.map(o => {
     const product = productMap.get(o.productId);
     const payment = paymentMap.get(o.id);
+    const buyer = userMap.get(o.userId);
+    const seller = product?.sellerId ? userMap.get(product.sellerId) : null;
+    const amount = parseFloat(o.amount);
     return {
       id: o.id,
       userId: o.userId,
+      buyerEmail: buyer?.email ?? null,
+      buyerName: buyer?.displayName ?? null,
       productId: o.productId,
       productName: product?.name ?? null,
       productImage: product?.previewImages?.[0] ?? null,
-      amount: parseFloat(o.amount),
+      sellerId: product?.sellerId ?? null,
+      sellerEmail: seller?.email ?? null,
+      sellerName: seller?.displayName ?? null,
+      amount,
+      platformFee: parseFloat((amount * 0.1).toFixed(2)),
+      sellerPayout: parseFloat((amount * 0.9).toFixed(2)),
       status: o.status,
       adminNotes: o.adminNotes ?? null,
       createdAt: o.createdAt instanceof Date ? o.createdAt.toISOString() : o.createdAt,
@@ -162,6 +181,9 @@ router.get("/admin/products/pending", requireAuth, requireAdmin, async (_req, re
   const products = await db.select().from(productsTable).where(eq(productsTable.status, "pending")).orderBy(desc(productsTable.createdAt));
   const cats = await db.select().from(categoriesTable);
   const catMap = new Map(cats.map(c => [c.id, c.name]));
+  const sellerIds = [...new Set(products.map(p => p.sellerId).filter(Boolean))] as number[];
+  const sellers = sellerIds.length > 0 ? await db.select({ id: usersTable.id, email: usersTable.email, displayName: usersTable.displayName }).from(usersTable).where(inArray(usersTable.id, sellerIds)) : [];
+  const sellerMap = new Map(sellers.map(s => [s.id, s]));
 
   res.json(products.map(p => ({
     id: p.id, name: p.name, slug: p.slug, description: p.description,
@@ -174,6 +196,41 @@ router.get("/admin/products/pending", requireAuth, requireAdmin, async (_req, re
     documentation: p.documentation ?? null, videoPreviewUrl: p.videoPreviewUrl ?? null,
     status: p.status, isFeatured: p.isFeatured, salesCount: p.salesCount,
     rating: null, reviewCount: 0,
+    sellerId: p.sellerId,
+    sellerEmail: p.sellerId ? (sellerMap.get(p.sellerId)?.email ?? null) : null,
+    sellerName: p.sellerId ? (sellerMap.get(p.sellerId)?.displayName ?? null) : null,
+    createdAt: p.createdAt instanceof Date ? p.createdAt.toISOString() : p.createdAt,
+  })));
+});
+
+router.get("/admin/products", requireAuth, requireAdmin, async (req, res): Promise<void> => {
+  const { status } = req.query as any;
+  let query = db.select().from(productsTable).$dynamic();
+  if (status && status !== "all") {
+    query = query.where(eq(productsTable.status, status));
+  }
+  const products = await query.orderBy(desc(productsTable.createdAt));
+
+  const cats = await db.select().from(categoriesTable);
+  const catMap = new Map(cats.map(c => [c.id, c.name]));
+  const sellerIds = [...new Set(products.map(p => p.sellerId).filter(Boolean))] as number[];
+  const sellers = sellerIds.length > 0 ? await db.select({ id: usersTable.id, email: usersTable.email, displayName: usersTable.displayName }).from(usersTable).where(inArray(usersTable.id, sellerIds)) : [];
+  const sellerMap = new Map(sellers.map(s => [s.id, s]));
+
+  res.json(products.map(p => ({
+    id: p.id, name: p.name, slug: p.slug, description: p.description,
+    shortDescription: p.shortDescription ?? null,
+    price: parseFloat(p.price), originalPrice: p.originalPrice ? parseFloat(p.originalPrice) : null,
+    categoryId: p.categoryId, categoryName: catMap.get(p.categoryId) ?? null,
+    tags: p.tags ?? [], previewImages: p.previewImages ?? [],
+    demoUrl: p.demoUrl ?? null, downloadUrl: p.downloadUrl ?? null,
+    version: p.version ?? null, changelog: p.changelog ?? null,
+    documentation: p.documentation ?? null, videoPreviewUrl: p.videoPreviewUrl ?? null,
+    status: p.status, isFeatured: p.isFeatured, salesCount: p.salesCount,
+    rating: null, reviewCount: 0,
+    sellerId: p.sellerId,
+    sellerEmail: p.sellerId ? (sellerMap.get(p.sellerId)?.email ?? null) : null,
+    sellerName: p.sellerId ? (sellerMap.get(p.sellerId)?.displayName ?? null) : null,
     createdAt: p.createdAt instanceof Date ? p.createdAt.toISOString() : p.createdAt,
   })));
 });
@@ -189,19 +246,45 @@ router.patch("/admin/products/:id/approve", requireAuth, requireAdmin, async (re
     .returning();
   if (!product) { res.status(404).json({ error: "Not found" }); return; }
 
-  res.json({
-    id: product.id, name: product.name, slug: product.slug, description: product.description,
-    shortDescription: product.shortDescription ?? null,
-    price: parseFloat(product.price), originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
-    categoryId: product.categoryId, categoryName: null,
-    tags: product.tags ?? [], previewImages: product.previewImages ?? [],
-    demoUrl: product.demoUrl ?? null, downloadUrl: product.downloadUrl ?? null,
-    version: product.version ?? null, changelog: product.changelog ?? null,
-    documentation: product.documentation ?? null, videoPreviewUrl: product.videoPreviewUrl ?? null,
-    status: product.status, isFeatured: product.isFeatured, salesCount: product.salesCount,
-    rating: null, reviewCount: 0,
-    createdAt: product.createdAt instanceof Date ? product.createdAt.toISOString() : product.createdAt,
-  });
+  if (product.sellerId) {
+    await db.insert(notificationsTable).values({
+      userId: product.sellerId,
+      type: "order",
+      title: "Product Approved!",
+      message: `Your product "${product.name}" has been approved and is now live on the marketplace.`,
+      link: `/seller/products`,
+      isRead: "false",
+    });
+  }
+
+  res.json({ id: product.id, name: product.name, status: product.status });
+});
+
+router.patch("/admin/products/:id/reject", requireAuth, requireAdmin, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+
+  const { reason } = req.body;
+
+  const [product] = await db.update(productsTable)
+    .set({ status: "rejected" })
+    .where(eq(productsTable.id, id))
+    .returning();
+  if (!product) { res.status(404).json({ error: "Not found" }); return; }
+
+  if (product.sellerId) {
+    await db.insert(notificationsTable).values({
+      userId: product.sellerId,
+      type: "order",
+      title: "Product Rejected",
+      message: `Your product "${product.name}" was not approved.${reason ? ` Reason: ${reason}` : " Please review and resubmit."}`,
+      link: `/seller/products`,
+      isRead: "false",
+    });
+  }
+
+  res.json({ id: product.id, name: product.name, status: product.status });
 });
 
 router.get("/admin/revenue", requireAuth, requireAdmin, async (_req, res): Promise<void> => {
