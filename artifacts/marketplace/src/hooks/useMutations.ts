@@ -166,3 +166,24 @@ export function useSellerDeleteProduct() {
       apiFetch("DELETE", `/seller/products/${id}`),
   });
 }
+
+export function useUpdateProfile() {
+  return useMutation({
+    mutationFn: ({ data }: { data: Record<string, unknown> }) =>
+      apiFetch("PATCH", "/auth/profile", data),
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: ({ data }: { data: { currentPassword: string; newPassword: string } }) =>
+      apiFetch("PATCH", "/auth/password", data),
+  });
+}
+
+export function useReleaseFunds() {
+  return useMutation({
+    mutationFn: ({ id }: { id: number }) =>
+      apiFetch("PATCH", `/orders/${id}/status`, { status: "funds_released" }),
+  });
+}

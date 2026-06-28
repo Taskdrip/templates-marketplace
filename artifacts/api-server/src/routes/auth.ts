@@ -95,6 +95,53 @@ router.post("/auth/logout", requireAuth, async (_req, res): Promise<void> => {
   res.json({ message: "Logged out successfully" });
 });
 
+router.patch("/auth/profile", requireAuth, async (req, res): Promise<void> => {
+  const { displayName, phone, telegramHandle, avatarUrl, piWalletAddress, sellerBio } = req.body;
+
+  const updateData: any = {};
+  if (displayName !== undefined) updateData.displayName = displayName;
+  if (phone !== undefined) updateData.phone = phone;
+  if (telegramHandle !== undefined) updateData.telegramHandle = telegramHandle;
+  if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
+  if (piWalletAddress !== undefined) updateData.piWalletAddress = piWalletAddress;
+  if (sellerBio !== undefined) updateData.sellerBio = sellerBio;
+
+  if (Object.keys(updateData).length === 0) {
+    res.status(400).json({ error: "No fields to update" });
+    return;
+  }
+
+  const [user] = await db.update(usersTable)
+    .set(updateData)
+    .where(eq(usersTable.id, req.userId!))
+    .returning();
+
+  if (!user) { res.status(404).json({ error: "User not found" }); return; }
+  res.json(toUserResponse(user));
+});
+
+router.patch("/auth/password", requireAuth, async (req, res): Promise<void> => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    res.status(400).json({ error: "currentPassword and newPassword are required" });
+    return;
+  }
+  if (newPassword.length < 6) {
+    res.status(400).json({ error: "New password must be at least 6 characters" });
+    return;
+  }
+
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, req.userId!));
+  if (!user) { res.status(404).json({ error: "User not found" }); return; }
+
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!valid) { res.status(401).json({ error: "Current password is incorrect" }); return; }
+
+  const newHash = await bcrypt.hash(newPassword, 10);
+  await db.update(usersTable).set({ passwordHash: newHash }).where(eq(usersTable.id, req.userId!));
+  res.json({ message: "Password updated successfully" });
+});
+
 // ─── 2FA routes (admin only) ─────────────────────────────────────────────────
 
 router.get("/auth/2fa/status", requireAuth, async (req, res): Promise<void> => {
@@ -226,7 +273,9 @@ function toUserResponse(user: any) {
     phone: user.phone,
     telegramHandle: user.telegramHandle,
     isSeller: user.isSeller,
+    sellerBio: user.sellerBio ?? null,
     isActive: user.isActive,
+    piWalletAddress: user.piWalletAddress ?? null,
     createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
     totalPurchases: 0,
   };
