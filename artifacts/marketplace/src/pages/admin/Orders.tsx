@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getListAdminOrdersQueryKey } from "@workspace/api-client-react";
 import { DollarSign, ExternalLink, Copy, Check, Eye, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePiPrice } from "@/hooks/usePiPrice";
 
 const PI_EXPLORER = "https://minepi.com/explorer";
 
@@ -67,6 +68,7 @@ export default function AdminOrders() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [detailOrder, setDetailOrder] = useState<any | null>(null);
+  const { toUsd, price: piPrice } = usePiPrice();
 
   const orders = (ordersData as any[]) ?? [];
 
@@ -153,12 +155,15 @@ export default function AdminOrders() {
                         <div className="flex items-center gap-1">
                           <span className="text-muted-foreground">Total:</span>
                           <span className="font-bold text-sm"><span style={{ fontFamily: "serif" }}>π</span>{amount.toFixed(2)}</span>
+                          {piPrice && <span className="text-emerald-400/70 text-[10px]">({toUsd(amount)})</span>}
                         </div>
                         <div className="flex items-center gap-1 text-red-400/80">
                           <span>Fee (10%):</span><span>-π{fee.toFixed(2)}</span>
+                          {piPrice && <span className="text-[10px] opacity-70">({toUsd(fee)})</span>}
                         </div>
                         <div className="flex items-center gap-1 text-emerald-400">
                           <span>Seller (90%):</span><span className="font-semibold">π{payout.toFixed(2)}</span>
+                          {piPrice && <span className="text-[10px] opacity-80">({toUsd(payout)})</span>}
                         </div>
                       </div>
                     </TableCell>

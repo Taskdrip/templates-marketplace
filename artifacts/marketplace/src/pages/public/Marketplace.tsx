@@ -11,6 +11,7 @@ import {
   Search, Cpu, Star, SlidersHorizontal, X, TrendingUp, Flame,
   Code2, Globe, Facebook, Instagram, Layers, ExternalLink, Package,
 } from "lucide-react";
+import { usePiPrice } from "@/hooks/usePiPrice";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   "source-code-apps": <Code2 className="w-4 h-4" />,
@@ -280,6 +281,8 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
   const isHot = product.salesCount > 200;
   const hasSale = product.originalPrice && Number(product.originalPrice) > Number(product.price);
   const discount = hasSale ? Math.round((1 - Number(product.price) / Number(product.originalPrice)) * 100) : 0;
+  const { toUsd, price: piPrice } = usePiPrice();
+  const usdValue = toUsd(Number(product.price));
 
   return (
     <div
@@ -310,15 +313,22 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
         </div>
 
         {/* Price */}
-        <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
-          {hasSale && (
-            <span className="text-[10px] line-through text-white/60 bg-black/40 px-1.5 py-0.5 rounded">
-              π{Number(product.originalPrice).toFixed(2)}
+        <div className="absolute bottom-2.5 right-2.5 flex flex-col items-end gap-1">
+          <div className="flex items-center gap-1.5">
+            {hasSale && (
+              <span className="text-[10px] line-through text-white/60 bg-black/40 px-1.5 py-0.5 rounded">
+                π{Number(product.originalPrice).toFixed(2)}
+              </span>
+            )}
+            <span className="text-xs font-bold bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg">
+              π{Number(product.price).toFixed(2)}
+            </span>
+          </div>
+          {usdValue && (
+            <span className="text-[10px] font-medium text-emerald-300 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-md">
+              {usdValue}
             </span>
           )}
-          <span className="text-xs font-bold bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg">
-            π{Number(product.price).toFixed(2)}
-          </span>
         </div>
       </div>
 
@@ -334,7 +344,9 @@ function ProductCard({ product, onClick }: { product: any; onClick: () => void }
             <span className="font-medium">4.8</span>
             <span className="text-muted-foreground ml-0.5">({product.salesCount})</span>
           </div>
-          <span className="text-[10px] text-yellow-400 font-black" style={{ fontFamily: "serif" }}>π Pi</span>
+          <span className="text-[10px] text-muted-foreground font-medium">
+            {usdValue ? <span className="text-emerald-400/80">{usdValue} USD</span> : <span className="text-yellow-400 font-black" style={{ fontFamily: "serif" }}>π Pi</span>}
+          </span>
         </div>
       </div>
     </div>

@@ -10,12 +10,14 @@ import { ShoppingCart, Check, ShieldCheck, Cpu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CryptoCheckoutModal from "@/components/checkout/CryptoCheckoutModal";
 import PaymentThankYouModal from "@/components/checkout/PaymentThankYouModal";
+import { usePiPrice } from "@/hooks/usePiPrice";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/marketplace/:id");
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { toUsd, price: piPrice } = usePiPrice();
   
   const id = Number(params?.id);
   
@@ -131,13 +133,24 @@ export default function ProductDetail() {
         <div className="space-y-6">
           <Card className="bg-card/50 border-border/50 backdrop-blur-sm sticky top-24">
             <CardContent className="p-6">
-              <div className="flex items-end gap-2 mb-6">
-                <span className="text-yellow-400 text-4xl font-black mb-1" style={{ fontFamily: "serif" }}>π</span>
-                <span className="text-4xl font-bold text-foreground">{product.price.toFixed(2)}</span>
-                {product.originalPrice && (
-                  <span className="text-xl text-muted-foreground line-through mb-1">{product.originalPrice.toFixed(2)}</span>
+              <div className="mb-6">
+                <div className="flex items-end gap-2">
+                  <span className="text-yellow-400 text-4xl font-black mb-1" style={{ fontFamily: "serif" }}>π</span>
+                  <span className="text-4xl font-bold text-foreground">{product.price.toFixed(2)}</span>
+                  {product.originalPrice && (
+                    <span className="text-xl text-muted-foreground line-through mb-1">{product.originalPrice.toFixed(2)}</span>
+                  )}
+                  <span className="text-muted-foreground mb-1 text-sm">Pi</span>
+                </div>
+                {piPrice && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-base font-semibold text-emerald-400">{toUsd(product.price)} USD</span>
+                    {product.originalPrice && (
+                      <span className="text-sm text-muted-foreground line-through">{toUsd(product.originalPrice)}</span>
+                    )}
+                    <span className="text-[10px] text-muted-foreground/50 bg-muted/30 px-1.5 py-0.5 rounded">1π = ${piPrice.toFixed(4)}</span>
+                  </div>
                 )}
-                <span className="text-muted-foreground mb-1 text-sm">Pi</span>
               </div>
               
               <Button 
