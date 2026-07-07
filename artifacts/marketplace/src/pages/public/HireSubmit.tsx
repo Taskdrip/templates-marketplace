@@ -7,12 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useSubmitHireRequest, HireRequest } from "@/hooks/useHireRequests";
 import { useSettings } from "@/hooks/useSettings";
+import { usePiPrice } from "@/hooks/usePiPrice";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, MessageSquare, Send,
   Globe, Phone, Loader2, ExternalLink, Lightbulb, Info,
   Code2, Smartphone, Bot, Database, TrendingUp, Zap,
   DollarSign, Clock, User, ChevronRight, Sparkles, Shield,
-  AlertCircle, Check, HelpCircle, X,
+  AlertCircle, Check, HelpCircle, X, Server, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -264,11 +265,15 @@ export default function HireSubmit() {
   const [, setLocation] = useLocation();
   const submitRequest = useSubmitHireRequest();
   const { data: settings } = useSettings();
+  const { price: piPrice, toUsd } = usePiPrice();
 
   const [submitted, setSubmitted] = useState<HireRequest | null>(null);
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [budgetPreset, setBudgetPreset] = useState<string | null>(null);
+
+  const MIN_BUDGET_USD = 50;
+  const minPiRequired = piPrice ? Math.ceil(MIN_BUDGET_USD / piPrice) : null;
 
   const [form, setForm] = useState({
     title: "",
@@ -281,12 +286,15 @@ export default function HireSubmit() {
     timeline: "",
     contactWhatsapp: "",
     contactTelegram: "",
+    includesHosting: false,
+    includesDomain: false,
+    hostingMonths: "3",
   });
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(p => ({ ...p, [key]: e.target.value }));
 
-  const setField = (key: keyof typeof form, value: string) =>
+  const setField = (key: keyof typeof form, value: string | boolean) =>
     setForm(p => ({ ...p, [key]: value }));
 
   useEffect(() => {
@@ -301,6 +309,12 @@ export default function HireSubmit() {
       if (form.title.trim().length > 0 && form.title.trim().length < 5) errs.title = "Title should be at least 5 characters";
       if (!form.description.trim()) errs.description = "Describe your project";
       if (form.description.trim().length > 0 && form.description.trim().length < 30) errs.description = "Add more detail (at least 30 characters)";
+    }
+    if (s === 3 && minPiRequired) {
+      const minVal = Number(form.budgetMin);
+      if (form.budgetMin && minVal < minPiRequired) {
+        errs.budgetMin = `Minimum budget is π${minPiRequired.toLocaleString()} Pi (~$${MIN_BUDGET_USD} USD) at current Pi price`;
+      }
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -326,6 +340,10 @@ export default function HireSubmit() {
         timeline: form.timeline || undefined,
         contactWhatsapp: form.contactWhatsapp || undefined,
         contactTelegram: form.contactTelegram || undefined,
+        includesHosting: form.includesHosting,
+        includesDomain: form.includesDomain,
+        hostingMonths: form.includesHosting ? Number(form.hostingMonths) : undefined,
+        depositPiAmount: minPiRequired ?? undefined,
       },
       {
         onSuccess: (data) => setSubmitted(data),
@@ -594,6 +612,104 @@ export default function HireSubmit() {
               </div>
             </div>
 
+            {/* $50 minimum notice */}
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/20 text-xs text-yellow-200/80">
+              <AlertCircle className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" />
+              <span>
+                Minimum budget is <strong className="text-yellow-400">$50 USD</strong>
+                {minPiRequired ? ` (~π${minPiRequired.toLocaleString()} Pi at current rate)` : ""}.
+                {" "}A refundable deposit secures your project slot.
+              </span>
+            </div>
+            {errors.budgetMin && (
+              <p className="text-xs text-red-400 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" /> {errors.budgetMin}
+              </p>
+            )}
+
+            {/* Add-ons: Hosting & Domain */}
+            <div className="space-y-3">
+              <label className="text-sm font-semibold flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-violet-400" /> Optional Add-ons
+              </label>
+
+              {/* Hosting */}
+              <div
+                onClick={() => setField("includesHosting", !form.includesHosting)}
+                className={cn(
+                  "flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all",
+                  form.includesHosting
+                    ? "border-violet-500/50 bg-violet-500/10"
+                    : "border-border/40 bg-card/30 hover:border-violet-500/30"
+                )}
+              >
+                <div className={cn(
+                  "w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all",
+                  form.includesHosting ? "bg-violet-500 border-violet-500" : "border-border/60"
+                )}>
+                  {form.includesHosting && <Check className="w-3 h-3 text-white" />}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <Server className="w-3.5 h-3.5 text-violet-400" />
+                    <span className="text-sm font-semibold">Include Hosting</span>
+                    <Badge variant="outline" className="text-[10px] text-violet-300 border-violet-500/30">+$10/mo</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Cloud hosting on a reliable server. We deploy, monitor, and maintain your app.</p>
+                  {form.includesHosting && (
+                    <div className="mt-2 flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                      <label className="text-xs text-muted-foreground shrink-0">Months:</label>
+                      <div className="flex gap-1.5">
+                        {["1", "3", "6", "12"].map(m => (
+                          <button
+                            key={m}
+                            type="button"
+                            onClick={() => setField("hostingMonths", m)}
+                            className={cn(
+                              "px-2.5 py-1 rounded-lg text-xs border transition-all",
+                              form.hostingMonths === m
+                                ? "bg-violet-500/20 border-violet-500/50 text-violet-300"
+                                : "border-border/40 text-muted-foreground hover:border-violet-500/30"
+                            )}
+                          >{m}mo</button>
+                        ))}
+                      </div>
+                      <span className="text-xs text-violet-300 font-semibold ml-1">
+                        = ${ (10 * Number(form.hostingMonths)).toFixed(0) }
+                        {piPrice ? ` (~π${Math.ceil(10 * Number(form.hostingMonths) / piPrice).toLocaleString()})` : ""}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Domain */}
+              <div
+                onClick={() => setField("includesDomain", !form.includesDomain)}
+                className={cn(
+                  "flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all",
+                  form.includesDomain
+                    ? "border-blue-500/50 bg-blue-500/10"
+                    : "border-border/40 bg-card/30 hover:border-blue-500/30"
+                )}
+              >
+                <div className={cn(
+                  "w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all",
+                  form.includesDomain ? "bg-blue-500 border-blue-500" : "border-border/60"
+                )}>
+                  {form.includesDomain && <Check className="w-3 h-3 text-white" />}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <Link2 className="w-3.5 h-3.5 text-blue-400" />
+                    <span className="text-sm font-semibold">Include Domain Name</span>
+                    <Badge variant="outline" className="text-[10px] text-blue-300 border-blue-500/30">+$15/yr</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">We purchase and connect a .com or .io domain name for your app (1 year registration).</p>
+                </div>
+              </div>
+            </div>
+
             <TipBox
               title="💡 About Pi Pricing"
               tips={[
@@ -675,10 +791,15 @@ export default function HireSubmit() {
                   { label: "Network", value: BLOCKCHAIN_TYPES.find(b => b.id === form.blockchainType)?.label },
                   { label: "Budget", value: form.budgetMin && form.budgetMax ? `π${form.budgetMin}–${form.budgetMax}` : form.budgetMin ? `From π${form.budgetMin}` : "Not specified" },
                   { label: "Timeline", value: TIMELINES.find(t => t.id === form.timeline)?.label || "Flexible" },
+                  { label: "Hosting", value: form.includesHosting ? `Yes — ${form.hostingMonths} month${Number(form.hostingMonths) > 1 ? "s" : ""} (+$${10 * Number(form.hostingMonths)})` : "Not included" },
+                  { label: "Domain", value: form.includesDomain ? "Yes — 1 year registration (+$15)" : "Not included" },
                 ].map(row => (
                   <div key={row.label} className="flex items-center justify-between gap-2">
                     <span className="text-xs text-muted-foreground">{row.label}</span>
-                    <span className="text-xs font-semibold text-right truncate max-w-[60%]">{row.value ?? "—"}</span>
+                    <span className={`text-xs font-semibold text-right truncate max-w-[60%] ${
+                      row.label === "Hosting" && form.includesHosting ? "text-violet-400" :
+                      row.label === "Domain" && form.includesDomain ? "text-blue-400" : ""
+                    }`}>{row.value ?? "—"}</span>
                   </div>
                 ))}
               </div>

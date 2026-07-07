@@ -15,6 +15,7 @@ import {
 import {
   Clock, CheckCircle2, XCircle, AlertCircle, Wrench, Phone, Send,
   ChevronDown, ChevronUp, Plus, Trash2, PlayCircle, Unlock,
+  Server, Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -215,6 +216,17 @@ function RequestCard({ req }: { req: any }) {
             </Badge>
           )}
           {req.timeline && <Badge variant="outline" className="text-[10px]">{req.timeline}</Badge>}
+          {req.includesHosting && (
+            <Badge variant="outline" className="text-[10px] text-violet-400 border-violet-500/20 flex items-center gap-1">
+              <Server className="w-2.5 h-2.5" /> Hosting
+              {req.hostingMonths ? ` (${req.hostingMonths}mo)` : ""}
+            </Badge>
+          )}
+          {req.includesDomain && (
+            <Badge variant="outline" className="text-[10px] text-blue-400 border-blue-500/20 flex items-center gap-1">
+              <Globe className="w-2.5 h-2.5" /> Domain
+            </Badge>
+          )}
           <span className="text-[10px] text-muted-foreground ml-auto">{new Date(req.createdAt).toLocaleDateString()} · User #{req.userId}</span>
         </div>
 

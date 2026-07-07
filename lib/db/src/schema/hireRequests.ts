@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer, numeric } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, numeric, boolean } from "drizzle-orm/pg-core";
 
 export const hireRequestsTable = pgTable("hire_requests", {
   id: serial("id").primaryKey(),
@@ -15,6 +15,11 @@ export const hireRequestsTable = pgTable("hire_requests", {
   adminNotes: text("admin_notes"),
   contactWhatsapp: text("contact_whatsapp"),
   contactTelegram: text("contact_telegram"),
+  includesHosting: boolean("includes_hosting").notNull().default(false),
+  includesDomain: boolean("includes_domain").notNull().default(false),
+  hostingMonths: integer("hosting_months"),
+  depositPiAmount: numeric("deposit_pi_amount", { precision: 12, scale: 4 }),
+  depositPaidAt: timestamp("deposit_paid_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

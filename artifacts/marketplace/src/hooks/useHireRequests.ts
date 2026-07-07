@@ -9,18 +9,13 @@ async function authFetch(path: string, method = "GET", body?: object) {
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error(`Server error (${res.status}). Please try again.`);
+  }
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Request failed");
   return data;
-}
-
-export interface HireRequest {
-  id: number; userId: number; title: string; description: string;
-  appType: string; blockchainType: string; features: string | null;
-  budgetMin: string | null; budgetMax: string | null; timeline: string | null;
-  status: string; adminNotes: string | null;
-  contactWhatsapp: string | null; contactTelegram: string | null;
-  createdAt: string; updatedAt: string;
 }
 
 export interface HireMilestone {
@@ -34,6 +29,19 @@ export interface SubmitHireRequest {
   title: string; description: string; appType: string; blockchainType: string;
   features?: string; budgetMin?: number; budgetMax?: number; timeline?: string;
   contactWhatsapp?: string; contactTelegram?: string;
+  includesHosting?: boolean; includesDomain?: boolean; hostingMonths?: number;
+  depositPiAmount?: number;
+}
+
+export interface HireRequest {
+  id: number; userId: number; title: string; description: string;
+  appType: string; blockchainType: string; features: string | null;
+  budgetMin: string | null; budgetMax: string | null; timeline: string | null;
+  status: string; adminNotes: string | null;
+  contactWhatsapp: string | null; contactTelegram: string | null;
+  includesHosting: boolean; includesDomain: boolean; hostingMonths: number | null;
+  depositPiAmount: string | null; depositPaidAt: string | null;
+  createdAt: string; updatedAt: string;
 }
 
 export function useHireRequests() {

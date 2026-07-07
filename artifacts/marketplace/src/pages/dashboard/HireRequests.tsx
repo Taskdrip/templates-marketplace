@@ -16,7 +16,7 @@ import {
   ArrowRight, Plus, Clock, CheckCircle2, XCircle, AlertCircle,
   Wrench, MessageSquare, Phone, Send, Lock, PlayCircle, Unlock,
   FileText, Copy, Check, Loader2, X, Upload, ImageIcon, Shield,
-  ChevronDown, ChevronUp, Printer, ExternalLink,
+  ChevronDown, ChevronUp, Printer, ExternalLink, Server, Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -551,6 +551,16 @@ function HireRequestCard({ req, settings }: { req: any; settings: any }) {
                 </Badge>
               )}
               {req.timeline && <Badge variant="outline" className="text-[10px] border-border/50">{req.timeline}</Badge>}
+              {req.includesHosting && (
+                <Badge variant="outline" className="text-[10px] text-violet-400 border-violet-500/20 flex items-center gap-1">
+                  <Server className="w-2.5 h-2.5" /> Hosting {req.hostingMonths ? `(${req.hostingMonths}mo)` : ""}
+                </Badge>
+              )}
+              {req.includesDomain && (
+                <Badge variant="outline" className="text-[10px] text-blue-400 border-blue-500/20 flex items-center gap-1">
+                  <Globe className="w-2.5 h-2.5" /> Domain
+                </Badge>
+              )}
             </div>
 
             {req.adminNotes && (
